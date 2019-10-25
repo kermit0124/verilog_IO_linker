@@ -31,8 +31,7 @@ THE SOFTWARE.
 /*
  * AXI4-Stream asynchronous FIFO with width converter
  */
-module axis_async_fifo_adapter #
-(
+module axis_async_fifo_adapter #(
     // FIFO depth in words
     // KEEP_WIDTH words per cycle if KEEP_ENABLE set
     // Rounded up to nearest power of 2 cycles
