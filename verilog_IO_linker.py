@@ -10,15 +10,24 @@ class class__verilog_IO_linker():
 		self.num_module = 0
 		self.moduleName = ""
 		self.nextWord_is_moduleName = 0
+		self.sts__in_module = 0
+		self.proc_word = ""
 	
 	def scan_all(self):
 		for lineTxt in iter(self.fp):
 			self.remove_commet(lineTxt)
 			if (self.rangeCM==0):
-				self.get_words()
-				self.get_modueName()
+				self.word_preProc()
+				for self.proc_word in self.words:
+					self.get_modueName()
 
-	
+	def word_preProc(self):
+		# clear \n
+		if (self.remain_txt[len(self.remain_txt)-1:]=='\n'):
+			self.remain_txt = self.remain_txt[:len(self.remain_txt)-1]
+
+		self.words = self.remain_txt.split(" ")
+
 	
 	def remove_commet(self,lineTxt):
 		remain_txt = ""
@@ -40,20 +49,21 @@ class class__verilog_IO_linker():
 		remain_txt = remain_txt.split("//")[0]
 		self.remain_txt = remain_txt
 		
-	def get_words(self):
-		self.words = self.remain_txt.split(" ")
 
 	def get_modueName(self):
-		for word in self.words:
-			if (word=="module"):
-				self.num_module+=1
-				self.nextWord_is_moduleName = 1
-			else:
-				if (self.nextWord_is_moduleName):
-					self.nextWord_is_moduleName = 0
-					self.moduleName = word
+		if (self.nextWord_is_moduleName):
+			self.nextWord_is_moduleName = 0
+			self.moduleName = self.proc_word
+			self.sts__in_module = 1
+			self.num_module+=1
 
+		if (self.proc_word=="module"):
+			self.nextWord_is_moduleName = 1
+		elif (self.proc_word=="endmodule"):
+			self.sts__in_module = 0
 	
+	# def get_params(self):
+
 
 
 
