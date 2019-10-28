@@ -33,21 +33,14 @@ class class__verilog_IO_linker():
 
 			if (self.rangeCM==0):
 				if (self.word_preProc()==1):
-					pb=1
-					# self.parse()
-					self.parse_module_title()
+
+					if (self.sts__in_module==0):
+						self.parse_module_title()
 
 	def parse_module_title(self):
 		WORD_TYPE_NONE = 0
 		WORD_TYPE_MOD_NAME = 1
-		WORD_TYPE_PARA_NAME = 2
-		WORD_TYPE_PARA_VALUE = 3
-		WORD_TYPE_PARA_LBKT = 4
-		WORD_TYPE_SYMBO_EQUA = 5
 		nextWord_type = WORD_TYPE_NONE
-		STS_MODULE_TITLE = 0
-		STS_PARA_TITLE = 1
-		sts = STS_MODULE_TITLE
 		titlePara_words = []
 		num_bkt = 0
 		titlePara_SI = 0
@@ -74,13 +67,16 @@ class class__verilog_IO_linker():
 				word_SI = idx
 				break
 		
+		c_words,r_words = "" , ""
 		if (titleParaMode==1):
 			c_words,r_words = self.parse_bucket(title_para_and_IO_words[word_SI:])
 			self.parseFlow_title_para(c_words)		
 		
 		c_words,r_words = self.parse_bucket(r_words)
 		self.parseFlow_title_IO(c_words)
-		aaa=1
+
+		self.sts__in_module = 1
+
 	
 	def parseFlow_title_IO(self,word_list):
 		while (1):
@@ -170,54 +166,6 @@ class class__verilog_IO_linker():
 		remain_words = word_list[titlePara_EI+1:]
 		return (inBucket_words,remain_words)
 
-	
-	def parse(self):
-		nextWord_type = "none"
-		sts__in_title_para = 0
-		for word in self.seg_words:
-			if (nextWord_type=="module_name"):
-				self.moduleName = word
-				self.num_module += 1
-				nextWord_type = "none"
-			elif (sts__in_title_para):
-				if (",") in word:
-					pass
-				else:
-					pass
-					# if (word=="parameter"):
-					# 	nextWord_type = "parameter_name"
-					# else:
-
-					# if (self.norm_word_check(word)):
-					# 	if (word!="parameter"):
-					# 		self.paraName = word
-
-
-
-			if (word=="module"):
-				nextWord_type = "module_name"
-			elif (word=="#"):
-				sts__in_title_para = 1
-				nextWord_type = "left_bkt"
-			elif (nextWord_type!="none"):
-				if (nextWord_type=="left_bkt"):
-					if (word==chr(40)):
-						nextWord_type = "para_name"
-				elif (nextWord_type == "para_name"):
-					if (word!="parameter"):
-						self.paraName = word
-						nextWord_type = "para_val"
-				elif (nextWord_type == "para_val"):
-					if ((word!=",")|(word!=chr(41))):
-						self.varVal_temp = self.varVal_temp + word
-					else:
-						self.varVal = self.varVal_temp
-						self.varVal_temp = ""
-						if (word==","):
-							nextWord_type = "para_name"
-						else:
-							nextWord_type = "none"
-			
 
 
 	def norm_word_check(self,word):
@@ -271,7 +219,6 @@ class class__verilog_IO_linker():
 		remain_txt = remain_txt.split("//")[0]
 		self.remain_txt = remain_txt
 		
-
 
 
 
