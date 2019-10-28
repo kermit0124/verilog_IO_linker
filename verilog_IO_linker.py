@@ -20,11 +20,12 @@ class class__verilog_IO_linker():
 		self.num_paras = 0
 		self.paraName = ""
 		self.paraValue = ""
-		self.char_list = ['(' , ')' , ',' , ';']
+		self.char_list = ['(' , ')' , ',' , ';','[',']']
 		self.varVal_temp =""
 		self.varVal =""
 		self.paras_list = []
 		self.IOs_list = []
+		self.inText = 0
 	
 	def scan_all(self):
 		for lineTxt in iter(self.fp):
@@ -35,9 +36,33 @@ class class__verilog_IO_linker():
 				if (self.word_preProc()==1):
 
 					if (self.sts__in_module==0):
-						self.parse_module_title()
+						self.parseFlow_module_title()
+					else:
+						self.parseFlow_body()
 
-	def parse_module_title(self):
+	def parseFlow_body(self):
+		idx_st = 0
+		for idx,word in enumerate(self.seg_words):
+			if (self.inText==1):
+				if (chr(34)) in word:
+					self.inText = 0
+			else:
+				if (chr(34)) in word:
+					self.inText = 1
+				else:
+					if (word=="parameter"):
+						idx_st = idx
+						paraName,paraValue = self.parse_parameter(self.seg_words[idx_st:])
+						break
+					else:
+						if ((word=="input")|(word=="output")|(word=="inout")):
+							idx_st = idx
+							self.parse_IO(self.seg_words[idx_st:])
+							break
+		
+		para_words = self.seg_words[idx_st:]
+
+	def parseFlow_module_title(self):
 		WORD_TYPE_NONE = 0
 		WORD_TYPE_MOD_NAME = 1
 		nextWord_type = WORD_TYPE_NONE
@@ -79,10 +104,19 @@ class class__verilog_IO_linker():
 
 	
 	def parseFlow_title_IO(self,word_list):
+
 		while (1):
 			finded , c_words , word_list = self.parse_symbo(word_list,',')
-			IO_name , IO_type = self.parse_IO(c_words)
-			self.IOs_list.append ([IO_name,IO_type])
+			
+			title_def_mode = 0
+			for word in c_words:
+				if ((word=="input")|(word=="output")|(word=="inout")):
+					title_def_mode = 1
+
+			if (title_def_mode):
+				self.parse_IO(c_words)
+				# IO_name , IO_type , IO_bitWidth = self.parse_IO(c_words)
+				# self.IOs_list.append ([IO_name,IO_type,IO_bitWidth])
 
 			if (finded==0):
 				break
@@ -111,24 +145,73 @@ class class__verilog_IO_linker():
 		return (paraName,paraValue)
 	
 	def parse_IO(self,word_list):
+		df_format_bitwidth = 0
+		df_format_wire = 0
+		for word in word_list:
+			if ('[') in word:
+				df_format_bitwidth = 1
+			elif (']') in word:				
+				df_format_bitwidth = 1
+			elif (word == "wire"):
+				df_format_wire = 1
+
 		IO_name = ""
 		IO_type = ""
+		IO_bitWidth = []
 		for idx,word in enumerate(word_list):
-			if (idx==0):
-				IO_type = word
-			else:
-				if (idx==1):
-					if (word=="wire"):
-						IO_type = IO_type + " " + word
-					else:
-						IO_name = word
+			if ((df_format_bitwidth==0)&(df_format_wire==0)):
+				if (idx==0):
+					IO_type = word
 				else:
 					IO_name = word
+				IO_bitWidth = None
+			elif ((df_format_bitwidth==0)&(df_format_wire==1)):
+				if ((idx==0)|(idx==1)):
+					if (word!="wire"):
+						IO_type = word
+				else:
+					IO_name = word
+				IO_bitWidth = None
+			elif ((df_format_bitwidth==1)&(df_format_wire==0)):
+				if (idx==0):
+					IO_type = word
+				else:
+					IO_bitWidth , r_words = self.parse_bitWidth(word_list[idx:])
+					for word2 in r_words:
+						IO_name = IO_name + word2 + " "
+					break				
+			else:
+				if ((idx==0)|(idx==1)):
+					if (word!="wire"):
+						IO_type = word
+				else:
+					IO_bitWidth , r_words = self.parse_bitWidth(word_list[idx:])
+					for word2 in r_words:
+						IO_name = IO_name + word2 + " "
+					break
+		self.IOs_list.append([IO_name,IO_type,IO_bitWidth])
 
-		return (IO_name,IO_type)
+		# return (IO_name.strip(),IO_type.strip(),IO_bitWidth)
 
+	def parse_bitWidth(self,word_list):
+		idx_s , idx_e = 0 , 0
+		for idx,word in enumerate(word_list):
+			if (chr(91)) in word:
+				idx_s = idx
+				if (chr(93)) in word:
+					idx_e = idx
+			elif (chr(93)) in word:
+				idx_e = idx
+				break
+		
+		bitWidth = []
+		if (idx_s == idx_e):
+			bitWidth = word_list[idx_s+1]
+		else:
+			bitWidth = word_list[idx_s+1:idx_e]
+		r_words = word_list[idx_e+1:]
 
-
+		return (bitWidth , r_words)
 
 	def parse_symbo(self,word_list,find_symbo):
 		idx_end = 0
