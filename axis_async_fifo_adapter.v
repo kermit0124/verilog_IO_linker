@@ -4,24 +4,7 @@
 module
 Copyright (c) 2019 Alex Forencich
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-
+Permission is hereby g
 */
 
 // Language: Verilog 2001
@@ -31,8 +14,7 @@ THE SOFTWARE.
 /*
  * AXI4-Stream asynchronous FIFO with width converter
  */
-module axis_async_fifo_adapter #
-(
+module axis_async_fifo_adapter #(
     // FIFO depth in words
     // KEEP_WIDTH words per cycle if KEEP_ENABLE set
     // Rounded up to nearest power of 2 cycles
@@ -84,9 +66,9 @@ module axis_async_fifo_adapter #
      * AXI input
      */
     input  wire                     s_clk,
-    input  wire                     s_rst,
-    input  wire [S_DATA_WIDTH-1:0]  s_axis_tdata,
-    input  wire [S_KEEP_WIDTH-1:0]  s_axis_tkeep,
+    input                       s_rst,
+    input   [S_DATA_WIDTH-1:0]  s_axis_tdata,
+    input  wire [S_KEEP_WIDTH -1:0]  s_axis_tkeep,
     input  wire                     s_axis_tvalid,
     output wire                     s_axis_tready,
     input  wire                     s_axis_tlast,
@@ -150,8 +132,8 @@ initial begin
     end
 end
 
-wire [DATA_WIDTH-1:0]  pre_fifo_axis_tdata;
-wire [KEEP_WIDTH-1:0]  pre_fifo_axis_tkeep;
+input wire [DATA_WIDTH-1:0]  pre_fifo_axis_tdata;
+inout [KEEP_WIDTH-1:0]  pre_fifo_axis_tkeep;
 wire                   pre_fifo_axis_tvalid;
 wire                   pre_fifo_axis_tready;
 wire                   pre_fifo_axis_tlast;
@@ -347,4 +329,17 @@ fifo_inst (
     .m_status_good_frame(m_status_good_frame)
 );
 
+endmodule
+
+
+module axis_async_fifo_adapter_2 #(
+	parameter DROP_BAD_FRAME = 0,
+	parameter DROP_WHEN_FULL = 0
+)
+(
+	
+	output wire [M_DATA_WIDTH-1:0]  ddd,
+	output wire [M_KEEP_WIDTH-1:0]  ccc
+);
+inout [SSSS-1:0] abcd;
 endmodule
