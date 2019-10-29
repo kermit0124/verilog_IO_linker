@@ -150,7 +150,7 @@ initial begin
 end
 
 input wire [DATA_WIDTH-1:0]  pre_fifo_axis_tdata;
-wire [KEEP_WIDTH-1:0]  pre_fifo_axis_tkeep;
+inout [KEEP_WIDTH-1:0]  pre_fifo_axis_tkeep;
 wire                   pre_fifo_axis_tvalid;
 wire                   pre_fifo_axis_tready;
 wire                   pre_fifo_axis_tlast;

@@ -2,8 +2,8 @@ import numpy as np
 
 
 class class__verilog_IO_linker():
-	def __init__(self, fp):
-		self.fp = fp
+	def __init__(self, fileName):
+		self.fp = open(fileName, "r")
 		self.rangeCM = 0
 		self.remain_txt = ""
 		self.words = []
@@ -26,6 +26,9 @@ class class__verilog_IO_linker():
 		self.paras_list = []
 		self.IOs_list = []
 		self.inText = 0
+
+		self.scan_all()
+		self.fp.close()
 	
 	def scan_all(self):
 		for lineTxt in iter(self.fp):
@@ -39,8 +42,20 @@ class class__verilog_IO_linker():
 						self.parseFlow_module_title()
 					else:
 						self.parseFlow_body()
+	
+	def __bodyDict_para(self,idx):
+		paraName,paraValue = self.parse_parameter(self.seg_words[idx:])
+		self.paras_list.append ([paraName,paraValue])
+	def __bodyDict_IO(self,idx):
+		self.parse_IO(self.seg_words[idx:])
 
 	def parseFlow_body(self):
+		dict = {
+			"parameter":self.__bodyDict_para
+			,"input":self.__bodyDict_IO
+			,"output":self.__bodyDict_IO
+			,"inout":self.__bodyDict_IO
+		}
 		idx_st = 0
 		for idx,word in enumerate(self.seg_words):
 			if (self.inText==1):
@@ -50,15 +65,8 @@ class class__verilog_IO_linker():
 				if (chr(34)) in word:
 					self.inText = 1
 				else:
-					if (word=="parameter"):
-						idx_st = idx
-						paraName,paraValue = self.parse_parameter(self.seg_words[idx_st:])
-						break
-					else:
-						if ((word=="input")|(word=="output")|(word=="inout")):
-							idx_st = idx
-							self.parse_IO(self.seg_words[idx_st:])
-							break
+					if (dict.get(word)):
+						dict[word](idx)
 		
 		para_words = self.seg_words[idx_st:]
 
@@ -306,12 +314,11 @@ class class__verilog_IO_linker():
 
 
 def main():
-	fp = open("D:\\DevProjects\\anaconda\\verilog_IO_linker\\axis_async_fifo_adapter.v", "r")
-	VIOL = class__verilog_IO_linker(fp)
+	filePath = "D:\\DevProjects\\anaconda\\verilog_IO_linker\\axis_async_fifo_adapter.v"
+	VIOL = class__verilog_IO_linker(filePath)
+	
+	print ("finish")
 
-	VIOL.scan_all()
-
-	fp.close()
 
 if __name__ =="__main__":
 	main()
