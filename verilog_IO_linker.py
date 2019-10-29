@@ -10,26 +10,45 @@ class class__verilog_IO_linker():
 		self.comma_left = 0
 		self.tab_char = '\t'
 		self.templateCode_list = []
+		self.MOD_DATA__MODULE_INFO = 0
+		self.MOD_DATA__MODULE_INFO_NAME = 0
+		self.MOD_DATA__IO_INFO = 1
+		self.MOD_DATA__PARA_INFO = 2
+		self.MOD_DATA__PARA_INFO_NAME = 0
+		self.MOD_DATA__PARA_INFO_VAL = 1
 		
+
+		self.templateCode_list.append ("// ----- verilog IO linker generated -----\n")
+		self.__gen__tmpl_def_paras(self.module_data_list[0])
 		self.__gen__tmpl_inst(self.module_data_list[0])
 	
-	# def gen_code(self):
-	# 	for module_data in self.module_data_list:
+	def __gen__tmpl_def_paras(self,modData):
+		self.templateCode_list.append ("// --- parameter ---\n")
+
+		self.__gen__tmpl_def_paras_link(modData[self.MOD_DATA__PARA_INFO])
+	
+	def __gen__tmpl_def_paras_link(self,paras):
+		for paraInfo in paras:
+			paraName = paraInfo[self.MOD_DATA__PARA_INFO_NAME].strip()
+			lineTxt = "localparam "
+			lineTxt += self.link_prefix + paraName + self.link_suffix
+			lineTxt += " = "
+			lineTxt += paraName
+			lineTxt += " ;\n"
+			self.templateCode_list.append (lineTxt)
+			pass
+
+
 	def __gen__tmpl_inst(self,modData):
-		MOD_DATA__MODULE_INFO = 0
-		MOD_DATA__MODULE_INFO_NAME = 0
-		MOD_DATA__IO_INFO = 1
-		MOD_DATA__PARA_INFO = 2
-		MOD_DATA__PARA_INFO_NAME = 0
-		MOD_DATA__PARA_INFO_VAL = 1
+		self.templateCode_list.append ("// --- instance module ---\n")
 
 		lineTxt = ""
-		lineTxt = modData[MOD_DATA__MODULE_INFO][MOD_DATA__MODULE_INFO_NAME] + " # " + chr(40) + '\n'
+		lineTxt = modData[self.MOD_DATA__MODULE_INFO][self.MOD_DATA__MODULE_INFO_NAME] + " # " + chr(40) + '\n'
 		self.templateCode_list.append (lineTxt)
 		lineTxt = ""
 
 		# Parameters
-		self.__gen__tmpl_inst_link(modData[MOD_DATA__PARA_INFO])
+		self.__gen__tmpl_inst_link(modData[self.MOD_DATA__PARA_INFO])
 				
 		self.templateCode_list.append (chr(41) + '\n')
 
@@ -38,7 +57,7 @@ class class__verilog_IO_linker():
 		self.templateCode_list.append (chr(40) + '\n')
 
 		# IOs		
-		self.__gen__tmpl_inst_link(modData[MOD_DATA__IO_INFO])
+		self.__gen__tmpl_inst_link(modData[self.MOD_DATA__IO_INFO])
 
 		self.templateCode_list.append (chr(41) + ' ; \n')
 
