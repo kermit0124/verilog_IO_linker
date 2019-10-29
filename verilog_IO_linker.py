@@ -10,18 +10,52 @@ class class__verilog_IO_linker():
 		self.comma_left = 0
 		self.tab_char = '\t'
 		self.templateCode_list = []
+		self.link_actIdx = 0
 		self.MOD_DATA__MODULE_INFO = 0
 		self.MOD_DATA__MODULE_INFO_NAME = 0
 		self.MOD_DATA__IO_INFO = 1
+		self.MOD_DATA__IO_INFO_NAME = 0
+		self.MOD_DATA__IO_INFO_TYPE = 1
+		self.MOD_DATA__IO_INFO_BIT = 2
 		self.MOD_DATA__PARA_INFO = 2
 		self.MOD_DATA__PARA_INFO_NAME = 0
 		self.MOD_DATA__PARA_INFO_VAL = 1
 		
 
 		self.templateCode_list.append ("// ----- verilog IO linker generated -----\n")
-		self.__gen__tmpl_def_paras(self.module_data_list[0])
-		self.__gen__tmpl_inst(self.module_data_list[0])
+		self.__gen__tmpl_def_paras(self.module_data_list[self.link_actIdx])
+		self.__gen__tmpl_def_IOs(self.module_data_list[self.link_actIdx])
+		self.__gen__tmpl_inst(self.module_data_list[self.link_actIdx])
 	
+	def __gen__tmpl_def_IOs(self,modData):
+		self.templateCode_list.append ("// --- input/output ---\n")
+		self.__gen__tmpl_def_IOs_link(modData[self.MOD_DATA__IO_INFO])
+
+	def __gen__tmpl_def_IOs_link(self,IOs):
+		for IO_info in IOs:
+			IO_name = IO_info[self.MOD_DATA__IO_INFO_NAME].strip()
+			IO_type = IO_info[self.MOD_DATA__IO_INFO_TYPE].strip()
+			IO_bit_list = IO_info[self.MOD_DATA__IO_INFO_BIT]
+			lineTxt = "wire "
+			if (IO_bit_list):
+				lineTxt += '[ '
+
+				# Auto link parameter
+				for bit_word in IO_bit_list:
+					temp = bit_word.strip()
+					for paraInfo in self.module_data_list[self.link_actIdx][self.MOD_DATA__PARA_INFO]:
+						paraName = paraInfo[self.MOD_DATA__PARA_INFO_NAME].strip()
+						if (paraName) in temp:
+							# find linker para
+							temp = temp.replace(paraName,self.link_prefix+paraName+self.link_suffix)
+							break
+
+					lineTxt += temp
+				lineTxt += ' ] '
+			lineTxt += self.link_prefix + IO_name + self.link_suffix
+			lineTxt += " ;\n"
+			self.templateCode_list.append (lineTxt)
+
 	def __gen__tmpl_def_paras(self,modData):
 		self.templateCode_list.append ("// --- parameter ---\n")
 
