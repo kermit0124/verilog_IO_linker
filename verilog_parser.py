@@ -27,7 +27,7 @@ class class__parser():
 	def __scan_all(self):
 		self.__split_module_text()
 		
-		print ("Num. of module ",len(self.__textInModule_list))
+		# print ("Num. of module ",len(self.__textInModule_list))
 
 		for module_txt in self.__textInModule_list:
 			for lineTxt in module_txt.splitlines():

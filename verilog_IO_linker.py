@@ -1,12 +1,11 @@
 import verilog_parser
-
 class class__verilog_IO_linker():
 	def __init__(self, fileName):
 		self.parser = verilog_parser.class__parser(fileName)
 		self.module_data_list = self.parser.get_module_data()
 		self.link_prefix = "pf_"
 		self.link_suffix = ""
-		self.link_inst_name = "aa_inst"
+		self.link_inst_name = "inst_name"
 		self.comma_left = 0
 		self.tab_char = '\t'
 		self.gen_para_assign_mode = 1
@@ -126,11 +125,12 @@ class class__verilog_IO_linker():
 		return (self.templateCode_list)
 	
 	def gen_code_file(self,filePath):
-		if (len(self.templateCode_list)==0):
-			self.gen_code()
+		code_list = self.gen_code()
 		fp = open(filePath, "w")
 		for line in self.templateCode_list:
 			fp.write (line)
+		fp.close()
+		return (code_list)
 
 	def show_code(self):
 		for line in self.templateCode_list:
@@ -142,17 +142,63 @@ class class__verilog_IO_linker():
 	def reparse(self,fileName):
 		self.parser = verilog_parser.class__parser(fileName)
 
+	def select_modulde(self,module_idx):
+		if (module_idx<len(self.module_data_list)):
+			self.link_actIdx = module_idx
+		else:
+			self.link_actIdx = 0
+			print ("Error index, select default (0)")
+	
+	def get_num_module(self):
+		return (self.parser.__num_module)
+
+def input_int():
+	tempIn = input()
+	if (tempIn==''):
+		return (0)
+	else:
+		return (int(tempIn))
 
 def main():
-	filePath = "D:\\DevProjects\\anaconda\\verilog_IO_linker\\axis_async_fifo_adapter.v"
+	print ("File:")
+	filePath = input()
+	# filePath = "D:\\DevProjects\\anaconda\\verilog_IO_linker\\axis_async_fifo_adapter.v"
 	
 	VIOL = class__verilog_IO_linker(filePath)
+	print ("Module:")
+	for idx, module_info in enumerate(VIOL.module_data_list):
+		for module_name in module_info[VIOL.MOD_DATA__MODULE_INFO_NAME]:
+			print (idx," : ",module_name)
 
-	code_list = VIOL.gen_code()
+	print ("Select module 0~%d : "%(len(VIOL.module_data_list)-1),end="")
+	VIOL.select_modulde (input_int())
 
-	VIOL.gen_code_file("D:\\DevProjects\\anaconda\\verilog_IO_linker\\gen.v")
+	print ("prefix : ",end="")
+	VIOL.link_prefix = input()
 
+	print ("suffix : ",end="")
+	VIOL.link_suffix = input()
+
+	print ("left comma mode (0 or 1) : ",end="")
+	VIOL.comma_left = input_int()
+	
+
+	print ("Instance name : ",end="")
+	VIOL.link_inst_name = input()
+
+	print ("Generate...\n\n")
+	code_list = VIOL.gen_code_file("D:\\DevProjects\\anaconda\\verilog_IO_linker\\gen.v")
 	VIOL.show_code()
+
+
+	# code_list = VIOL.gen_code()
+
+	# VIOL.gen_code_file("D:\\DevProjects\\anaconda\\verilog_IO_linker\\gen.v")
+
+	# VIOL.show_code()
+
+	# VIOL.select_modulde(1)
+	# VIOL.gen_code_file("D:\\DevProjects\\anaconda\\verilog_IO_linker\\gen_2.v")
 	
 	print ("\n\n\n\nfinish")
 
