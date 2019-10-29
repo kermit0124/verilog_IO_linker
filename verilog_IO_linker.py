@@ -44,10 +44,8 @@ class class__verilog_IO_linker():
 	
 	def __gen__tmpl_def_IOs(self,modData):
 		self.templateCode_list.append ("\n// --- input/output ---\n")
-		self.__gen__tmpl_def_IOs_link(modData[self.MOD_DATA__IO_INFO])
 
-	def __gen__tmpl_def_IOs_link(self,IOs):
-		for IO_info in IOs:
+		for IO_info in modData[self.MOD_DATA__IO_INFO]:
 			IO_name = IO_info[self.MOD_DATA__IO_INFO_NAME].strip()
 			IO_type = IO_info[self.MOD_DATA__IO_INFO_TYPE].strip()
 			IO_bit_list = IO_info[self.MOD_DATA__IO_INFO_BIT]
@@ -74,10 +72,7 @@ class class__verilog_IO_linker():
 	def __gen__tmpl_def_paras(self,modData):
 		self.templateCode_list.append ("\n// --- parameter ---\n")
 
-		self.__gen__tmpl_def_paras_link(modData[self.MOD_DATA__PARA_INFO])
-	
-	def __gen__tmpl_def_paras_link(self,paras):
-		for paraInfo in paras:
+		for paraInfo in modData[self.MOD_DATA__PARA_INFO]:
 			paraName = paraInfo[self.MOD_DATA__PARA_INFO_NAME].strip()
 			paraVal_list = paraInfo[self.MOD_DATA__PARA_INFO_VAL]
 			lineTxt = "localparam "
@@ -88,8 +83,7 @@ class class__verilog_IO_linker():
 					lineTxt += word.strip()
 			lineTxt += " ;\n"
 			self.templateCode_list.append (lineTxt)
-			pass
-
+	
 
 	def __gen__tmpl_inst(self,modData):
 		self.templateCode_list.append ("\n// --- instance module ---\n")
