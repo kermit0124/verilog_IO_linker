@@ -5,10 +5,11 @@ class class__verilog_IO_linker():
 		self.parser = verilog_parser.class__parser(fileName)
 		self.module_data_list = self.parser.get_module_data()
 		self.link_prefix = "pf_"
-		self.link_suffix = "_sf"
+		self.link_suffix = ""
 		self.link_inst_name = "aa_inst"
 		self.comma_left = 0
 		self.tab_char = '\t'
+		self.gen_para_assign_mode = 1
 		self.templateCode_list = []
 		self.link_actIdx = 0
 		self.MOD_DATA__MODULE_INFO = 0
@@ -29,7 +30,7 @@ class class__verilog_IO_linker():
 		self.__gen__tmpl_assign(self.module_data_list[self.link_actIdx])
 	
 	def __gen__tmpl_assign(self,modData):
-		self.templateCode_list.append ("// --- assign input/inout ---\n")
+		self.templateCode_list.append ("\n// --- assign input/inout ---\n")
 
 		for IO_info in modData[self.MOD_DATA__IO_INFO]:
 			IO_name = IO_info[self.MOD_DATA__IO_INFO_NAME].strip()
@@ -42,7 +43,7 @@ class class__verilog_IO_linker():
 				self.templateCode_list.append (lineTxt)
 	
 	def __gen__tmpl_def_IOs(self,modData):
-		self.templateCode_list.append ("// --- input/output ---\n")
+		self.templateCode_list.append ("\n// --- input/output ---\n")
 		self.__gen__tmpl_def_IOs_link(modData[self.MOD_DATA__IO_INFO])
 
 	def __gen__tmpl_def_IOs_link(self,IOs):
@@ -71,24 +72,27 @@ class class__verilog_IO_linker():
 			self.templateCode_list.append (lineTxt)
 
 	def __gen__tmpl_def_paras(self,modData):
-		self.templateCode_list.append ("// --- parameter ---\n")
+		self.templateCode_list.append ("\n// --- parameter ---\n")
 
 		self.__gen__tmpl_def_paras_link(modData[self.MOD_DATA__PARA_INFO])
 	
 	def __gen__tmpl_def_paras_link(self,paras):
 		for paraInfo in paras:
 			paraName = paraInfo[self.MOD_DATA__PARA_INFO_NAME].strip()
+			paraVal_list = paraInfo[self.MOD_DATA__PARA_INFO_VAL]
 			lineTxt = "localparam "
 			lineTxt += self.link_prefix + paraName + self.link_suffix
 			lineTxt += " = "
-			lineTxt += paraName
+			if (self.gen_para_assign_mode):
+				for word in paraVal_list:
+					lineTxt += word.strip()
 			lineTxt += " ;\n"
 			self.templateCode_list.append (lineTxt)
 			pass
 
 
 	def __gen__tmpl_inst(self,modData):
-		self.templateCode_list.append ("// --- instance module ---\n")
+		self.templateCode_list.append ("\n// --- instance module ---\n")
 
 		lineTxt = ""
 		lineTxt = modData[self.MOD_DATA__MODULE_INFO][self.MOD_DATA__MODULE_INFO_NAME] + " # " + chr(40) + '\n'
@@ -131,11 +135,14 @@ def main():
 
 	show_code(VIOL.templateCode_list)
 	
-	print ("finish")
+	print ("\n\n\n\nfinish")
 
 def show_code(code_list):
 	for line in code_list:
-		print (line)
+		p_line = line
+		if (line[len(line)-1:]=='\n'):
+			p_line = line[:len(line)-1]
+		print (p_line)
 
 if __name__ =="__main__":
 	main()
