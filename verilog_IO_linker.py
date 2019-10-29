@@ -22,12 +22,6 @@ class class__verilog_IO_linker():
 		self.MOD_DATA__PARA_INFO_NAME = 0
 		self.MOD_DATA__PARA_INFO_VAL = 1
 		
-
-		self.templateCode_list.append ("// ----- verilog IO linker generated -----\n")
-		self.__gen__tmpl_def_paras(self.module_data_list[self.link_actIdx])
-		self.__gen__tmpl_def_IOs(self.module_data_list[self.link_actIdx])
-		self.__gen__tmpl_inst(self.module_data_list[self.link_actIdx])
-		self.__gen__tmpl_assign(self.module_data_list[self.link_actIdx])
 	
 	def __gen__tmpl_assign(self,modData):
 		self.templateCode_list.append ("\n// --- assign input/inout ---\n")
@@ -122,21 +116,46 @@ class class__verilog_IO_linker():
 			self.templateCode_list.append (lineTxt)
 			lineTxt = ""
 
+	def gen_code(self):
+		self.templateCode_list = []
+		self.templateCode_list.append ("// ----- verilog IO linker generated -----\n")
+		self.__gen__tmpl_def_paras(self.module_data_list[self.link_actIdx])
+		self.__gen__tmpl_def_IOs(self.module_data_list[self.link_actIdx])
+		self.__gen__tmpl_inst(self.module_data_list[self.link_actIdx])
+		self.__gen__tmpl_assign(self.module_data_list[self.link_actIdx])
+		return (self.templateCode_list)
+	
+	def gen_code_file(self,filePath):
+		if (len(self.templateCode_list)==0):
+			self.gen_code()
+		fp = open(filePath, "w")
+		for line in self.templateCode_list:
+			fp.write (line)
+
+	def show_code(self):
+		for line in self.templateCode_list:
+			p_line = line
+			if (line[len(line)-1:]=='\n'):
+				p_line = line[:len(line)-1]
+			print (p_line)
+	
+	def reparse(self,fileName):
+		self.parser = verilog_parser.class__parser(fileName)
+
 
 def main():
 	filePath = "D:\\DevProjects\\anaconda\\verilog_IO_linker\\axis_async_fifo_adapter.v"
+	
 	VIOL = class__verilog_IO_linker(filePath)
 
-	show_code(VIOL.templateCode_list)
+	code_list = VIOL.gen_code()
+
+	VIOL.gen_code_file("D:\\DevProjects\\anaconda\\verilog_IO_linker\\gen.v")
+
+	VIOL.show_code()
 	
 	print ("\n\n\n\nfinish")
 
-def show_code(code_list):
-	for line in code_list:
-		p_line = line
-		if (line[len(line)-1:]=='\n'):
-			p_line = line[:len(line)-1]
-		print (p_line)
 
 if __name__ =="__main__":
 	main()
