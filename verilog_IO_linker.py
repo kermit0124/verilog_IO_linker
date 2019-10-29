@@ -6,27 +6,18 @@ class class__verilog_IO_linker():
 		self.fp = open(fileName, "r")
 		self.rangeCM = 0
 		self.remain_txt = ""
-		self.words = []
+		self.temp_words = []
 		self.num_module = 0
 		self.moduleName = ""
-		self.nextWord_is_moduleName = 0
-		self.sts__in_module = 0
-		self.sts__in_module_title = 0
-		self.proc_word = ""
-		self.sts__in_bracket = 0
-		self.sts__in_title_para = 0
-		self.bracket_stack = 0
-		self.seg_words = []
-		self.num_paras = 0
+		self.sts_in_moduleTitle = 0
+		self.parse_words = []
 		self.paraName = ""
 		self.paraValue = ""
 		self.char_list = ['(' , ')' , ',' , ';','[',']','\t']
-		self.varVal_temp =""
-		self.varVal =""
 		self.paras_list = []
 		self.IOs_list = []
-		self.inText = 0
-		self.module_all_info = []
+		self.verilogCode_inStr = 0
+		self.module_data_list = []
 		self.textInModule_list = []
 
 		self.scan_all()
@@ -40,14 +31,14 @@ class class__verilog_IO_linker():
 		for module_txt in self.textInModule_list:
 			for lineTxt in module_txt.splitlines():
 				self.remain_txt = lineTxt
-				if (self.word_preProc()==1):
-					if (self.sts__in_module==0):
+				if (self.get_word_by_semicolon()==1):
+					if (self.sts_in_moduleTitle==0):
 						self.parseFlow_module_title()
 					else:
 						self.parseFlow_body()
 			
-			self.sts__in_module = 0
-			self.module_all_info.append ([[self.moduleName],self.IOs_list,self.paras_list])
+			self.sts_in_moduleTitle = 0
+			self.module_data_list.append ([[self.moduleName],self.IOs_list,self.paras_list])
 			self.moduleName = ""
 			self.IOs_list = []
 			self.paras_list = []
@@ -57,8 +48,8 @@ class class__verilog_IO_linker():
 		textInModule_temp = ""
 		for lineTxt in iter(self.fp):
 			self.remove_commet(lineTxt)
-			self.add_speac()
-			self.word_preProc2()
+			self.add_space()
+			self.word_replace()
 			if ((self.rangeCM==0)&(self.remain_txt!='')):
 				if (inModule):
 					if ("endmodule") in self.remain_txt:
@@ -77,16 +68,16 @@ class class__verilog_IO_linker():
 
 	
 	def __bodyDict_para(self,idx):
-		paraName,paraValue = self.parse_parameter(self.seg_words[idx:])
+		paraName,paraValue = self.parse_parameter(self.parse_words[idx:])
 		self.paras_list.append ([paraName,paraValue])
 	def __bodyDict_IO(self,idx):
-		self.parse_IO(self.seg_words[idx:])
+		self.parse_IO(self.parse_words[idx:])
 	def parseFlow_moduleEnd(self):
-		for idx,word in enumerate(self.seg_words):
+		for idx,word in enumerate(self.parse_words):
 			if ("endmodule") in word:
-				self.sts__in_module = 0
-				self.module_all_info.append ([[self.moduleName],self.IOs_list,self.paras_list])
-				self.seg_words = self.seg_words[idx+1:]
+				self.sts_in_moduleTitle = 0
+				self.module_data_list.append ([[self.moduleName],self.IOs_list,self.paras_list])
+				self.parse_words = self.parse_words[idx+1:]
 				self.moduleName = ""
 				self.IOs_list = []
 				self.paras_list = []
@@ -100,13 +91,13 @@ class class__verilog_IO_linker():
 			,"inout":self.__bodyDict_IO
 		}
 		idx_st = 0
-		for idx,word in enumerate(self.seg_words):
-			if (self.inText==1):
+		for idx,word in enumerate(self.parse_words):
+			if (self.verilogCode_inStr==1):
 				if (chr(34)) in word:
-					self.inText = 0
+					self.verilogCode_inStr = 0
 			else:
 				if (chr(34)) in word:
-					self.inText = 1
+					self.verilogCode_inStr = 1
 				else:
 					if (dict.get(word)):
 						dict[word](idx)
@@ -119,7 +110,7 @@ class class__verilog_IO_linker():
 		num_bkt = 0
 		titlePara_SI = 0
 		titlePara_EI = 0
-		for idx,word in enumerate(self.seg_words):
+		for idx,word in enumerate(self.parse_words):
 			if (nextWord_type == WORD_TYPE_NONE):				
 				if (word == "module"):
 					nextWord_type = WORD_TYPE_MOD_NAME
@@ -129,7 +120,7 @@ class class__verilog_IO_linker():
 				nextWord_type = WORD_TYPE_NONE
 				titlePara_SI = idx+1
 				break
-		title_para_and_IO_words = self.seg_words [titlePara_SI:]
+		title_para_and_IO_words = self.parse_words [titlePara_SI:]
 
 		titleParaMode = 0
 		for idx,word in enumerate(title_para_and_IO_words):
@@ -149,7 +140,7 @@ class class__verilog_IO_linker():
 		c_words,r_words = self.parse_bucket(r_words)
 		self.parseFlow_title_IO(c_words)
 
-		self.sts__in_module = 1
+		self.sts_in_moduleTitle = 1
 
 	
 	def parseFlow_title_IO(self,word_list):
@@ -312,28 +303,23 @@ class class__verilog_IO_linker():
 				return (0)
 		return (1)
 
-	def word_preProc2(self):
-		# self.remain_txt = self.remain_txt.replace("\n","")
+	def word_replace(self):
 		self.remain_txt = self.remain_txt.replace("\t"," ")
 
-	def word_preProc(self):
-		# clear \n
-		if (self.remain_txt[len(self.remain_txt)-1:]=='\n'):
-			self.remain_txt = self.remain_txt[:len(self.remain_txt)-1]
-
+	def get_word_by_semicolon(self):
 		reamin_split = self.remain_txt.split(" ")
 		for temp in reamin_split:
 			if (temp!=''):
 				if (temp==';'):
-					self.seg_words = self.words
-					self.words =[]
+					self.parse_words = self.temp_words
+					self.temp_words =[]
 					return (1)
 				else:
-					self.words.append (temp)
+					self.temp_words.append (temp)
 		
 		return (-1)
 	
-	def add_speac(self):
+	def add_space(self):
 		for ch in self.char_list:
 			if (len(self.remain_txt)>1):
 				if (ch) in self.remain_txt:
