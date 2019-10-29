@@ -20,34 +20,77 @@ class class__verilog_IO_linker():
 		self.num_paras = 0
 		self.paraName = ""
 		self.paraValue = ""
-		self.char_list = ['(' , ')' , ',' , ';','[',']']
+		self.char_list = ['(' , ')' , ',' , ';','[',']','\t']
 		self.varVal_temp =""
 		self.varVal =""
 		self.paras_list = []
 		self.IOs_list = []
 		self.inText = 0
+		self.module_all_info = []
+		self.textInModule_list = []
 
 		self.scan_all()
 		self.fp.close()
 	
 	def scan_all(self):
-		for lineTxt in iter(self.fp):
-			self.remove_commet(lineTxt)
-			self.add_speac()
+		self.split_module_text()
+		
+		print ("Num. of module ",len(self.textInModule_list))
 
-			if (self.rangeCM==0):
+		for module_txt in self.textInModule_list:
+			for lineTxt in module_txt.splitlines():
+				self.remain_txt = lineTxt
 				if (self.word_preProc()==1):
-
 					if (self.sts__in_module==0):
 						self.parseFlow_module_title()
 					else:
 						self.parseFlow_body()
+			
+			self.sts__in_module = 0
+			self.module_all_info.append ([[self.moduleName],self.IOs_list,self.paras_list])
+			self.moduleName = ""
+			self.IOs_list = []
+			self.paras_list = []
+
+	def split_module_text(self):
+		inModule = 0
+		textInModule_temp = ""
+		for lineTxt in iter(self.fp):
+			self.remove_commet(lineTxt)
+			self.add_speac()
+			self.word_preProc2()
+			if ((self.rangeCM==0)&(self.remain_txt!='')):
+				if (inModule):
+					if ("endmodule") in self.remain_txt:
+						inModule = 0
+						textInModule_temp = textInModule_temp + self.remain_txt
+
+						self.textInModule_list.append (textInModule_temp)
+						textInModule_temp = ""
+					else:
+						textInModule_temp = textInModule_temp + self.remain_txt
+				else:
+					if ("module") in self.remain_txt:
+						inModule = 1
+						if (inModule):
+							textInModule_temp = textInModule_temp + self.remain_txt
+
 	
 	def __bodyDict_para(self,idx):
 		paraName,paraValue = self.parse_parameter(self.seg_words[idx:])
 		self.paras_list.append ([paraName,paraValue])
 	def __bodyDict_IO(self,idx):
 		self.parse_IO(self.seg_words[idx:])
+	def parseFlow_moduleEnd(self):
+		for idx,word in enumerate(self.seg_words):
+			if ("endmodule") in word:
+				self.sts__in_module = 0
+				self.module_all_info.append ([[self.moduleName],self.IOs_list,self.paras_list])
+				self.seg_words = self.seg_words[idx+1:]
+				self.moduleName = ""
+				self.IOs_list = []
+				self.paras_list = []
+				return (1)
 
 	def parseFlow_body(self):
 		dict = {
@@ -67,8 +110,6 @@ class class__verilog_IO_linker():
 				else:
 					if (dict.get(word)):
 						dict[word](idx)
-		
-		para_words = self.seg_words[idx_st:]
 
 	def parseFlow_module_title(self):
 		WORD_TYPE_NONE = 0
@@ -242,6 +283,9 @@ class class__verilog_IO_linker():
 
 	def parse_bucket(self,word_list):
 		num_bkt = 0
+		titlePara_EI = 0
+		titlePara_SI = 0
+		inBucket_words = ""
 		for idx,word in enumerate(word_list):
 			if (word == chr(40)):
 					if (num_bkt ==0):
@@ -254,7 +298,10 @@ class class__verilog_IO_linker():
 					inBucket_words = word_list[titlePara_SI:titlePara_EI]
 					break
 		
-		remain_words = word_list[titlePara_EI+1:]
+		if ((titlePara_EI+1)<=len(word_list)):
+			remain_words = word_list[titlePara_EI+1:]
+		else:
+			remain_words = ''
 		return (inBucket_words,remain_words)
 
 
@@ -265,6 +312,9 @@ class class__verilog_IO_linker():
 				return (0)
 		return (1)
 
+	def word_preProc2(self):
+		# self.remain_txt = self.remain_txt.replace("\n","")
+		self.remain_txt = self.remain_txt.replace("\t"," ")
 
 	def word_preProc(self):
 		# clear \n
@@ -296,7 +346,9 @@ class class__verilog_IO_linker():
 			if ("/*") in lineTxt:
 				if ("*/") in lineTxt:
 					self.rangeCM = 0
-					remain_txt = remain_txt + lineTxt.split("/*")[0] + " "
+					temp = lineTxt.split("/*")[0]
+					if (temp!=''):
+						remain_txt = remain_txt +  + " "
 					remain_txt += lineTxt.split("*/")[1]
 					a=1
 				else:
