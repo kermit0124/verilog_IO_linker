@@ -26,6 +26,20 @@ class class__verilog_IO_linker():
 		self.__gen__tmpl_def_paras(self.module_data_list[self.link_actIdx])
 		self.__gen__tmpl_def_IOs(self.module_data_list[self.link_actIdx])
 		self.__gen__tmpl_inst(self.module_data_list[self.link_actIdx])
+		self.__gen__tmpl_assign(self.module_data_list[self.link_actIdx])
+	
+	def __gen__tmpl_assign(self,modData):
+		self.templateCode_list.append ("// --- assign input/inout ---\n")
+
+		for IO_info in modData[self.MOD_DATA__IO_INFO]:
+			IO_name = IO_info[self.MOD_DATA__IO_INFO_NAME].strip()
+			IO_type = IO_info[self.MOD_DATA__IO_INFO_TYPE].strip()
+			if ((IO_type == "input")|(IO_type == "inout")):
+				lineTxt = "assign "
+				lineTxt += self.link_prefix + IO_name + self.link_suffix
+				lineTxt += " = "
+				lineTxt += " ;\n"
+				self.templateCode_list.append (lineTxt)
 	
 	def __gen__tmpl_def_IOs(self,modData):
 		self.templateCode_list.append ("// --- input/output ---\n")
