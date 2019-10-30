@@ -1,4 +1,7 @@
 
+import wx
+import wx._adv
+import wx._html
 import wx.xrc
 import wxGUI_layout
 import verilog_IO_linker

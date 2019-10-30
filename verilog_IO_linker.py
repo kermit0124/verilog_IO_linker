@@ -9,7 +9,7 @@ class class__verilog_IO_linker():
 			self.fp.close()
 		except:
 			self.fp = ''
-			print ("File path error")
+			# print ("File path error")
 		
 
 		self.parser = verilog_parser.class__parser(fileTxt)
