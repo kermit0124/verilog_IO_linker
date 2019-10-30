@@ -5,18 +5,23 @@ import verilog_IO_linker
 	
 #import the newly created GUI file 
 class MainFrame(wxGUI_layout.Frame1): 
-	t=[]
 	def __init__(self,parent): 
 		wxGUI_layout.Frame1.__init__(self,parent)  
+		self.tab_focus_list = []
+		self.tab_focus_list.append (self.m_textCtrl__instName)
+		self.tab_focus_list.append (self.m_textCtrl__prefix)
+		self.tab_focus_list.append (self.m_textCtrl__suffix)
+		self.tab_focus_list.append (self.m_choice__left_comma)
+		self.tab_focus_list.append (self.m_choice__modSel)
 
-	# def onText__instName( self, event ):
-	# def OnKeyDown__instName( self, event ):		
-		# pass
-		# if (event.key()=='t'):
-		# 	print ("ttt")
-	# def OnKeyUp__instName( self, event ):
-		# if (event.KeyCode==9):
-		# 	self.m_textCtrl__prefix.SetFocus()
+	def OnKeyUp__all_txtCtrl( self, event ):
+		if (event.KeyCode==9):
+			for idx,obj in enumerate(self.tab_focus_list):
+				if (obj==event.EventObject):
+					idx += 1
+					idx %= len(self.tab_focus_list)
+					self.tab_focus_list[idx].SetFocus()
+					break
 
 	def rtxt_origSrc__onText( self , event ):
 		self.m_textCtrl__prefix

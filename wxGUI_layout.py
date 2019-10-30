@@ -119,8 +119,12 @@ class Frame1 ( wx.Frame ):
 		self.Centre( wx.BOTH )
 
 		# Connect Events
-		self.m_textCtrl__instName.Bind( wx.EVT_KEY_UP, self.OnKeyUp__instName )
+		self.m_textCtrl__instName.Bind( wx.EVT_KEY_UP, self.OnKeyUp__all_txtCtrl )
 		self.m_textCtrl__instName.Bind( wx.EVT_TEXT, self.onText__instName )
+		self.m_textCtrl__prefix.Bind( wx.EVT_KEY_UP, self.OnKeyUp__all_txtCtrl )
+		self.m_textCtrl__suffix.Bind( wx.EVT_KEY_UP, self.OnKeyUp__all_txtCtrl )
+		self.m_choice__left_comma.Bind( wx.EVT_KEY_UP, self.OnKeyUp__all_txtCtrl )
+		self.m_choice__modSel.Bind( wx.EVT_KEY_UP, self.OnKeyUp__all_txtCtrl )
 		self.m_richText__origSrc.Bind( wx.EVT_TEXT, self.rtxt_origSrc__onText )
 		self.m_button70.Bind( wx.EVT_BUTTON, self.gen_code )
 
@@ -129,11 +133,15 @@ class Frame1 ( wx.Frame ):
 
 
 	# Virtual event handlers, overide them in your derived class
-	def OnKeyUp__instName( self, event ):
+	def OnKeyUp__all_txtCtrl( self, event ):
 		event.Skip()
 
 	def onText__instName( self, event ):
 		event.Skip()
+
+
+
+
 
 	def rtxt_origSrc__onText( self, event ):
 		event.Skip()
