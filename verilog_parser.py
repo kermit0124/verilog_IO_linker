@@ -1,7 +1,6 @@
 
 class class__parser():
-	def __init__(self, fileName):
-		self.__fp = open(fileName, "r")
+	def __init__(self, all_txt):
 		self.__rangeCM = 0
 		self.__remain_txt = ""
 		self.__temp_words = []
@@ -17,9 +16,9 @@ class class__parser():
 		self.__verilogCode_inStr = 0
 		self.__module_data_list = []
 		self.__textInModule_list = []
+		self.__all_txt = all_txt
 
 		self.__scan_all()
-		self.__fp.close()
 	
 	def get_module_data(self):
 		return (self.__module_data_list)
@@ -27,8 +26,6 @@ class class__parser():
 	def __scan_all(self):
 		self.__split_module_text()
 		
-		# print ("Num. of module ",len(self.__textInModule_list))
-
 		for module_txt in self.__textInModule_list:
 			for lineTxt in module_txt.splitlines():
 				self.__remain_txt = lineTxt
@@ -47,8 +44,8 @@ class class__parser():
 	def __split_module_text(self):
 		inModule = 0
 		textInModule_temp = ""
-		for lineTxt in iter(self.__fp):
-			self.__remove_commet(lineTxt)
+		for lineTxt in (self.__all_txt.splitlines()):
+			self.__remove_commet(lineTxt+'\n')
 			self.__add_space()
 			self.__word_replace()
 			if ((self.__rangeCM==0)&(self.__remain_txt!='')):

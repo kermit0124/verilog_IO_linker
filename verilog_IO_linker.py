@@ -1,7 +1,18 @@
 import verilog_parser
 class class__verilog_IO_linker():
 	def __init__(self, fileName):
-		self.parser = verilog_parser.class__parser(fileName)
+
+		fileTxt = ""
+		try:
+			self.fp = open (fileName,'r')
+			fileTxt = self.fp.read()
+			self.fp.close()
+		except:
+			self.fp = ''
+			print ("File path error")
+		
+
+		self.parser = verilog_parser.class__parser(fileTxt)
 		self.module_data_list = self.parser.get_module_data()
 		self.link_prefix = "pf_"
 		self.link_suffix = ""
@@ -139,8 +150,15 @@ class class__verilog_IO_linker():
 				p_line = line[:len(line)-1]
 			print (p_line)
 	
-	def reparse(self,fileName):
-		self.parser = verilog_parser.class__parser(fileName)
+	def reparse_file(self,fileName):
+		self.fp = open (fileName,'r')
+		self.reparse_txt(self.fp.read())
+		self.fp.close()
+	
+	def reparse_txt(self,all_txt):
+		self.parser = verilog_parser.class__parser(all_txt)
+		self.module_data_list = self.parser.get_module_data()
+
 
 	def select_modulde(self,module_idx):
 		if (module_idx<len(self.module_data_list)):
@@ -151,6 +169,12 @@ class class__verilog_IO_linker():
 	
 	def get_num_module(self):
 		return (self.parser.__num_module)
+	
+	def get_module_name_list(self):
+		nameList = []
+		for moduleData in self.module_data_list:
+			nameList.append (moduleData[self.MOD_DATA__MODULE_INFO])
+		return (nameList)
 
 def input_int():
 	tempIn = input()
@@ -160,9 +184,12 @@ def input_int():
 		return (int(tempIn))
 
 def main():
+	pass
+def ui():
 	print ("File:")
-	filePath = input()
+	# filePath = input()
 	# filePath = "D:\\DevProjects\\anaconda\\verilog_IO_linker\\axis_async_fifo_adapter.v"
+	# filePath = ""
 	
 	VIOL = class__verilog_IO_linker(filePath)
 	print ("Module:")
