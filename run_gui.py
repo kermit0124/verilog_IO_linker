@@ -16,6 +16,8 @@ class MainFrame(wxGUI_layout.Frame1):
 		self.tab_focus_list.append (self.m_textCtrl__suffix)
 		self.tab_focus_list.append (self.m_choice__left_comma)
 		self.tab_focus_list.append (self.m_choice__modSel)
+		self.m_button__genCode.Enable(False)
+
 
 	def OnKeyUp__all_txtCtrl( self, event ):
 		if (event.KeyCode==9):
@@ -27,13 +29,20 @@ class MainFrame(wxGUI_layout.Frame1):
 					break
 
 	def rtxt_origSrc__onText( self , event ):
-		self.m_textCtrl__prefix
-		VIOL.reparse_txt(self.m_richText__origSrc.Value)
-		module_select_list_txt = VIOL.get_module_name_list()
-		self.m_choice__modSel.Clear()
-		for modName in module_select_list_txt:
-			self.m_choice__modSel.Append(modName)
-		self.m_choice__modSel.Select(0)
+		if (self.m_richText__origSrc.Value.strip()!=''):
+			VIOL.reparse_txt(self.m_richText__origSrc.Value)
+			module_select_list_txt = VIOL.get_module_name_list()
+			if (len(module_select_list_txt)>0):
+				self.m_choice__modSel.Clear()
+				for modName in module_select_list_txt:
+					self.m_choice__modSel.Append(modName)
+				self.m_choice__modSel.Select(0)
+				self.m_button__genCode.Enable(True)
+			else:
+				self.m_button__genCode.Enable(False)
+
+		else:
+			self.m_button__genCode.Enable(False)
 	
 	def gen_code( self, event ):
 
