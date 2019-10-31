@@ -1,8 +1,8 @@
 # Verilog IO Linker
 - Enginner: Kermit
 - Company: LiscoTech
-- Version: 0.0.0
-- Date: 20191030
+- Version: 0.1.0
+- Date: 20191031
 - Python: 3.5.5
 
 # Note
@@ -15,5 +15,11 @@
 	- Generate code autoly go in clipboard 
 
 # Version Log
+# 0.1.0
+- Add
+	- Assign output/input switch
+	- GUI check box for assign
+	- GUI auto generate instance name
+
 # 0.0.0
 - Basic function

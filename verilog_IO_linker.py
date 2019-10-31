@@ -1,6 +1,7 @@
 import verilog_parser
 class class__verilog_IO_linker():
 	def __init__(self, fileName):
+		self.version = "0.1.0"
 
 		fileTxt = ""
 		try:

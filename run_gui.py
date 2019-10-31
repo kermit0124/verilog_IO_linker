@@ -69,6 +69,7 @@ class MainFrame(wxGUI_layout.Frame1):
 VIOL = verilog_IO_linker.class__verilog_IO_linker('')
 app = wx.App(False) 
 frame = MainFrame(None) 
+frame.SetTitle("Verilog IO Linker  v"+VIOL.version)
 frame.Show(True) 
 #start the applications 
 app.MainLoop()  
