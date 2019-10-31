@@ -93,7 +93,7 @@ class class__verilog_IO_linker():
 							replace_paraName_word = replace_paraName_word.replace(cmpParaName,	self.link_prefix+cmpParaName+self.link_suffix)
 							break
 
-					lineTxt += replace_paraName_word
+					lineTxt += replace_paraName_word+' '
 			lineTxt += " ;\n"
 			self.templateCode_list.append (lineTxt)
 	
