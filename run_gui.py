@@ -16,6 +16,7 @@ class MainFrame(wxGUI_layout.Frame1):
 		self.tab_focus_list.append (self.m_textCtrl__suffix)
 		self.tab_focus_list.append (self.m_choice__left_comma)
 		self.tab_focus_list.append (self.m_choice__modSel)
+
 		self.m_button__genCode.Enable(False)
 
 
@@ -46,12 +47,13 @@ class MainFrame(wxGUI_layout.Frame1):
 	
 	def gen_code( self, event ):
 
-		# print (self.m_choice__modSel.GetSelection())
 		VIOL.select_modulde(self.m_choice__modSel.GetSelection())
 		VIOL.comma_left = self.m_choice__left_comma.GetSelection()
 		VIOL.link_prefix = self.m_textCtrl__prefix.Value
 		VIOL.link_suffix = self.m_textCtrl__suffix.Value
 		VIOL.link_inst_name = self.m_textCtrl__instName.Value
+		VIOL.gen_assign_tmpl_input = self.m_checkBox__gen_agn_in.Value
+		VIOL.gen_assign_tmpl_output = self.m_checkBox__gen_agn_out.Value
 
 
 		txt_list = VIOL.gen_code()
