@@ -155,6 +155,7 @@ class Frame1 ( wx.Frame ):
 		self.Centre( wx.BOTH )
 
 		# Connect Events
+		self.m_choice__modSel.Bind( wx.EVT_CHOICE, self.OnChoice__moduleSel )
 		self.m_choice__modSel.Bind( wx.EVT_KEY_UP, self.OnKeyUp__all_txtCtrl )
 		self.m_textCtrl__instName.Bind( wx.EVT_KEY_UP, self.OnKeyUp__all_txtCtrl )
 		self.m_textCtrl__instName.Bind( wx.EVT_TEXT, self.onText__instName )
@@ -169,6 +170,9 @@ class Frame1 ( wx.Frame ):
 
 
 	# Virtual event handlers, overide them in your derived class
+	def OnChoice__moduleSel( self, event ):
+		event.Skip()
+
 	def OnKeyUp__all_txtCtrl( self, event ):
 		event.Skip()
 

@@ -19,6 +19,9 @@ class MainFrame(wxGUI_layout.Frame1):
 
 		self.m_button__genCode.Enable(False)
 
+	def OnChoice__moduleSel( self, event ):
+		self.m_textCtrl__instName.SetValue(self.m_choice__modSel.GetStringSelection()+"_inst")
+
 
 	def OnKeyUp__all_txtCtrl( self, event ):
 		if (event.KeyCode==9):
@@ -39,6 +42,7 @@ class MainFrame(wxGUI_layout.Frame1):
 					self.m_choice__modSel.Append(modName)
 				self.m_choice__modSel.Select(0)
 				self.m_button__genCode.Enable(True)
+				self.m_textCtrl__instName.SetValue(self.m_choice__modSel.GetStringSelection()+"_inst")
 			else:
 				self.m_button__genCode.Enable(False)
 
