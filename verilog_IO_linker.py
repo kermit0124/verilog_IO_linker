@@ -84,7 +84,16 @@ class class__verilog_IO_linker():
 			lineTxt += " = "
 			if (self.gen_para_assign_mode):
 				for word in paraVal_list:
-					lineTxt += word.strip()
+					
+					# auto link parameter
+					replace_paraName_word = word.strip()
+					for cmpParaInfo in modData[self.MOD_DATA__PARA_INFO]:
+						cmpParaName = cmpParaInfo[self.MOD_DATA__PARA_INFO_NAME].strip()
+						if (cmpParaName==replace_paraName_word):
+							replace_paraName_word = replace_paraName_word.replace(cmpParaName,	self.link_prefix+cmpParaName+self.link_suffix)
+							break
+
+					lineTxt += replace_paraName_word
 			lineTxt += " ;\n"
 			self.templateCode_list.append (lineTxt)
 	

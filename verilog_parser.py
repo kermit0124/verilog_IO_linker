@@ -318,10 +318,35 @@ class class__parser():
 		return (-1)
 	
 	def __add_space(self):
-		for ch in self.__char_list:
-			if (len(self.__remain_txt)>1):
-				if (ch) in self.__remain_txt:
-					self.__remain_txt =  self.__remain_txt.replace(ch," "+ch+" ")
+		if (len(self.__remain_txt)>1):
+			temp_str = ""
+			leftIsSpChar = 0
+			for each_char in self.__remain_txt:
+				if ((each_char==' ')|(each_char=='`')|(each_char==chr(39))):
+					temp_str += each_char
+					leftIsSpChar = 0
+				else:
+					if (each_char.isalnum()):
+						if (leftIsSpChar):
+							temp_str += ' ' + each_char
+						else:
+							temp_str += each_char
+						leftIsSpChar = 0
+					else:
+						if (each_char=='_'):
+							if (leftIsSpChar):
+								temp_str += ' ' + each_char
+							else:
+								temp_str += each_char
+							leftIsSpChar = 0
+						else:
+							temp_str += ' ' + each_char
+							leftIsSpChar = 1
+			self.__remain_txt = temp_str
+
+			self.__remain_txt = self.__remain_txt.replace("  ",' ')
+			self.__remain_txt = self.__remain_txt.replace("  ",' ')
+
 
 	
 	def __remove_commet(self,lineTxt):
