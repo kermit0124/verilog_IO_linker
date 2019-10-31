@@ -1,6 +1,7 @@
 import verilog_parser
 class class__verilog_IO_linker():
 	def __init__(self, fileName):
+		self.version = "0.1.0"
 
 		fileTxt = ""
 		try:
@@ -31,23 +32,45 @@ class class__verilog_IO_linker():
 		self.MOD_DATA__PARA_INFO = 2
 		self.MOD_DATA__PARA_INFO_NAME = 0
 		self.MOD_DATA__PARA_INFO_VAL = 1
-		
+		self.gen_assign_tmpl_input = 0
+		self.gen_assign_tmpl_output = 0
+	
+	def __gen__str_show_module(self):
+		return ("// *** module: "+self.link_inst_name+" ( "+self.module_data_list[self.link_actIdx][self.MOD_DATA__MODULE_INFO][self.MOD_DATA__MODULE_INFO_NAME]+" ) ***\n")
 	
 	def __gen__tmpl_assign(self,modData):
-		self.templateCode_list.append ("\n// --- assign input/inout ---\n")
+		if (self.gen_assign_tmpl_input):
+			self.templateCode_list.append ("\n// --- assign input/inout ---\n")
+			self.templateCode_list.append (self.__gen__str_show_module())
 
-		for IO_info in modData[self.MOD_DATA__IO_INFO]:
-			IO_name = IO_info[self.MOD_DATA__IO_INFO_NAME].strip()
-			IO_type = IO_info[self.MOD_DATA__IO_INFO_TYPE].strip()
-			if ((IO_type == "input")|(IO_type == "inout")):
-				lineTxt = "assign "
-				lineTxt += self.link_prefix + IO_name + self.link_suffix
-				lineTxt += " = "
-				lineTxt += " ;\n"
-				self.templateCode_list.append (lineTxt)
+			for IO_info in modData[self.MOD_DATA__IO_INFO]:
+				IO_name = IO_info[self.MOD_DATA__IO_INFO_NAME].strip()
+				IO_type = IO_info[self.MOD_DATA__IO_INFO_TYPE].strip()
+				if ((IO_type == "input")|(IO_type == "inout")):
+					lineTxt = "assign "
+					lineTxt += self.link_prefix + IO_name + self.link_suffix
+					lineTxt += " = "
+					lineTxt += " ;\n"
+					self.templateCode_list.append (lineTxt)
+		
+		if (self.gen_assign_tmpl_output):
+			self.templateCode_list.append ("\n// --- assign output ---\n")
+			self.templateCode_list.append (self.__gen__str_show_module())
+			
+			for IO_info in modData[self.MOD_DATA__IO_INFO]:
+				IO_name = IO_info[self.MOD_DATA__IO_INFO_NAME].strip()
+				IO_type = IO_info[self.MOD_DATA__IO_INFO_TYPE].strip()
+				if (IO_type == "output"):					
+					lineTxt = "assign "
+					lineTxt += " = "
+					lineTxt += self.link_prefix + IO_name + self.link_suffix + " ;\n"
+					self.templateCode_list.append (lineTxt)
+
+
 	
 	def __gen__tmpl_def_IOs(self,modData):
 		self.templateCode_list.append ("\n// --- input/output ---\n")
+		self.templateCode_list.append (self.__gen__str_show_module())
 
 		for IO_info in modData[self.MOD_DATA__IO_INFO]:
 			IO_name = IO_info[self.MOD_DATA__IO_INFO_NAME].strip()
@@ -75,6 +98,7 @@ class class__verilog_IO_linker():
 
 	def __gen__tmpl_def_paras(self,modData):
 		self.templateCode_list.append ("\n// --- parameter ---\n")
+		self.templateCode_list.append (self.__gen__str_show_module())
 
 		for paraInfo in modData[self.MOD_DATA__PARA_INFO]:
 			paraName = paraInfo[self.MOD_DATA__PARA_INFO_NAME].strip()
@@ -84,13 +108,23 @@ class class__verilog_IO_linker():
 			lineTxt += " = "
 			if (self.gen_para_assign_mode):
 				for word in paraVal_list:
-					lineTxt += word.strip()
+					
+					# auto link parameter
+					replace_paraName_word = word.strip()
+					for cmpParaInfo in modData[self.MOD_DATA__PARA_INFO]:
+						cmpParaName = cmpParaInfo[self.MOD_DATA__PARA_INFO_NAME].strip()
+						if (cmpParaName==replace_paraName_word):
+							replace_paraName_word = replace_paraName_word.replace(cmpParaName,	self.link_prefix+cmpParaName+self.link_suffix)
+							break
+
+					lineTxt += replace_paraName_word+' '
 			lineTxt += " ;\n"
 			self.templateCode_list.append (lineTxt)
 	
 
 	def __gen__tmpl_inst(self,modData):
 		self.templateCode_list.append ("\n// --- instance module ---\n")
+		self.templateCode_list.append (self.__gen__str_show_module())
 
 		lineTxt = ""
 		lineTxt = modData[self.MOD_DATA__MODULE_INFO][self.MOD_DATA__MODULE_INFO_NAME] + " # " + chr(40) + '\n'

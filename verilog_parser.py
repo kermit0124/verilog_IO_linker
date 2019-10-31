@@ -10,7 +10,8 @@ class class__parser():
 		self.__parse_words = []
 		self.__paraName = ""
 		self.__paraValue = ""
-		self.__char_list = ['(' , ')' , ',' , ';','[',']','\t']
+		self.__w_speac_char_list = ['(' , ')' , ',' , ';','[',']','\t']
+		self.__wo_speac_char_list = [' ','`',chr(39)]
 		self.__paras_list = []
 		self.__IOs_list = []
 		self.__verilogCode_inStr = 0
@@ -296,7 +297,7 @@ class class__parser():
 
 
 	def __norm_word_check(self,word):
-		for ch in self.__char_list:
+		for ch in self.__w_speac_char_list:
 			if (word==ch):
 				return (0)
 		return (1)
@@ -318,10 +319,30 @@ class class__parser():
 		return (-1)
 	
 	def __add_space(self):
-		for ch in self.__char_list:
-			if (len(self.__remain_txt)>1):
-				if (ch) in self.__remain_txt:
-					self.__remain_txt =  self.__remain_txt.replace(ch," "+ch+" ")
+		if (len(self.__remain_txt)>1):
+			temp_str = ""
+			leftIsSpChar = 0
+			for each_char in self.__remain_txt:
+				check_wo_speac = 0
+				if (each_char) in self.__wo_speac_char_list:
+					check_wo_speac = 1
+					temp_str += each_char
+					leftIsSpChar = 0
+				else:
+					if ((each_char.isalnum()==True)|(each_char=='_')):
+						if (leftIsSpChar):
+							temp_str += ' ' + each_char
+						else:
+							temp_str += each_char
+						leftIsSpChar = 0
+					else:
+						temp_str += ' ' + each_char
+						leftIsSpChar = 1
+			self.__remain_txt = temp_str
+
+			self.__remain_txt = self.__remain_txt.replace("  ",' ')
+			self.__remain_txt = self.__remain_txt.replace("  ",' ')
+
 
 	
 	def __remove_commet(self,lineTxt):
@@ -334,7 +355,6 @@ class class__parser():
 					if (temp!=''):
 						remain_txt = remain_txt +  + " "
 					remain_txt += lineTxt.split("*/")[1]
-					a=1
 				else:
 					self.__rangeCM = 1
 			else:

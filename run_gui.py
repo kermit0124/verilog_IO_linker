@@ -16,7 +16,11 @@ class MainFrame(wxGUI_layout.Frame1):
 		self.tab_focus_list.append (self.m_textCtrl__suffix)
 		self.tab_focus_list.append (self.m_choice__left_comma)
 		self.tab_focus_list.append (self.m_choice__modSel)
+
 		self.m_button__genCode.Enable(False)
+
+	def OnChoice__moduleSel( self, event ):
+		self.m_textCtrl__instName.SetValue(self.m_choice__modSel.GetStringSelection()+"_inst")
 
 
 	def OnKeyUp__all_txtCtrl( self, event ):
@@ -38,6 +42,7 @@ class MainFrame(wxGUI_layout.Frame1):
 					self.m_choice__modSel.Append(modName)
 				self.m_choice__modSel.Select(0)
 				self.m_button__genCode.Enable(True)
+				self.m_textCtrl__instName.SetValue(self.m_choice__modSel.GetStringSelection()+"_inst")
 			else:
 				self.m_button__genCode.Enable(False)
 
@@ -46,12 +51,13 @@ class MainFrame(wxGUI_layout.Frame1):
 	
 	def gen_code( self, event ):
 
-		# print (self.m_choice__modSel.GetSelection())
 		VIOL.select_modulde(self.m_choice__modSel.GetSelection())
 		VIOL.comma_left = self.m_choice__left_comma.GetSelection()
 		VIOL.link_prefix = self.m_textCtrl__prefix.Value
 		VIOL.link_suffix = self.m_textCtrl__suffix.Value
 		VIOL.link_inst_name = self.m_textCtrl__instName.Value
+		VIOL.gen_assign_tmpl_input = self.m_checkBox__gen_agn_in.Value
+		VIOL.gen_assign_tmpl_output = self.m_checkBox__gen_agn_out.Value
 
 
 		txt_list = VIOL.gen_code()
@@ -63,6 +69,7 @@ class MainFrame(wxGUI_layout.Frame1):
 VIOL = verilog_IO_linker.class__verilog_IO_linker('')
 app = wx.App(False) 
 frame = MainFrame(None) 
+frame.SetTitle("Verilog IO Linker  v"+VIOL.version)
 frame.Show(True) 
 #start the applications 
 app.MainLoop()  

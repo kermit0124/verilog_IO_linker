@@ -18,7 +18,7 @@ import wx.richtext
 class Frame1 ( wx.Frame ):
 
 	def __init__( self, parent ):
-		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = u"verilog IO linker v0.0.0", pos = wx.DefaultPosition, size = wx.Size( 1346,677 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
+		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = u"verilog IO linker", pos = wx.DefaultPosition, size = wx.Size( 1346,677 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
 
 		self.SetSizeHints( wx.DefaultSize, wx.DefaultSize )
 		self.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_WINDOW ) )
@@ -83,6 +83,23 @@ class Frame1 ( wx.Frame ):
 		self.m_choice__left_comma.SetSelection( 0 )
 		gSizer4.Add( self.m_choice__left_comma, 0, wx.ALL, 5 )
 
+		self.m_staticText6 = wx.StaticText( self, wx.ID_ANY, u"Generate assign", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText6.Wrap( -1 )
+
+		gSizer4.Add( self.m_staticText6, 0, wx.ALL, 5 )
+
+		bSizer81 = wx.BoxSizer( wx.VERTICAL )
+
+		self.m_checkBox__gen_agn_in = wx.CheckBox( self, wx.ID_ANY, u"input/inout", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_checkBox__gen_agn_in.SetValue(True)
+		bSizer81.Add( self.m_checkBox__gen_agn_in, 0, wx.ALL, 5 )
+
+		self.m_checkBox__gen_agn_out = wx.CheckBox( self, wx.ID_ANY, u"output", wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer81.Add( self.m_checkBox__gen_agn_out, 0, wx.ALL, 5 )
+
+
+		gSizer4.Add( bSizer81, 1, wx.EXPAND, 5 )
+
 
 		bSizer10.Add( gSizer4, 1, wx.EXPAND, 5 )
 
@@ -138,6 +155,7 @@ class Frame1 ( wx.Frame ):
 		self.Centre( wx.BOTH )
 
 		# Connect Events
+		self.m_choice__modSel.Bind( wx.EVT_CHOICE, self.OnChoice__moduleSel )
 		self.m_choice__modSel.Bind( wx.EVT_KEY_UP, self.OnKeyUp__all_txtCtrl )
 		self.m_textCtrl__instName.Bind( wx.EVT_KEY_UP, self.OnKeyUp__all_txtCtrl )
 		self.m_textCtrl__instName.Bind( wx.EVT_TEXT, self.onText__instName )
@@ -152,6 +170,9 @@ class Frame1 ( wx.Frame ):
 
 
 	# Virtual event handlers, overide them in your derived class
+	def OnChoice__moduleSel( self, event ):
+		event.Skip()
+
 	def OnKeyUp__all_txtCtrl( self, event ):
 		event.Skip()
 
