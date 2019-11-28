@@ -1,8 +1,8 @@
 # Verilog IO Linker
 - Enginner: Kermit
 - Company: LiscoTech
-- Version: 0.1.0
-- Date: 20191031
+- Version: 0.2.0
+- Date: 20191128
 - Python: 3.5.5
 
 # Note
@@ -15,6 +15,13 @@
 	- Generate code autoly go in clipboard 
 
 # Version Log
+# 0.2.0
+- Add
+	- Parameter mapping mode (name or value)
+	- Wire under line mode
+- FixBug
+	- Parse the comment function
+
 # 0.1.0
 - Add
 	- Assign output/input switch
