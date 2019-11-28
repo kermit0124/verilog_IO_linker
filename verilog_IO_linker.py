@@ -35,6 +35,7 @@ class class__verilog_IO_linker():
 		self.gen_assign_tmpl_input = 0
 		self.gen_assign_tmpl_output = 0
 		self.link_param_keep_name = 1
+		self.link_wire_add_under_line = 1
 	
 	def __gen__str_show_module(self):
 		return ("// *** module: "+self.link_inst_name+" ( "+self.module_data_list[self.link_actIdx][self.MOD_DATA__MODULE_INFO][self.MOD_DATA__MODULE_INFO_NAME]+" ) ***\n")
@@ -49,7 +50,10 @@ class class__verilog_IO_linker():
 				IO_type = IO_info[self.MOD_DATA__IO_INFO_TYPE].strip()
 				if ((IO_type == "input")|(IO_type == "inout")):
 					lineTxt = "assign "
-					lineTxt += self.link_prefix + IO_name + self.link_suffix
+					if (self.link_wire_add_under_line):
+						lineTxt += '_' + self.link_prefix + IO_name + self.link_suffix
+					else:
+						lineTxt += self.link_prefix + IO_name + self.link_suffix
 					lineTxt += " = "
 					lineTxt += " ;\n"
 					self.templateCode_list.append (lineTxt)
@@ -93,7 +97,11 @@ class class__verilog_IO_linker():
 
 					lineTxt += temp
 				lineTxt += ' ] '
-			lineTxt += self.link_prefix + IO_name + self.link_suffix
+			
+			if (self.link_wire_add_under_line):
+				lineTxt += '_' + self.link_prefix + IO_name + self.link_suffix
+			else:
+				lineTxt += self.link_prefix + IO_name + self.link_suffix
 			lineTxt += " ;\n"
 			self.templateCode_list.append (lineTxt)
 
@@ -156,7 +164,10 @@ class class__verilog_IO_linker():
 			if ((self.comma_left)&(idx!=0)):
 				lineTxt += ','
 			lineTxt = lineTxt + '.' + data[0].strip() + ' ( ' 
-			lineTxt += self.link_prefix + data[0].strip() + self.link_suffix
+			if (self.link_wire_add_under_line):
+				lineTxt += '_'+ self.link_prefix + data[0].strip() + self.link_suffix
+			else:
+				lineTxt += self.link_prefix + data[0].strip() + self.link_suffix
 			lineTxt += ' ) '
 			if ((self.comma_left==0)&(idx!=(len(IO_or_para_list)-1))):
 				lineTxt += ','
