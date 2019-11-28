@@ -349,6 +349,7 @@ class class__parser():
 		remain_txt = ""
 		if (self.__rangeCM==0):
 			if ("/*") in lineTxt:
+				lineTxt = lineTxt.replace("/*","")
 				if ("*/") in lineTxt:
 					self.__rangeCM = 0
 					temp = lineTxt.split("/*")[0]
@@ -363,6 +364,7 @@ class class__parser():
 			if ("*/") in lineTxt:
 				self.__rangeCM = 0
 				remain_txt = lineTxt.split("*/")[1]
+
 		remain_txt = remain_txt.split("//")[0]
 		self.__remain_txt = remain_txt
 		
