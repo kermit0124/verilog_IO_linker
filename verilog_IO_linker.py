@@ -34,6 +34,7 @@ class class__verilog_IO_linker():
 		self.MOD_DATA__PARA_INFO_VAL = 1
 		self.gen_assign_tmpl_input = 0
 		self.gen_assign_tmpl_output = 0
+		self.link_param_keep_name = 1
 	
 	def __gen__str_show_module(self):
 		return ("// *** module: "+self.link_inst_name+" ( "+self.module_data_list[self.link_actIdx][self.MOD_DATA__MODULE_INFO][self.MOD_DATA__MODULE_INFO_NAME]+" ) ***\n")
@@ -116,6 +117,9 @@ class class__verilog_IO_linker():
 						if (cmpParaName==replace_paraName_word):
 							replace_paraName_word = replace_paraName_word.replace(cmpParaName,	self.link_prefix+cmpParaName+self.link_suffix)
 							break
+					
+					if (self.link_param_keep_name):
+						replace_paraName_word = paraName
 
 					lineTxt += replace_paraName_word+' '
 			lineTxt += " ;\n"

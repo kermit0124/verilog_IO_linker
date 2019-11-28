@@ -100,6 +100,25 @@ class Frame1 ( wx.Frame ):
 
 		gSizer4.Add( bSizer81, 1, wx.EXPAND, 5 )
 
+		self.m_staticText7 = wx.StaticText( self, wx.ID_ANY, u"Wire prefix add \"_\"", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText7.Wrap( -1 )
+
+		gSizer4.Add( self.m_staticText7, 0, wx.ALL, 5 )
+
+		self.m_checkBox__wire_mode = wx.CheckBox( self, wx.ID_ANY, u"enable", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_checkBox__wire_mode.SetValue(True)
+		gSizer4.Add( self.m_checkBox__wire_mode, 0, wx.ALL, 5 )
+
+		self.m_staticText8 = wx.StaticText( self, wx.ID_ANY, u"Localpara mapping mode", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText8.Wrap( -1 )
+
+		gSizer4.Add( self.m_staticText8, 0, wx.ALL, 5 )
+
+		m_choice__para_mapping_modeChoices = [ u"value", u"name" ]
+		self.m_choice__para_mapping_mode = wx.Choice( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, m_choice__para_mapping_modeChoices, 0 )
+		self.m_choice__para_mapping_mode.SetSelection( 1 )
+		gSizer4.Add( self.m_choice__para_mapping_mode, 0, wx.ALL, 5 )
+
 
 		bSizer10.Add( gSizer4, 1, wx.EXPAND, 5 )
 
