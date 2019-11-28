@@ -58,6 +58,8 @@ class MainFrame(wxGUI_layout.Frame1):
 		VIOL.link_inst_name = self.m_textCtrl__instName.Value
 		VIOL.gen_assign_tmpl_input = self.m_checkBox__gen_agn_in.Value
 		VIOL.gen_assign_tmpl_output = self.m_checkBox__gen_agn_out.Value
+		VIOL.link_param_keep_name = self.m_choice__para_mapping_mode.GetSelection()
+		VIOL.link_wire_add_under_line = self.m_checkBox__wire_mode.GetValue()
 
 
 		txt_list = VIOL.gen_code()
