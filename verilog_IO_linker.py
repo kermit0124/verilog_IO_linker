@@ -1,7 +1,7 @@
 import verilog_parser
 class class__verilog_IO_linker():
 	def __init__(self, fileName):
-		self.version = "0.2.0"
+		self.version = "0.2.1"
 
 		fileTxt = ""
 		try:
@@ -144,7 +144,7 @@ class class__verilog_IO_linker():
 		lineTxt = ""
 
 		# Parameters
-		self.__gen__tmpl_inst_link(modData[self.MOD_DATA__PARA_INFO])
+		self.__gen__tmpl_inst_link(modData[self.MOD_DATA__PARA_INFO],1)
 				
 		self.templateCode_list.append (chr(41) + '\n')
 
@@ -157,14 +157,14 @@ class class__verilog_IO_linker():
 
 		self.templateCode_list.append (chr(41) + ' ; \n')
 
-	def __gen__tmpl_inst_link(self,IO_or_para_list):		
+	def __gen__tmpl_inst_link(self,IO_or_para_list,isParam=0):		
 		lineTxt = ""
 		for idx,data in enumerate(IO_or_para_list):
 			lineTxt = lineTxt + self.tab_char
 			if ((self.comma_left)&(idx!=0)):
 				lineTxt += ','
 			lineTxt = lineTxt + '.' + data[0].strip() + ' ( ' 
-			if (self.link_wire_add_under_line):
+			if (self.link_wire_add_under_line & (isParam==0)):
 				lineTxt += '_'+ self.link_prefix + data[0].strip() + self.link_suffix
 			else:
 				lineTxt += self.link_prefix + data[0].strip() + self.link_suffix
