@@ -79,19 +79,23 @@ class ClassWire(Basic_component):
         self.scanable_src = False
         self.scanable_dest = False
         self.onwer_objID = None
+        self.type = "wire"
 
 
 class ClassInput(ClassWire):
     def __init__(self,name_str,depth_d1_str="[0:0]",depth_d2_str=None,depth_d3_str=None):
         super(ClassInput, self).__init__(name_str,depth_d1_str,depth_d2_str,depth_d3_str)
         self.asloOut = False
+        self.type = "input"
 class ClassOutput(ClassWire):
     def __init__(self,name_str,depth_d1_str="[0:0]",depth_d2_str=None,depth_d3_str=None):
         super(ClassOutput, self).__init__(name_str,depth_d1_str,depth_d2_str,depth_d3_str)
+        self.type = "output"
 class ClassInout(ClassWire):
     def __init__(self,name_str,depth_d1_str="[0:0]",depth_d2_str=None,depth_d3_str=None):
         super(ClassInout, self).__init__(name_str,depth_d1_str,depth_d2_str,depth_d3_str)
         self.asloOut = True
+        self.type = "inout"
 
 def test():
     # DV = Depth_vector("aa  -1 :0")

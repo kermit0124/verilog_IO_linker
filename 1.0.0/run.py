@@ -86,43 +86,82 @@ class MainFrame ( wx_gui.mainFrame.MainFrame ):
         self.Update_src_list()
         self.Update_dest_list()
 
+
     def Update_dest_list(self):
-        self.dest_inst_lt = []
-        self.dest_objID_lt = []
-        self.dest_mapListIdx_lt = []
-        
-        for inst in self.core.inst_lt:
-            cnt = 0
-            for input in inst.input_lt:
-                self.dest_inst_lt.append (inst)
-                self.dest_objID_lt.append (input)
-                self.dest_mapListIdx_lt.append (cnt)
-                cnt += 1
-        
-        cnt = 0
-        for output in self.core.proc_wrapper.output_lt:
-            self.dest_inst_lt.append (self.core.proc_wrapper)
-            self.dest_objID_lt.append (output)
-            self.dest_mapListIdx_lt.append (cnt)
-
-        self.m_listBox__dest.Clear()
-        for idx,objID in enumerate(self.dest_objID_lt):
-            if (self.dest_inst_lt[idx]!=self.core.proc_wrapper):
-                txt = "[" + self.dest_inst_lt[idx].inst_name + ":I] "
-                txt += objID.name
-                txt += " :: "
-                txt += objID.assign_txt
-            else:
-                txt = "[Wrapper:O]"
-                txt += objID.name
-                txt += " :: "
-                txt += objID.assign_txt
-            self.m_listBox__dest.Append (txt)
+        self.destList_objID_lt = self.ScanListToShow(True)
+        self.UpdateListItem(self.m_listBox__dest,self.destList_objID_lt)
 
 
-
-        
     def Update_src_list(self):
+        self.srcList_objID_lt = self.ScanListToShow(False)
+        self.UpdateListItem(self.m_listBox__src,self.srcList_objID_lt)
+
+        pass
+
+    def UpdateListItem(self,classList,objID_lt):
+        type_str_dict = {
+            "input":"I"
+            ,"inout":"IO"
+            ,"output":"O"
+            ,"wire":"W"
+        }
+        classList.Clear()
+        
+        for obj in objID_lt:
+            type_str = type_str_dict[obj.type]
+            if (obj.onwer_objID==self.core.proc_wrapper):
+                str_inst = "wrapper"
+            else:
+                str_inst = obj.onwer_objID.name
+            if (len(obj.vec_lt)>0):
+                str_depth = obj.vec_lt[0]
+            else:
+                str_depth = ""
+            str_port_name = obj.name
+            str = "[%s:%s] %s%s"%(str_inst,type_str,str_depth,str_port_name)
+            classList.Append(str)
+
+    
+    def ScanListToShow(self,isDest=False):
+        
+        rt = []
+        if (isDest):
+            keys = ["output","inout"]
+        else:
+            keys = ["input","inout","wire"]
+        
+        for key in keys:
+            for port in self.core.proc_wrapper.port_dict[key]:
+                rt.append (port)
+
+
+        if (isDest):
+            keys = ["input","inout"]
+        else:
+            keys = ["output","inout"]
+
+        for inst in self.core.inst_lt:
+            for key in keys:
+                for port in inst.port_dict[key]:
+                    rt.append (port)
+        return (rt)
+        
+        # rt = []
+        # if (isWrapper):
+        #     pass
+        # else:
+        #     if (isDest):
+        #         keys = ["input","inout"]
+        #     else:
+        #         keys = ["output","inout"]
+
+        #     for inst in self.core.inst_lt:
+        #         for key in keys:
+        #             for port in inst.port_dict[key]:
+        #                 rt.append (port)
+        # return (rt)
+        
+    def Update_src_list_bak(self):
         self.src_inst_lt = []
         self.src_objID_lt = []
         self.src_mapListIdx_lt = []
@@ -153,7 +192,7 @@ class MainFrame ( wx_gui.mainFrame.MainFrame ):
                 txt = "[" + self.src_inst_lt[idx].inst_name + ":O] "
                 txt += objID.name
             else:
-                print (type(objID))
+                # print (type(objID))
                 txt = "[Wrapper:I]"
                 txt += objID.name
             self.m_listBox__src.Append (txt)

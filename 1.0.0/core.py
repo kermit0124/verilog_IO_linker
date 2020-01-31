@@ -18,6 +18,7 @@ class Core():
     def CreateWrapperFromModule(self,module_idx=0):
         self.proc_wrapper = module.Wrapper(self.module_lt[module_idx])
         self.Config_wrapper_linkPoints()
+        self.inst_update = True
 
     def ParseVerilogToModule(self,filePath):
         self.VP.LoadTxt(filePath)
@@ -145,4 +146,4 @@ def test():
     pass
 
 
-test2()
+# test2()
