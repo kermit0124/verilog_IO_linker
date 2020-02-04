@@ -89,7 +89,7 @@ class MainFrame ( wx_gui.mainFrame.MainFrame ):
 
     def Update_dest_list(self):
         self.destList_objID_lt = self.ScanListToShow(True)
-        self.UpdateListItem(self.m_listBox__dest,self.destList_objID_lt)
+        self.UpdateListItem(self.m_listBox__dest,self.destList_objID_lt,True)
 
 
     def Update_src_list(self):
@@ -98,7 +98,7 @@ class MainFrame ( wx_gui.mainFrame.MainFrame ):
 
         pass
 
-    def UpdateListItem(self,classList,objID_lt):
+    def UpdateListItem(self,classList,objID_lt,isDestList = False):
         type_str_dict = {
             "input":"I"
             ,"inout":"IO"
@@ -112,13 +112,17 @@ class MainFrame ( wx_gui.mainFrame.MainFrame ):
             if (obj.onwer_objID==self.core.proc_wrapper):
                 str_inst = "wrapper"
             else:
-                str_inst = obj.onwer_objID.name
+                str_inst = obj.onwer_objID.inst_name
             if (len(obj.vec_lt)>0):
                 str_depth = obj.vec_lt[0]
             else:
                 str_depth = ""
             str_port_name = obj.name
-            str = "[%s:%s] %s%s"%(str_inst,type_str,str_depth,str_port_name)
+            if (obj.assign_objID!=None):
+                str_src_name = obj.assign_objID.wrapper_wire_name
+            else:
+                str_src_name = ""
+            str = "[%s:%s] %s%s: %s"%(str_inst,type_str,str_depth,str_port_name,str_src_name)
             classList.Append(str)
 
     
@@ -208,9 +212,9 @@ class MainFrame ( wx_gui.mainFrame.MainFrame ):
     def connect__onBtnClick( self , event ):
         for dest_sel_num in self.m_listBox__dest.GetSelections():
             src_sel_num = self.m_listBox__src.GetSelections()[0]
-            sel_dest = self.dest_objID_lt[dest_sel_num]
-            sel_src = self.src_objID_lt[src_sel_num]
-            self.core.LinkInstIO(sel_dest,sel_src)
+            sel_dest = self.destList_objID_lt[dest_sel_num]
+            sel_src = self.srcList_objID_lt[src_sel_num]
+            self.core.LinkInstIO(sel_src,sel_dest)
 
             self.Update_dest_list()
 
@@ -220,9 +224,11 @@ class MainFrame ( wx_gui.mainFrame.MainFrame ):
             self.m_listBox__src.SetSelection((src_sel_num+1)%self.m_listBox__src.GetCount())
 
     def src__onListBox( self , event ):
-        src_sel_num = self.m_listBox__src.GetSelections()[0]
-        sel_src = self.src_objID_lt[src_sel_num]
-        self.m_textCtrl__agnModeSeg.SetLabel(sel_src.wrapper_wire_name)
+        get_sel = self.m_listBox__src.GetSelections()
+        if (get_sel!=[]):
+            src_sel_num = get_sel[0]
+            sel_src = self.srcList_objID_lt[src_sel_num]
+            self.m_textCtrl__agnModeSeg.SetLabel(sel_src.wrapper_wire_name)
 
     def createWire__onBtnClick( self, event ):
         wireName = self.m_textCtrl__createWireName.GetValue()

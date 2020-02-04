@@ -91,6 +91,7 @@ class Core():
         new_wire.scanable_src = True
         new_wire.sample_assign = False
         new_wire.assign_objID = assign_objID
+        new_wire.wrapper_wire_name = wireName
         self.proc_wrapper.AddWire(new_wire)
 
 
