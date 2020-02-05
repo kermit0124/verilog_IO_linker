@@ -1,5 +1,7 @@
 import re
 import copy
+from jinja2 import Template
+
 import module
 import wrapper
 import verilog_parser
@@ -13,6 +15,10 @@ class Core():
         self.proc_inst = None
         self.inst_lt = []
         self.inst_update = False
+        self.jinja_tmpl = Template(" ")
+        self.jinja_tmpl.environment.variable_start_string = "[{["
+        self.jinja_tmpl.environment.variable_end_string = "]}]"
+        self.jinja_tmpl = Template(basic_verilog_code_wrapHeader())
         pass
 
     def CreateWrapperFromModule(self,module_idx=0):
@@ -50,6 +56,7 @@ class Core():
                 str = "_" + inst.inst_name + "__" + port.name
                 port.wrapper_wire_name = str
                 port.scanable_src = True
+                port.assign_txt = port.wrapper_wire_name
                 
         key_lt = ["input","inout"]
         for key in key_lt:
@@ -83,7 +90,21 @@ class Core():
         dest_obj.assign_txt = src_obj.name
         dest_obj.jump_link_objID = None
         dest_obj.sample_assign = False
-        pass
+    
+    def LinkParam(self,src_obj,dest_obj):
+        dest_obj.override_objID = src_obj
+        dest_obj.override_txt = src_obj.name
+    
+    def CfgPortParam(self,inst):
+        for key in ["input","inout","output"]:
+            for port in inst.port_dict[key]:
+                temp_str = port.vec_lt[0].verilog_str
+                if (temp_str!=""):
+                    search_succ = False
+                    for param in inst.param_lt:
+                        if (param.name) in temp_str:
+                            port.vec_lt[0].verilog_overrideParam_str  = temp_str.replace(param.name,param.override_txt)
+
 
     def CreateWireToWrapper(self,wireName,wireSeg,vec_d1="[0:0]",vec_d2=None,vec_d3=None,assign_objID=None):
         new_wire = basic_component.ClassWire(wireName,vec_d1,vec_d2,vec_d3)
@@ -93,6 +114,153 @@ class Core():
         new_wire.assign_objID = assign_objID
         new_wire.wrapper_wire_name = wireName
         self.proc_wrapper.AddWire(new_wire)
+
+    def CfgAllPortOverrider(self):
+        for inst in self.inst_lt:
+            self.CfgPortParam(inst)
+
+    def GenerateVerilogCode(self):
+        self.CfgAllPortOverrider()
+
+        wrapPort_lt = []
+        keys = ["input","output","inout"]
+        for key in keys:
+            for port in self.proc_wrapper.port_dict[key]:
+                wrapPort_lt.append (port)
+
+        self.gen_source = self.jinja_tmpl.render(
+            wrapper_name = self.proc_wrapper.name
+            ,wrapParams = self.proc_wrapper.param_lt
+            ,wrapPort_lt = wrapPort_lt
+            ,inst_lt = self.inst_lt
+            ,proc_wrapper = self.proc_wrapper
+        )
+        print (self.gen_source)
+        pass
+
+
+
+
+
+def basic_verilog_code_wrapHeader():
+        templateTxt = u"""
+{%-macro port_link_item(port)%}
+{%-if (port.type != "output")%}
+{%-if (port.assign_objID != None)%}[{[port.assign_objID.wrapper_wire_name]}]
+{%-endif%}
+{%-else%}[{[port.wrapper_wire_name]}]
+{%-endif%}
+{%- endmacro %}
+{%-set inst_port_keys = [
+"input"
+,"output"
+,"inout"
+]%}
+`timescale 1ns / 1ps
+
+module [{[wrapper_name]}] #(
+{%-for wrapParam in wrapParams%}
+    [{[wrapParam.name]}] = [{[wrapParam.value]}] {%if loop.last == False%},{%endif%}
+{%-endfor%}
+)
+(
+{%-for port in wrapPort_lt%}
+    [{[port.type]}] wire [{[port.vec_lt[0]]}] [{[port.name]}] {%if loop.last == False%},{%endif%}
+{%-endfor%}
+);
+
+// Wrapper wire 
+{%-for wire in proc_wrapper.wire_lt%}
+wire [{[wire.vec_lt[0]]}] [{[wire.name]}] ;
+{%endfor%}
+
+// Instance module
+{%-for inst in inst_lt%}
+
+// ## Instance: [{[inst.inst_name]}]
+// ## Output port
+{%-for outPort in inst.output_lt%}
+wire [{[outPort.vec_lt[0].verilog_overrideParam_str]}] [{[outPort.wrapper_wire_name]}] ;
+{%-endfor%}
+
+[{[inst.name]}] # (
+    {%-for param in inst.param_lt%}
+    {%-if param.override_objID != None %}
+    .[{[param.name]}] ( [{[param.override_objID.name]}] ) {%if loop.last == False%},{%endif%}
+    {%-else%}
+    //.[{[param.name]}] ( [{[param.override_objID.name]}] ) {%if loop.last == False%},{%endif%}
+    {%-endif%}
+    {%-endfor%}
+)
+[{[inst.inst_name]}] (
+    {%-for key in inst_port_keys%}
+    {%-for port in inst.port_dict[key]%}
+    .[{[port.name]}] ( [{[port.assign_txt]}] ) {%if loop.last == False%},{%endif%}
+    {%-endfor%}    
+    {%-endfor%}    
+);
+{%-endfor%}
+
+endmodule
+
+"""
+        return (templateTxt)
+
+
+def basic_verilog_code_inst():
+        templateTxt = u"""
+axis_async_fifo #(
+    .DEPTH(DEPTH),
+    .DATA_WIDTH(DATA_WIDTH),
+    .KEEP_ENABLE(EXPAND_BUS ? M_KEEP_ENABLE : S_KEEP_ENABLE),
+    .KEEP_WIDTH(KEEP_WIDTH),
+    .LAST_ENABLE(1),
+    .ID_ENABLE(ID_ENABLE),
+    .ID_WIDTH(ID_WIDTH),
+    .DEST_ENABLE(DEST_ENABLE),
+    .DEST_WIDTH(DEST_WIDTH),
+    .USER_ENABLE(USER_ENABLE),
+    .USER_WIDTH(USER_WIDTH),
+    .FRAME_FIFO(FRAME_FIFO),
+    .USER_BAD_FRAME_VALUE(USER_BAD_FRAME_VALUE),
+    .USER_BAD_FRAME_MASK(USER_BAD_FRAME_MASK),
+    .DROP_BAD_FRAME(DROP_BAD_FRAME),
+    .DROP_WHEN_FULL(DROP_WHEN_FULL)
+)
+fifo_inst (
+    // Common reset
+    .async_rst(s_rst | m_rst),
+    // AXI input
+    .s_clk(s_clk),
+    .s_axis_tdata(pre_fifo_axis_tdata),
+    .s_axis_tkeep(pre_fifo_axis_tkeep),
+    .s_axis_tvalid(pre_fifo_axis_tvalid),
+    .s_axis_tready(pre_fifo_axis_tready),
+    .s_axis_tlast(pre_fifo_axis_tlast),
+    .s_axis_tid(pre_fifo_axis_tid),
+    .s_axis_tdest(pre_fifo_axis_tdest),
+    .s_axis_tuser(pre_fifo_axis_tuser),
+    // AXI output
+    .m_clk(m_clk),
+    .m_axis_tdata(post_fifo_axis_tdata),
+    .m_axis_tkeep(post_fifo_axis_tkeep),
+    .m_axis_tvalid(post_fifo_axis_tvalid),
+    .m_axis_tready(post_fifo_axis_tready),
+    .m_axis_tlast(post_fifo_axis_tlast),
+    .m_axis_tid(post_fifo_axis_tid),
+    .m_axis_tdest(post_fifo_axis_tdest),
+    .m_axis_tuser(post_fifo_axis_tuser),
+    // Status
+    .s_status_overflow(s_status_overflow),
+    .s_status_bad_frame(s_status_bad_frame),
+    .s_status_good_frame(s_status_good_frame),
+    .m_status_overflow(m_status_overflow),
+    .m_status_bad_frame(m_status_bad_frame),
+    .m_status_good_frame(m_status_good_frame)
+);
+"""
+        return (templateTxt)
+
 
 
 def test2():
@@ -109,7 +277,9 @@ def test2():
     # core.CreateWireToWrapper("wire_1","~rstn",assign_objID=core.inst_lt[0].port_dict["output"][0])
     core.CreateWireToWrapper("wire_1","~rstn",assign_objID=core.proc_wrapper.port_dict["input"][1])
     core.LinkWrapWire(core.proc_wrapper.port_dict["wire"][0],core.inst_lt[0].port_dict["input"][1])
-
+    core.LinkParam(core.proc_wrapper.param_lt[0],core.inst_lt[0].param_lt[0])
+    # core.CfgPortParam(core.inst_lt[0])
+    core.GenerateVerilogCode()
     pass
 
 def test():
@@ -147,4 +317,4 @@ def test():
     pass
 
 
-# test2()
+test2()

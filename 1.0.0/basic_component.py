@@ -8,6 +8,7 @@ class Depth_vector():
         self.vec_top = ""
         self.vec_down = ""
         self.verilog_str = ""
+        self.verilog_overrideParam_str = ""
         re_txt = r"(.+):(.+)"
         re_res = re.match(re_txt,init_str)
         if (re_res!=None):
@@ -56,6 +57,7 @@ class ClassParameter(Basic_component):
     def __init__(self,name_str,value,depth_d1_str="[0:0]"):
         self.value = value
         self.override_txt = value
+        self.override_objID = None
         self.ignore = False
         super(ClassParameter, self).__init__(name_str,depth_d1_str,None,None)
     def GetVerilogCode(self):
