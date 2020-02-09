@@ -14,17 +14,18 @@ class Core():
         self.wrap_module_lt = None
         self.proc_inst = None
         self.inst_lt = []
-        self.inst_update = False
         self.jinja_tmpl = Template(" ")
         self.jinja_tmpl.environment.variable_start_string = "[{["
         self.jinja_tmpl.environment.variable_end_string = "]}]"
         self.jinja_tmpl = Template(basic_verilog_code_wrapHeader())
+        self.proc_wrapper = None
+        self.update_cnt = 0
         pass
 
     def CreateWrapperFromModule(self,module_idx=0):
         self.proc_wrapper = module.Wrapper(self.module_lt[module_idx])
         self.Config_wrapper_linkPoints()
-        self.inst_update = True
+        self.update_cnt += 1
 
     def ParseVerilogToModule(self,filePath):
         self.VP.LoadTxt(filePath)
@@ -45,7 +46,7 @@ class Core():
         temp_module = self.module_lt[module_idx]
         temp_inst = module.Instance(temp_module,inst_name)
         self.inst_lt.append (temp_inst)
-        self.inst_update = True
+        self.update_cnt += 1
         self.Config_inst_linkPoints(len(self.inst_lt)-1)
             
     def Config_inst_linkPoints(self,lt_idx):
@@ -84,16 +85,22 @@ class Core():
         dest_obj.assign_txt = src_obj.wrapper_wire_name
         dest_obj.jump_link_objID = None
         dest_obj.sample_assign = True
+        self.update_cnt += 1
+
 
     def LinkWrapWire(self,src_obj,dest_obj):
         dest_obj.assign_objID = src_obj
         dest_obj.assign_txt = src_obj.name
         dest_obj.jump_link_objID = None
         dest_obj.sample_assign = False
+        self.update_cnt += 1
+
     
     def LinkParam(self,src_obj,dest_obj):
         dest_obj.override_objID = src_obj
         dest_obj.override_txt = src_obj.name
+        self.update_cnt += 1
+
     
     def CfgPortParam(self,inst):
         for key in ["input","inout","output"]:
@@ -103,7 +110,7 @@ class Core():
                     search_succ = False
                     for param in inst.param_lt:
                         if (param.name) in temp_str:
-                            port.vec_lt[0].verilog_overrideParam_str  = temp_str.replace(param.name,param.override_txt)
+                            port.vec_lt[0].verilog_overrideParam_str  = temp_str.replace(param.name,"("+param.override_txt+")")
 
 
     def CreateWireToWrapper(self,wireName,wireSeg,vec_d1="[0:0]",vec_d2=None,vec_d3=None,assign_objID=None):
@@ -114,6 +121,22 @@ class Core():
         new_wire.assign_objID = assign_objID
         new_wire.wrapper_wire_name = wireName
         self.proc_wrapper.AddWire(new_wire)
+
+    def CreateIO_toWrapper(self,itemName,type_str,vec_d1="[0:0]"):
+        if (type_str=="input"):
+            self.proc_wrapper.input_lt.append (basic_component.ClassInput(itemName,vec_d1))
+        elif (type_str=="inout"):
+            self.proc_wrapper.inout_lt.append (basic_component.ClassInout(itemName,vec_d1))
+        else:
+            self.proc_wrapper.output_lt.append (basic_component.ClassOutput(itemName,vec_d1))
+        self.Config_wrapper_linkPoints()
+
+    def CreateParameterToWrapper(self,paramName,value,vec_d1="[0:0]"):
+        self.proc_wrapper.param_lt.append (basic_component.ClassParameter(paramName,value,vec_d1))
+
+    def CreateEmptyWrapper(self,wrapperName):
+        temp = module.Module(wrapperName)
+        self.proc_wrapper = module.Wrapper(temp)
 
     def CfgAllPortOverrider(self):
         for inst in self.inst_lt:
@@ -136,7 +159,7 @@ class Core():
             ,proc_wrapper = self.proc_wrapper
         )
         print (self.gen_source)
-        pass
+        return(self.gen_source)
 
 
 
@@ -199,6 +222,22 @@ wire [{[outPort.vec_lt[0].verilog_overrideParam_str]}] [{[outPort.wrapper_wire_n
     {%-endfor%}    
     {%-endfor%}    
 );
+{%-endfor%}
+
+// Assign input/inout
+
+
+{%-for wire in proc_wrapper.wire_lt%}
+assign [{[wire.name]}] = [{[wire.assign_txt]}] ;
+{%-endfor%}
+
+// Wrapper IO
+{%-for outPort in proc_wrapper.output_lt%}
+{%-if (outPort.assign_objID != None)%}
+assign [{[outPort.name]}] = [{[outPort.assign_txt]}] ;
+{%-else%}
+//assign [{[outPort.name]}] = [{[outPort.assign_txt]}] ;
+{%-endif%}
 {%-endfor%}
 
 endmodule
@@ -279,7 +318,34 @@ def test2():
     core.LinkWrapWire(core.proc_wrapper.port_dict["wire"][0],core.inst_lt[0].port_dict["input"][1])
     core.LinkParam(core.proc_wrapper.param_lt[0],core.inst_lt[0].param_lt[0])
     # core.CfgPortParam(core.inst_lt[0])
+    core.LinkInstIO(core.inst_lt[0].port_dict["output"][0],core.proc_wrapper.output_lt[0])
+    core.CreateIO_toWrapper("abc_o","output")
     core.GenerateVerilogCode()
+    pass
+
+
+def test3():
+    core = Core()
+    core.ParseVerilogToModule("D:/DevProjects/anaconda/verilog_IO_linker/1.0.0/test.v")
+    core.ParseVerilogToModule("D:/DevProjects/anaconda/verilog_IO_linker/1.0.0/test_wrapper.v")
+    core.CreateInstFromModule("instA_0",0)
+    core.CreateInstFromModule("instA_1",0)
+    core.CreateInstFromModule("instB_1",1)
+    core.Select_procInst(0)
+    core.CreateEmptyWrapper("Top_wrapper")
+    core.CreateParameterToWrapper("asb",10)
+    core.CreateIO_toWrapper("abc_o","output","[asb-1:0]")
+    # core.CreateWrapperFromModule(0)
+    # core.LinkInstIO(core.inst_lt[0].port_dict["output"][0],core.inst_lt[1].port_dict["input"][0])
+    
+    # # core.CreateWireToWrapper("wire_1","~rstn",assign_objID=core.inst_lt[0].port_dict["output"][0])
+    # core.CreateWireToWrapper("wire_1","~rstn",assign_objID=core.proc_wrapper.port_dict["input"][1])
+    # core.LinkWrapWire(core.proc_wrapper.port_dict["wire"][0],core.inst_lt[0].port_dict["input"][1])
+    # core.LinkParam(core.proc_wrapper.param_lt[0],core.inst_lt[0].param_lt[0])
+    # # core.CfgPortParam(core.inst_lt[0])
+    # core.LinkInstIO(core.inst_lt[0].port_dict["output"][0],core.proc_wrapper.output_lt[0])
+    # core.CreateIO_toWrapper("abc_o","output")
+    # core.GenerateVerilogCode()
     pass
 
 def test():
@@ -317,4 +383,4 @@ def test():
     pass
 
 
-test2()
+test3()

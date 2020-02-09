@@ -28,6 +28,7 @@
 #include <wx/checkbox.h>
 #include <wx/menu.h>
 #include <wx/frame.h>
+#include <wx/richtext/richtextctrl.h>
 #include <wx/filepicker.h>
 
 ///////////////////////////////////////////////////////////////////////////
@@ -79,6 +80,28 @@ class MainFrame : public wxFrame
 		MainFrame( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 983,624 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
 
 		~MainFrame();
+
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class VerilogCodeFrame
+///////////////////////////////////////////////////////////////////////////////
+class VerilogCodeFrame : public wxFrame
+{
+	private:
+
+	protected:
+		wxRichTextCtrl* m_richText__showGen;
+
+		// Virtual event handlers, overide them in your derived class
+		virtual void VerilogCodeFrame__onAct( wxActivateEvent& event ) { event.Skip(); }
+
+
+	public:
+
+		VerilogCodeFrame( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 909,669 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
+
+		~VerilogCodeFrame();
 
 };
 

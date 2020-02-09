@@ -2,6 +2,7 @@ import re
 import wx
 import wx_gui.mainFrame
 import wx_gui.moduleManagerFrame
+import wx_gui.verilogCodeFrame
 import verilog_parser
 import linker
 import core
@@ -70,7 +71,8 @@ class ModuleManagerFrame ( wx_gui.moduleManagerFrame.ModuleManagerFrame):
     def mapping__onBtnClick( self, event ):
         num_instParam = self.m_listBox__override_param.GetSelection()
         num_wrapParam = self.m_listBox__wrapper_param.GetSelection()
-        self.core.proc_inst.param_lt[num_instParam].override_txt = self.core.proc_wrapper.param_lt[num_wrapParam].name
+        # self.core.proc_inst.param_lt[num_instParam].override_txt = self.core.proc_wrapper.param_lt[num_wrapParam].name
+        self.core.LinkParam(self.core.proc_wrapper.param_lt[num_wrapParam],self.core.proc_inst.param_lt[num_instParam])
         self.UpdateParamList()
         self.m_listBox__override_param.Select((num_instParam+1)%self.m_listBox__override_param.GetCount())
         self.m_listBox__wrapper_param.Select((num_wrapParam+1)%self.m_listBox__wrapper_param.GetCount())
@@ -80,7 +82,10 @@ class MainFrame ( wx_gui.mainFrame.MainFrame ):
     def __init__( self, parent ):
         super(MainFrame,self).__init__(parent)
         self.core = core.Core()
+        self.update_cnt = 0
         self.moduleManagerFrame = ModuleManagerFrame(None,self.core)
+        self.verilogCodeFrame = VerilogCodeFrame(None,self.core)
+        self.verilogCodeFrame.Show()
     
     def Update_all_list(self):
         self.Update_src_list()
@@ -150,21 +155,6 @@ class MainFrame ( wx_gui.mainFrame.MainFrame ):
                     rt.append (port)
         return (rt)
         
-        # rt = []
-        # if (isWrapper):
-        #     pass
-        # else:
-        #     if (isDest):
-        #         keys = ["input","inout"]
-        #     else:
-        #         keys = ["output","inout"]
-
-        #     for inst in self.core.inst_lt:
-        #         for key in keys:
-        #             for port in inst.port_dict[key]:
-        #                 rt.append (port)
-        # return (rt)
-        
     def Update_src_list_bak(self):
         self.src_inst_lt = []
         self.src_objID_lt = []
@@ -206,9 +196,10 @@ class MainFrame ( wx_gui.mainFrame.MainFrame ):
         self.moduleManagerFrame.Show()
 
     def mainFrame__onAct( self , event ):
-        if (self.core.inst_update):
-            self.core.inst_update = False
+        if (self.core.update_cnt!=self.update_cnt):
+            self.update_cnt = self.core.update_cnt
             self.Update_all_list()
+            
     def connect__onBtnClick( self , event ):
         for dest_sel_num in self.m_listBox__dest.GetSelections():
             src_sel_num = self.m_listBox__src.GetSelections()[0]
@@ -235,6 +226,18 @@ class MainFrame ( wx_gui.mainFrame.MainFrame ):
         wireSeg = self.m_textCtrl__createWireSeg.GetValue()
         self.core.CreateWireToWrapper(wireName,wireSeg)
         self.Update_src_list()
+
+class VerilogCodeFrame ( wx_gui.verilogCodeFrame.VerilogCodeFrame ):	
+    def __init__( self, parent , core):
+        super(VerilogCodeFrame,self).__init__(parent)
+        self.core = core
+        self.update_cnt = 0
+    
+    def VerilogCodeFrame__onAct( self, event ):
+        if (self.core.proc_wrapper!=None):
+            if (self.update_cnt!=self.core.update_cnt):
+                self.m_richText__showGen.SetValue(self.core.GenerateVerilogCode())
+                self.update_cnt = self.core.update_cnt
 
 def main():
     app=wx.App()

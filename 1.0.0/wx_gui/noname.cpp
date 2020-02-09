@@ -186,6 +186,33 @@ MainFrame::~MainFrame()
 
 }
 
+VerilogCodeFrame::VerilogCodeFrame( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxFrame( parent, id, title, pos, size, style )
+{
+	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+
+	wxBoxSizer* bSizer15;
+	bSizer15 = new wxBoxSizer( wxVERTICAL );
+
+	m_richText__showGen = new wxRichTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0|wxVSCROLL|wxHSCROLL|wxNO_BORDER|wxWANTS_CHARS );
+	bSizer15->Add( m_richText__showGen, 1, wxEXPAND | wxALL, 5 );
+
+
+	this->SetSizer( bSizer15 );
+	this->Layout();
+
+	this->Centre( wxBOTH );
+
+	// Connect Events
+	this->Connect( wxEVT_ACTIVATE, wxActivateEventHandler( VerilogCodeFrame::VerilogCodeFrame__onAct ) );
+}
+
+VerilogCodeFrame::~VerilogCodeFrame()
+{
+	// Disconnect Events
+	this->Disconnect( wxEVT_ACTIVATE, wxActivateEventHandler( VerilogCodeFrame::VerilogCodeFrame__onAct ) );
+
+}
+
 ModuleManagerFrame::ModuleManagerFrame( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxFrame( parent, id, title, pos, size, style )
 {
 	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
