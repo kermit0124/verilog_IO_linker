@@ -6,6 +6,7 @@ import module
 import wrapper
 import verilog_parser
 import basic_component
+import basic_parameter
 
 class Core():
     def __init__(self):
@@ -75,6 +76,7 @@ class Core():
         for key in key_lt:
             for port in self.proc_wrapper.port_dict[key]:
                 port.scanable_dest = True
+        self.proc_wrapper.SetOnwer(self.proc_wrapper)
 
     
     def Select_procInst(self,idx):
@@ -130,13 +132,15 @@ class Core():
         else:
             self.proc_wrapper.output_lt.append (basic_component.ClassOutput(itemName,vec_d1))
         self.Config_wrapper_linkPoints()
+        self.update_cnt += 1
 
-    def CreateParameterToWrapper(self,paramName,value,vec_d1="[0:0]"):
-        self.proc_wrapper.param_lt.append (basic_component.ClassParameter(paramName,value,vec_d1))
+    def CreateParameterToWrapper(self,paramName,value,vec_d1=""):
+        self.proc_wrapper.param_lt.append (basic_parameter.ClassParameter(paramName,value,vec_d1))
 
     def CreateEmptyWrapper(self,wrapperName):
         temp = module.Module(wrapperName)
         self.proc_wrapper = module.Wrapper(temp)
+        self.update_cnt += 1
 
     def CfgAllPortOverrider(self):
         for inst in self.inst_lt:
@@ -333,7 +337,7 @@ def test3():
     core.CreateInstFromModule("instB_1",1)
     core.Select_procInst(0)
     core.CreateEmptyWrapper("Top_wrapper")
-    core.CreateParameterToWrapper("asb",10)
+    core.CreateParameterToWrapper("asb",10,"[abc-1:0]")
     core.CreateIO_toWrapper("abc_o","output","[asb-1:0]")
     # core.CreateWrapperFromModule(0)
     # core.LinkInstIO(core.inst_lt[0].port_dict["output"][0],core.inst_lt[1].port_dict["input"][0])
@@ -383,4 +387,4 @@ def test():
     pass
 
 
-test3()
+# test3()

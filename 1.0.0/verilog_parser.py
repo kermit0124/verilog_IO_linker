@@ -1,5 +1,6 @@
 import re
 import basic_component
+import basic_parameter
 import module
 
 class ClassVerilogParser():
@@ -95,7 +96,7 @@ class ClassVerilogParser():
             depth = para_seg[1].replace(" ","")
             name = para_seg[3].replace(" ","")
             value = para_seg[5].replace(" ","")
-            self.param_lt.append (basic_component.ClassParameter(name,value,depth))
+            self.param_lt.append (basic_parameter.ClassParameter(name,value,depth))
         
 
     def __ParseModuleTitle_IO_scan(self):

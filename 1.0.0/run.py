@@ -77,6 +77,28 @@ class ModuleManagerFrame ( wx_gui.moduleManagerFrame.ModuleManagerFrame):
         self.m_listBox__override_param.Select((num_instParam+1)%self.m_listBox__override_param.GetCount())
         self.m_listBox__wrapper_param.Select((num_wrapParam+1)%self.m_listBox__wrapper_param.GetCount())
     
+    def createNewWrapper__onBtnClick( self, event ):
+        wrapName = self.m_textCtrl__createNewWrapper.GetValue()
+        self.core.CreateEmptyWrapper(wrapName)
+
+    def overrideParamByConst__onBtnClick( self, event ):
+        pass
+    
+    def createNewParam__onBtnClick( self, event ):
+        paramName = self.m_textCtrl__newParam_name.GetValue()
+        paramValue = self.m_textCtrl_newParam_value.GetValue()
+        paramName = paramName.replace(" ","")
+        re_res_lt = re.findall(r"(\[.+\])(.+)",paramName)
+        paramDepth = ''
+        if (len(re_res_lt)>0):
+            re_res_lt = re_res_lt[0]
+            paramName = re_res_lt[1]
+            paramDepth = re_res_lt[0]
+
+        if ((paramName!='') & (paramValue!='')):
+            self.core.CreateParameterToWrapper(paramName,paramValue,paramDepth)
+            self.UpdateWrapperParam()
+        pass
 
 class MainFrame ( wx_gui.mainFrame.MainFrame ):	
     def __init__( self, parent ):
@@ -221,11 +243,25 @@ class MainFrame ( wx_gui.mainFrame.MainFrame ):
             sel_src = self.srcList_objID_lt[src_sel_num]
             self.m_textCtrl__agnModeSeg.SetLabel(sel_src.wrapper_wire_name)
 
-    def createWire__onBtnClick( self, event ):
-        wireName = self.m_textCtrl__createWireName.GetValue()
-        wireSeg = self.m_textCtrl__createWireSeg.GetValue()
-        self.core.CreateWireToWrapper(wireName,wireSeg)
-        self.Update_src_list()
+    def create_wireIO__onBtnClick( self, event ):
+        name = self.m_textCtrl__createWireName.GetValue()
+        segm = self.m_textCtrl__createWireSeg.GetValue()
+
+        re_res_lt = re.findall(r"(input|output|inout|wire|)( |)(\[.+\]|)(.+)",name)
+        if (len(re_res_lt)>0):
+            re_res_lt = re_res_lt[0]
+            # IO_type = re_res_lt[0]
+            IO_type = self.m_choice__create_wireIO_type.GetStringSelection()
+            if (IO_type=='wire'):
+                if (segm.replace(' ','') == ''):
+                    segm = '0'
+                self.core.CreateWireToWrapper(name,segm)
+            else:
+                IO_depth = re_res_lt[2]
+                IO_name = re_res_lt[3].replace(' ','')
+                self.core.CreateIO_toWrapper(IO_name,IO_type,IO_depth)
+        
+        self.Update_all_list()
 
 class VerilogCodeFrame ( wx_gui.verilogCodeFrame.VerilogCodeFrame ):	
     def __init__( self, parent , core):

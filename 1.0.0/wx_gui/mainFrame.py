@@ -92,14 +92,24 @@ class MainFrame ( wx.Frame ):
 		self.m_staticline6 = wx.StaticLine( sbSizer8.GetStaticBox(), wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
 		sbSizer8.Add( self.m_staticline6, 0, wx.EXPAND |wx.ALL, 5 )
 
+		bSizer33 = wx.BoxSizer( wx.HORIZONTAL )
+
 		self.m_textCtrl__createWireName = wx.TextCtrl( sbSizer8.GetStaticBox(), wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
-		sbSizer8.Add( self.m_textCtrl__createWireName, 0, wx.ALL|wx.ALIGN_CENTER_HORIZONTAL|wx.EXPAND, 5 )
+		bSizer33.Add( self.m_textCtrl__createWireName, 1, wx.ALL|wx.ALIGN_CENTER_HORIZONTAL, 5 )
+
+		m_choice__create_wireIO_typeChoices = [ u"input", u"output", u"inout", u"wire" ]
+		self.m_choice__create_wireIO_type = wx.Choice( sbSizer8.GetStaticBox(), wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, m_choice__create_wireIO_typeChoices, 0 )
+		self.m_choice__create_wireIO_type.SetSelection( 0 )
+		bSizer33.Add( self.m_choice__create_wireIO_type, 0, wx.ALL, 5 )
+
+
+		sbSizer8.Add( bSizer33, 1, wx.EXPAND, 5 )
 
 		self.m_textCtrl__createWireSeg = wx.TextCtrl( sbSizer8.GetStaticBox(), wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
 		sbSizer8.Add( self.m_textCtrl__createWireSeg, 0, wx.ALL|wx.ALIGN_CENTER_HORIZONTAL|wx.EXPAND, 5 )
 
-		self.m_button__createWire = wx.Button( sbSizer8.GetStaticBox(), wx.ID_ANY, u"Create wire", wx.DefaultPosition, wx.DefaultSize, 0 )
-		sbSizer8.Add( self.m_button__createWire, 0, wx.ALL|wx.ALIGN_CENTER_HORIZONTAL, 5 )
+		self.m_button__create_wireIO = wx.Button( sbSizer8.GetStaticBox(), wx.ID_ANY, u"Create wire/IO", wx.DefaultPosition, wx.DefaultSize, 0 )
+		sbSizer8.Add( self.m_button__create_wireIO, 0, wx.ALL|wx.ALIGN_CENTER_HORIZONTAL, 5 )
 
 
 		bSizer22.Add( sbSizer8, 1, wx.EXPAND, 5 )
@@ -172,7 +182,7 @@ class MainFrame ( wx.Frame ):
 		self.m_listBox__src.Bind( wx.EVT_LISTBOX, self.src__onListBox )
 		self.m_button__connect.Bind( wx.EVT_BUTTON, self.connect__onBtnClick )
 		self.m_button__assign.Bind( wx.EVT_BUTTON, self.assign__onBtnClick )
-		self.m_button__createWire.Bind( wx.EVT_BUTTON, self.createWire__onBtnClick )
+		self.m_button__create_wireIO.Bind( wx.EVT_BUTTON, self.create_wireIO__onBtnClick )
 		self.m_listBox__dest.Bind( wx.EVT_LISTBOX, self.dest__onListBox )
 		self.Bind( wx.EVT_MENU, self.menu_moduleManager__onMenuSel, id = self.m_menuItem11.GetId() )
 
@@ -193,7 +203,7 @@ class MainFrame ( wx.Frame ):
 	def assign__onBtnClick( self, event ):
 		event.Skip()
 
-	def createWire__onBtnClick( self, event ):
+	def create_wireIO__onBtnClick( self, event ):
 		event.Skip()
 
 	def dest__onListBox( self, event ):

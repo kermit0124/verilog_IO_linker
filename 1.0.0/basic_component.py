@@ -53,19 +53,6 @@ class Basic_component():
         self.name = name_str
 
 
-class ClassParameter(Basic_component):
-    def __init__(self,name_str,value,depth_d1_str="[0:0]"):
-        self.value = value
-        self.override_txt = value
-        self.override_objID = None
-        self.ignore = False
-        super(ClassParameter, self).__init__(name_str,depth_d1_str,None,None)
-    def GetVerilogCode(self):
-        vec_str = self.vec_lt[0].verilog_str if (self.vec_lt[0].verilog_str!="") else ""
-        rt = vec_str + self.name + " = " + self.value
-        return (rt)
-
-
 class ClassRegister(Basic_component):
     def __init__(self,name_str,depth_d1_str="[0:0]",depth_d2_str=None,depth_d3_str=None):
         super(ClassRegister, self).__init__(name_str,depth_d1_str,depth_d2_str,depth_d3_str)
