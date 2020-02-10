@@ -387,4 +387,9 @@ def test():
     pass
 
 
-# test3()
+def test4():
+    core = Core()
+    core.ParseVerilogToModule("D:\\DevProjects\\Vivado\\IP_Design\\CMOS-Python_Sys\\python_data_proc\\python_data_proc.srcs\\sources_1\\python_data_proc.sv")
+    core.ParseVerilogToModule("D:\\DevProjects\\Vivado\\IP_Design\\CMOS-Python_Sys\\python_data_proc\\python_data_proc.srcs\\sources_1\\sub\\training\\data_training_v4\\top_data_training.v")
+
+test4()

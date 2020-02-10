@@ -36,6 +36,7 @@ class ClassVerilogParser():
                 self.src_module_title = re_res2_lt[0][0]
                 self.src_body = re_res2_lt[0][1]
                 self.__ParseModuleTitle()
+                self.__ParseModuleBody_IO_scan()
                 self.parse_succ = True
                 
                 self.module_lt.append (
@@ -87,6 +88,7 @@ class ClassVerilogParser():
         if ("#") in self.src_module_title:
             # with parameter in title
             self.__ParseModuleTitle_param()
+        
         self.__ParseModuleTitle_IO_scan()
     
     def __ParseModuleTitle_param(self):
@@ -100,17 +102,21 @@ class ClassVerilogParser():
         
 
     def __ParseModuleTitle_IO_scan(self):
-        self.parseModuleTitle_IO_type_sel = "input"
-        self.__ParseModuleTitle_IO_type()
-        self.parseModuleTitle_IO_type_sel = "output"
-        self.__ParseModuleTitle_IO_type()
-        self.parseModuleTitle_IO_type_sel = "inout"
-        self.__ParseModuleTitle_IO_type()
+        self.src_module_title_IO = self.src_module_title.replace("\n","")
+        # re_lt = re.findall("(input|output|inout)(wire|) (\[.+?\]|)(.+?)(,|\))",self.src_module_title_IO)        
+        # self.parseModuleTitle_IO_type_sel = "input"
+        # self.__ParseModuleTitle_IO_type()
+        # self.parseModuleTitle_IO_type_sel = "output"
+        # self.__ParseModuleTitle_IO_type()
+        # self.parseModuleTitle_IO_type_sel = "inout"
+        # self.__ParseModuleTitle_IO_type()
+        for txt in self.src_module_title_IO.split(","):
+            self.__ParseModuleIO_scan(txt)
 
     def __ParseModuleTitle_IO_type(self):
         rStr = self.parseModuleTitle_IO_type_sel
         rStr = rStr + "[\n| ]+(wire|)[\n| ]+(\[(.+)\]|)(.+?)(,|\n)"
-        re_res_lt = re.findall(rStr,self.src_module_title)
+        re_res_lt = re.findall(rStr,self.src_module_title_IO)
         # print (self.parseModuleTitle_IO_type_sel)
         for io_seg in re_res_lt:
             IO_name = io_seg[3].replace(" ","")
@@ -122,6 +128,30 @@ class ClassVerilogParser():
             else:
                 self.inout_lt.append (basic_component.ClassInout(IO_name,IO_depth))
             # print (IO_name , IO_depth)
+    
+    def __ParseModuleBody_IO_scan(self):
+        type_keys = ["input","inout","output"]
+        re_lt = re.findall("([\s\w\S\W]+?);",self.src_body.replace("\n",""))
+        for txt in re_lt:
+            self.__ParseModuleIO_scan(txt)
+    def __ParseModuleIO_scan(self,txt):
+        re2_lt = re.findall("(input|output|inout) (wire |)(\[.+\]|)(.+)",txt)
+        if (len(re2_lt)>0):
+            re2_lt = re2_lt[0]
+            temp_type = re2_lt[0].replace(" ","")
+            temp_depth = re2_lt[2].replace(" ","")
+            temp_name = re2_lt[3].replace(" ","")
+            temp_name_lt = temp_name.split(",")
+            for name in temp_name_lt:
+                # print(name , temp_depth ,temp_type)
+                if (temp_type =="input"):
+                    self.input_lt.append (basic_component.ClassInput(name,temp_depth))
+                elif (temp_type == "output"):
+                    self.output_lt.append (basic_component.ClassOutput(name,temp_depth))
+                elif (temp_type == "inout"):
+                    self.inout_lt.append (basic_component.ClassInout(name,temp_depth))
+                else:
+                    print ("Type error:",name,temp_type,temp_depth)
 
 
 def test():
