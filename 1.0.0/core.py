@@ -187,7 +187,7 @@ def basic_verilog_code_wrapHeader():
 
 module [{[wrapper_name]}] #(
 {%-for wrapParam in wrapParams%}
-    [{[wrapParam.name]}] = [{[wrapParam.value]}] {%if loop.last == False%},{%endif%}
+    parameter [{[wrapParam.name]}] = [{[wrapParam.value]}] {%if loop.last == False%},{%endif%}
 {%-endfor%}
 )
 (
@@ -221,8 +221,9 @@ wire [{[outPort.vec_lt[0].verilog_overrideParam_str]}] [{[outPort.wrapper_wire_n
 )
 [{[inst.inst_name]}] (
     {%-for key in inst_port_keys%}
+    {%-set last_key = loop.last%}
     {%-for port in inst.port_dict[key]%}
-    .[{[port.name]}] ( [{[port.assign_txt]}] ) {%if loop.last == False%},{%endif%}
+    .[{[port.name]}] ( [{[port.assign_txt]}] ) {%if (loop.last == False or last_key==False)%},{%endif%}
     {%-endfor%}    
     {%-endfor%}    
 );
@@ -392,4 +393,4 @@ def test4():
     core.ParseVerilogToModule("D:\\DevProjects\\Vivado\\IP_Design\\CMOS-Python_Sys\\python_data_proc\\python_data_proc.srcs\\sources_1\\python_data_proc.sv")
     core.ParseVerilogToModule("D:\\DevProjects\\Vivado\\IP_Design\\CMOS-Python_Sys\\python_data_proc\\python_data_proc.srcs\\sources_1\\sub\\training\\data_training_v4\\top_data_training.v")
 
-test4()
+# test4()

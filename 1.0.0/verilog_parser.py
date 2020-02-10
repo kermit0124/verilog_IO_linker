@@ -81,19 +81,26 @@ class ClassVerilogParser():
 
     
     def __ParseModuleTitle(self):
-        rStr = r"module (.+) "
+        # rStr = r"module (.+?)([\s]+|)(#[\w\s\W\S]+?\)|)(\s+|)(\([\w\s\W\S]+\))"
+        rStr = r"module (.+?)([\s]+|)(#(\s+|)([\w\s\W\S]+)\)|)(\s+|)(\(([\w\s\W\S]+)\))"
+        
         re_res = re.findall(rStr,self.src_module_title)
-        self.module_name = re_res[0] if (re_res!=[]) else ""
-        
-        if ("#") in self.src_module_title:
-            # with parameter in title
-            self.__ParseModuleTitle_param()
-        
-        self.__ParseModuleTitle_IO_scan()
+        if (len(re_res)>0):
+            re_res = re_res[0]
+            self.module_name = re_res[0] if (re_res!=[]) else ""
+            self.module_name = self.module_name.replace(" ","")
+            
+            if ("#") in self.src_module_title:
+                # with parameter in title
+                self.src_param_title = re_res[4]
+                self.__ParseModuleTitle_param()
+            
+            self.src_module_title_IO = re_res[7]
+            self.__ParseModuleTitle_IO_scan()
     
     def __ParseModuleTitle_param(self):
         rStr = r"parameter[\n ]+(\[(.+)\]|)([\n ]+|)(.+)=([\n ]+|)(.+?)(\n|,)"
-        re_res_lt = re.findall(rStr,self.src_module_title)
+        re_res_lt = re.findall(rStr,self.src_param_title)
         for para_seg in re_res_lt:
             depth = para_seg[1].replace(" ","")
             name = para_seg[3].replace(" ","")
@@ -102,14 +109,7 @@ class ClassVerilogParser():
         
 
     def __ParseModuleTitle_IO_scan(self):
-        self.src_module_title_IO = self.src_module_title.replace("\n","")
-        # re_lt = re.findall("(input|output|inout)(wire|) (\[.+?\]|)(.+?)(,|\))",self.src_module_title_IO)        
-        # self.parseModuleTitle_IO_type_sel = "input"
-        # self.__ParseModuleTitle_IO_type()
-        # self.parseModuleTitle_IO_type_sel = "output"
-        # self.__ParseModuleTitle_IO_type()
-        # self.parseModuleTitle_IO_type_sel = "inout"
-        # self.__ParseModuleTitle_IO_type()
+        self.src_module_title_IO = self.src_module_title_IO.replace("\n","")
         for txt in self.src_module_title_IO.split(","):
             self.__ParseModuleIO_scan(txt)
 
