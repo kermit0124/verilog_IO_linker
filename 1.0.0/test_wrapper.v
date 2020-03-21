@@ -17,7 +17,10 @@ Permission is hereby g
 
 module wrap #(
 	parameter DROP_BAD_FRAME = 0,
-	parameter DROP_WHEN_FULL = 0
+	parameter DROP_WHEN_FULL = 0,
+	parameter M_DATA_WIDTH = 16,
+	parameter M_KEEP_WIDTH = M_DATA_WIDTH/8,
+	parameter SSSS = 1
 )
 (
 	

@@ -24,8 +24,18 @@ class Core():
         pass
 
     def CreateWrapperFromModule(self,module_idx=0):
-        self.proc_wrapper = module.Wrapper(self.module_lt[module_idx])
-        self.Config_wrapper_linkPoints()
+        sel_mod = self.module_lt[module_idx]
+        self.proc_wrapper = module.Wrapper(sel_mod.name)
+        # self.Config_wrapper_linkPoints()
+
+        for IO_port in sel_mod.IO_port_lt:
+            cp_IO = copy.deepcopy(IO_port)
+            self.proc_wrapper.AddPort(cp_IO)
+        
+        for param in sel_mod.param_lt:
+            cp_param = copy.deepcopy(param)
+            self.proc_wrapper.AddParameter(cp_param)
+
         self.update_cnt += 1
 
     def ParseVerilogToModule(self,filePath):
@@ -48,7 +58,7 @@ class Core():
         temp_inst = module.Instance(temp_module,inst_name)
         self.inst_lt.append (temp_inst)
         self.update_cnt += 1
-        self.Config_inst_linkPoints(len(self.inst_lt)-1)
+        # self.Config_inst_linkPoints(len(self.inst_lt)-1)
             
     def Config_inst_linkPoints(self,lt_idx):
         inst = self.inst_lt[lt_idx]
@@ -116,30 +126,39 @@ class Core():
 
 
     def CreateWireToWrapper(self,wireName,wireSeg,vec_d1="[0:0]",vec_d2=None,vec_d3=None,assign_objID=None):
-        new_wire = basic_component.ClassWire(wireName,vec_d1,vec_d2,vec_d3)
-        new_wire.assign_txt = wireSeg
-        new_wire.scanable_src = True
-        new_wire.sample_assign = False
-        new_wire.assign_objID = assign_objID
-        new_wire.wrapper_wire_name = wireName
-        self.proc_wrapper.AddWire(new_wire)
+        # new_wire = basic_component.ClassWire(wireName,vec_d1,vec_d2,vec_d3)
+        # new_wire.assign_txt = wireSeg
+        # new_wire.scanable_src = True
+        # new_wire.sample_assign = False
+        # new_wire.assign_objID = assign_objID
+        # new_wire.wrapper_wire_name = wireName
+        # self.proc_wrapper.AddWire(new_wire)
+        temp_wire = basic_component.ClassWire(wireName,vec_d1)
+        self.proc_wrapper.AddWire(temp_wire)
 
     def CreateIO_toWrapper(self,itemName,type_str,vec_d1="[0:0]"):
-        if (type_str=="input"):
-            self.proc_wrapper.input_lt.append (basic_component.ClassInput(itemName,vec_d1))
-        elif (type_str=="inout"):
-            self.proc_wrapper.inout_lt.append (basic_component.ClassInout(itemName,vec_d1))
-        else:
-            self.proc_wrapper.output_lt.append (basic_component.ClassOutput(itemName,vec_d1))
-        self.Config_wrapper_linkPoints()
+        # if (type_str=="input"):
+        #     self.proc_wrapper.input_lt.append (basic_component.ClassInput(itemName,vec_d1))
+        # elif (type_str=="inout"):
+        #     self.proc_wrapper.inout_lt.append (basic_component.ClassInout(itemName,vec_d1))
+        # else:
+        #     self.proc_wrapper.output_lt.append (basic_component.ClassOutput(itemName,vec_d1))
+        # self.Config_wrapper_linkPoints()
+        dict_class = {
+            'input': basic_component.ClassInput(itemName,vec_d1)
+            ,'inout':basic_component.ClassInout(itemName,vec_d1)
+            ,'output': basic_component.ClassOutput(itemName,vec_d1)
+        }
+        self.proc_wrapper.AddPort(dict_class[type_str])
+
         self.update_cnt += 1
 
     def CreateParameterToWrapper(self,paramName,value,vec_d1=""):
-        self.proc_wrapper.param_lt.append (basic_parameter.ClassParameter(paramName,value,vec_d1))
+        # self.proc_wrapper.param_lt.append (basic_parameter.ClassParameter(paramName,value,vec_d1))
+        self.proc_wrapper.AddParameter(basic_parameter.ClassParameter(paramName,value,vec_d1))
 
     def CreateEmptyWrapper(self,wrapperName):
-        temp = module.Module(wrapperName)
-        self.proc_wrapper = module.Wrapper(temp)
+        self.proc_wrapper = module.Wrapper(wrapperName)
         self.update_cnt += 1
 
     def CfgAllPortOverrider(self):
@@ -393,4 +412,42 @@ def test4():
     core.ParseVerilogToModule("D:\\DevProjects\\Vivado\\IP_Design\\CMOS-Python_Sys\\python_data_proc\\python_data_proc.srcs\\sources_1\\python_data_proc.sv")
     core.ParseVerilogToModule("D:\\DevProjects\\Vivado\\IP_Design\\CMOS-Python_Sys\\python_data_proc\\python_data_proc.srcs\\sources_1\\sub\\training\\data_training_v4\\top_data_training.v")
 
-# test4()
+
+
+def test5():
+    core = Core()
+    core.ParseVerilogToModule("D:/DevProjects/anaconda/verilog_IO_linker/1.0.0/test.v")
+    core.ParseVerilogToModule("D:/DevProjects/anaconda/verilog_IO_linker/1.0.0/test_wrapper.v")
+    core.CreateInstFromModule("instA_0",0)
+    core.CreateInstFromModule("instA_1",0)
+    core.CreateInstFromModule("instB_1",1)
+    core.Select_procInst(0)
+
+    # core.CreateEmptyWrapper("Top_wrapper")
+    core.CreateWrapperFromModule(2)
+
+    core.CreateParameterToWrapper("asb",'10',"[abc-1:0]")
+    core.CreateIO_toWrapper("abc_o","output","[asb-1:0]")
+    core.CreateIO_toWrapper("abc_i","input","")
+    core.CreateWireToWrapper('_zz_','~rst')
+    core.CreateWireToWrapper('_zz2_','~rstn','[3:0]')
+
+    core.CreateParameterToWrapper('bbb','5')
+    core.CreateParameterToWrapper('aa112b','5')
+    core.CreateParameterToWrapper('pp','aa112b*bbb-5:0')
+    core.proc_wrapper.LinkAllParameter()
+    a = 1
+    # core.CreateWrapperFromModule(0)
+    # core.LinkInstIO(core.inst_lt[0].port_dict["output"][0],core.inst_lt[1].port_dict["input"][0])
+    
+    # # core.CreateWireToWrapper("wire_1","~rstn",assign_objID=core.inst_lt[0].port_dict["output"][0])
+    # core.CreateWireToWrapper("wire_1","~rstn",assign_objID=core.proc_wrapper.port_dict["input"][1])
+    # core.LinkWrapWire(core.proc_wrapper.port_dict["wire"][0],core.inst_lt[0].port_dict["input"][1])
+    # core.LinkParam(core.proc_wrapper.param_lt[0],core.inst_lt[0].param_lt[0])
+    # # core.CfgPortParam(core.inst_lt[0])
+    # core.LinkInstIO(core.inst_lt[0].port_dict["output"][0],core.proc_wrapper.output_lt[0])
+    # core.CreateIO_toWrapper("abc_o","output")
+    # core.GenerateVerilogCode()
+    pass
+
+test5()

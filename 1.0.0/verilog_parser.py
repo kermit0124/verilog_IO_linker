@@ -2,6 +2,7 @@ import re
 import basic_component
 import basic_parameter
 import module
+import bitwidth
 
 class ClassVerilogParser():
     def __init__(self):
@@ -39,15 +40,31 @@ class ClassVerilogParser():
                 self.__ParseModuleBody_IO_scan()
                 self.parse_succ = True
                 
-                self.module_lt.append (
-                    module.Module(
-                        self.module_name
-                        ,self.input_lt
-                        ,self.output_lt
-                        ,self.inout_lt
-                        ,self.param_lt
-                    )
-                )
+                module_t = module.Module( self.module_name)
+
+                port_type_lt = [
+                    self.input_lt
+                    ,self.output_lt
+                    ,self.inout_lt
+                ]
+                for port_type in port_type_lt:
+                    for port in port_type:
+                        module_t.AddPort(port)
+                
+                for param in self.param_lt:
+                    module_t.AddParameter(param)
+
+                self.module_lt.append (module_t)
+
+                # self.module_lt.append (
+                #     module.Module(
+                #         self.module_name
+                #         ,self.input_lt
+                #         ,self.output_lt
+                #         ,self.inout_lt
+                #         ,self.param_lt
+                #     )
+                # )
 
                 # check = True
                 # for moduleInfo in self.module_lt:
@@ -105,7 +122,15 @@ class ClassVerilogParser():
             depth = para_seg[1].replace(" ","")
             name = para_seg[3].replace(" ","")
             value = para_seg[5].replace(" ","")
-            self.param_lt.append (basic_parameter.ClassParameter(name,value,depth))
+
+            new_param = basic_parameter.ClassParameter(name,value,depth)
+
+            new_param.LinkParameter(self.param_lt)
+
+
+
+            self.param_lt.append (new_param)
+    
         
 
     def __ParseModuleTitle_IO_scan(self):
@@ -113,34 +138,18 @@ class ClassVerilogParser():
         for txt in self.src_module_title_IO.split(","):
             self.__ParseModuleIO_scan(txt)
 
-    def __ParseModuleTitle_IO_type(self):
-        rStr = self.parseModuleTitle_IO_type_sel
-        rStr = rStr + "[\n| ]+(wire|)[\n| ]+(\[(.+)\]|)(.+?)(,|\n)"
-        re_res_lt = re.findall(rStr,self.src_module_title_IO)
-        # print (self.parseModuleTitle_IO_type_sel)
-        for io_seg in re_res_lt:
-            IO_name = io_seg[3].replace(" ","")
-            IO_depth = io_seg[2].replace(" ","")
-            if (self.parseModuleTitle_IO_type_sel == "input"):
-                self.input_lt.append (basic_component.ClassInput(IO_name,IO_depth))
-            elif (self.parseModuleTitle_IO_type_sel == "output"):
-                self.output_lt.append (basic_component.ClassOutput(IO_name,IO_depth))
-            else:
-                self.inout_lt.append (basic_component.ClassInout(IO_name,IO_depth))
-            # print (IO_name , IO_depth)
-    
     def __ParseModuleBody_IO_scan(self):
         type_keys = ["input","inout","output"]
         re_lt = re.findall("([\s\w\S\W]+?);",self.src_body.replace("\n",""))
         for txt in re_lt:
             self.__ParseModuleIO_scan(txt)
     def __ParseModuleIO_scan(self,txt):
-        re2_lt = re.findall("(input|output|inout) (wire |)(\[.+\]|)(.+)",txt)
+        re2_lt = re.findall("(input|output|inout) +(wire|)( +|)(\[.+\]|)( +|)(.+)",txt)
         if (len(re2_lt)>0):
             re2_lt = re2_lt[0]
             temp_type = re2_lt[0].replace(" ","")
-            temp_depth = re2_lt[2].replace(" ","")
-            temp_name = re2_lt[3].replace(" ","")
+            temp_depth = re2_lt[3].replace(" ","")
+            temp_name = re2_lt[5].replace(" ","")
             temp_name_lt = temp_name.split(",")
             for name in temp_name_lt:
                 # print(name , temp_depth ,temp_type)
