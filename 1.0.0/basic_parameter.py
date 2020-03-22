@@ -31,6 +31,7 @@ class Basic_parameter():
         #             self.value = self.value.replace(link.name,'$'+str(len(self.link_param_obj)))
         #             self.link_param_obj.append (link)
 
+        link_succ = True
         re_txt = r'[\w\']+'
         re_res_lt = re.findall(re_txt,self.link_value)
         for re_res in re_res_lt:
@@ -53,6 +54,7 @@ class Basic_parameter():
                 
                 if (link_succ == False):
                     print ('Parameter: link parameter failed! Can\'t find:%s, parameter:%s, value:%s'%(re_res,self.name,self.value))
+        return (link_succ)
 
 
 

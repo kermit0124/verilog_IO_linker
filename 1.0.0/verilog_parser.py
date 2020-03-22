@@ -34,55 +34,39 @@ class ClassVerilogParser():
             re_res2_lt = re.findall(r"(module [\s\w\S\W]+?);([\s\w\S\W]+?)endmodule",src_moduleAll)
 
             if (len(re_res2_lt)>0):
+
+                self.proc_module = module.Module('new')
+                self.parse_succ = True
                 self.src_module_title = re_res2_lt[0][0]
                 self.src_body = re_res2_lt[0][1]
+
                 self.__ParseModuleTitle()
+
+                self.proc_module.SetModuleName(self.module_name)
+
+                self.__ParseModuleBody_param()
                 self.__ParseModuleBody_IO_scan()
-                self.parse_succ = True
+                # self.parse_succ = True
+
+                # port_type_lt = [
+                #     self.input_lt
+                #     ,self.output_lt
+                #     ,self.inout_lt
+                # ]
+                # for port_type in port_type_lt:
+                #     for port in port_type:
+                #         self.proc_module.AddPort(port)
                 
-                module_t = module.Module( self.module_name)
+                # for param in self.param_lt:
+                #     self.proc_module.AddParameter(param)
 
-                port_type_lt = [
-                    self.input_lt
-                    ,self.output_lt
-                    ,self.inout_lt
-                ]
-                for port_type in port_type_lt:
-                    for port in port_type:
-                        module_t.AddPort(port)
-                
-                for param in self.param_lt:
-                    module_t.AddParameter(param)
+                if (self.parse_succ==True):
+                    print ('Module parse success:%s'%(self.proc_module.name))
 
-                self.module_lt.append (module_t)
 
-                # self.module_lt.append (
-                #     module.Module(
-                #         self.module_name
-                #         ,self.input_lt
-                #         ,self.output_lt
-                #         ,self.inout_lt
-                #         ,self.param_lt
-                #     )
-                # )
+                    self.module_lt.append (self.proc_module)
 
-                # check = True
-                # for moduleInfo in self.module_lt:
-                #     if (moduleInfo.name == self.module_name):
-                #         check = False
 
-                # if (check):
-                #     self.module_lt.append (
-                #         module.Module(
-                #             self.module_name
-                #             ,self.input_lt
-                #             ,self.output_lt
-                #             ,self.inout_lt
-                #             ,self.param_lt
-                #         )
-                #     )
-                # else:
-                #     print ("Module conflict: ",self.module_name)
             else:
                 print ("Module format error")
             pass
@@ -123,13 +107,28 @@ class ClassVerilogParser():
             name = para_seg[3].replace(" ","")
             value = para_seg[5].replace(" ","")
 
-            new_param = basic_parameter.ClassParameter(name,value,depth)
+            self.__ParseModule_paramGenerate(name,depth,value)
 
-            new_param.LinkParameter(self.param_lt)
+    def __ParseModuleBody_param(self):
+        rStr = r"parameter(( |)\[(.+)\]| )(.+?)=(.+?);"
+        re_res_lt = re.findall(rStr,self.src_body.replace('\n',''))
+        for seg in re_res_lt:
+            name = seg[3].replace(" ","")
+            value = seg[4].replace(" ","")
+            depth = seg[2].replace(" ","")
+            self.__ParseModule_paramGenerate(name,depth,value)
 
 
+    def __ParseModule_paramGenerate(self,name,depth,value):
+        new_param = basic_parameter.ClassParameter(name,value,depth)
 
-            self.param_lt.append (new_param)
+        link_res = new_param.LinkParameter(self.proc_module.param_lt)
+        if (link_res==True):
+            self.proc_module.AddParameter(new_param)
+            new_param.SetOwner(self.proc_module)
+        else:
+            self.parse_succ = False
+
     
         
 
@@ -153,14 +152,29 @@ class ClassVerilogParser():
             temp_name_lt = temp_name.split(",")
             for name in temp_name_lt:
                 # print(name , temp_depth ,temp_type)
+                typeError = False
                 if (temp_type =="input"):
-                    self.input_lt.append (basic_component.ClassInput(name,temp_depth))
+                    new_port = basic_component.ClassInput(name,temp_depth)
+                    # self.input_lt.append (new_port)
                 elif (temp_type == "output"):
-                    self.output_lt.append (basic_component.ClassOutput(name,temp_depth))
+                    new_port = basic_component.ClassOutput(name,temp_depth)
+                    # self.output_lt.append (new_port)
                 elif (temp_type == "inout"):
-                    self.inout_lt.append (basic_component.ClassInout(name,temp_depth))
+                    new_port = basic_component.ClassInout(name,temp_depth)
+                    # self.inout_lt.append (new_port)
                 else:
+                    typeError = True
                     print ("Type error:",name,temp_type,temp_depth)
+                
+                if (typeError == False):
+                    self.proc_module.AddPort(new_port)
+                    link_res = new_port.bitwidth.LinkParameter(self.proc_module.param_lt)
+                    # new_port.SetOwner(self.proc_module)
+                    if (link_res == False):
+                        self.parse_succ = False
+                else:
+                    self.parse_succ = False
+
 
 
 def test():

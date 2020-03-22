@@ -32,6 +32,7 @@ class Bitwidth():
     def LinkParameter(self,link_lt):
         re_txt = r'[^\W]+'
         re_res_lt = re.findall(re_txt,self.link_init_str)
+        link_succ = True
         for re_res in re_res_lt:
             check_all_num = re.findall(r'[^0-9]',re_res)
             if (len(check_all_num)>0):
@@ -49,11 +50,7 @@ class Bitwidth():
                         re_res
                         ,self.owner_obj.owner_obj.name
                         ,self.owner_obj.name))
-
-                    
-
-                    
-                    
+        return (link_succ)
 
 class Param_bitwidth(Bitwidth):
     def __init__(self,init_str = "",owner_obj = None):

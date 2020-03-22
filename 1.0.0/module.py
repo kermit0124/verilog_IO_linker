@@ -12,6 +12,9 @@ class Module():
         self.name = name
         pass
 
+    def SetModuleName(self,name):
+        self.name = name
+
     def AddPort(self,port_obj):
         port_obj.SetOwner(self)
         self.IO_port_lt.append (port_obj)
@@ -36,8 +39,8 @@ class Module():
         # for param in self.param_lt:
         #     param.LinkParameter(self.param_lt)
         
-        for IO_port in self.IO_port_lt:
-            IO_port.bitwidth.LinkParameter(self.param_lt)
+        # for IO_port in self.IO_port_lt:
+        #     IO_port.bitwidth.LinkParameter(self.param_lt)
         pass
 
 class Instance(Module):

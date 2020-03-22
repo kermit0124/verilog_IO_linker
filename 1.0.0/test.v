@@ -339,8 +339,14 @@ module axis_async_fifo_adapter_2 #(
 )
 (
 	
-	output wire [M_DATA_WIDTH-1:0]  ddd,
-	output wire [M_KEEP_WIDTH-1:0]  ccc
+	output wire [DROP_BAD_FRAME-1:0]  ddd,
+	output wire [DROP_WHEN_FULL-1:0]  ccc
 );
-inout [SSSS-1:0] abcd;
+inout [DROP_WHEN_FULL*2-1:0] abcd;
+// (
+	
+// 	output wire [M_DATA_WIDTH-1:0]  ddd,
+// 	output wire [M_KEEP_WIDTH-1:0]  ccc
+// );
+// inout [SSSS-1:0] abcd;
 endmodule
