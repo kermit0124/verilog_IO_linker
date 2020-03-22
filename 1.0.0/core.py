@@ -27,7 +27,7 @@ class Core():
         sel_mod = self.module_lt[module_idx]
         self.proc_wrapper = module.Wrapper(sel_mod.name)
 
-        for IO_port in sel_mod.IO_port_lt:
+        for IO_port in sel_mod.IO_lt:
             cp_IO = copy.deepcopy(IO_port)
             self.proc_wrapper.AddPort(cp_IO)
         
@@ -67,6 +67,7 @@ class Core():
         # dest_obj.assign_txt = src_obj.wrapper_wire_name
         # dest_obj.jump_link_objID = None
         # dest_obj.sample_assign = True
+        dest_obj.assign_from_obj = src_obj
         self.update_cnt += 1
 
 
@@ -78,8 +79,8 @@ class Core():
         self.update_cnt += 1
 
     
-    def LinkParam(self,src_obj,dest_obj):
-        # dest_obj.override_objID = src_obj
+    def LinkParam(self,override_obj,inst_param_obj):
+        inst_param_obj.override_obj = override_obj
         # dest_obj.override_txt = src_obj.name
         self.update_cnt += 1
 
@@ -193,10 +194,10 @@ wire [{[outPort.vec_lt[0].verilog_overrideParam_str]}] [{[outPort.wrapper_wire_n
 
 [{[inst.name]}] # (
     {%-for param in inst.param_lt%}
-    {%-if param.override_objID != None %}
-    .[{[param.name]}] ( [{[param.override_objID.name]}] ) {%if loop.last == False%},{%endif%}
+    {%-if param.override_obj != None %}
+    .[{[param.name]}] ( [{[param.override_obj.name]}] ) {%if loop.last == False%},{%endif%}
     {%-else%}
-    //.[{[param.name]}] ( [{[param.override_objID.name]}] ) {%if loop.last == False%},{%endif%}
+    //.[{[param.name]}] ( [{[param.override_obj.name]}] ) {%if loop.last == False%},{%endif%}
     {%-endif%}
     {%-endfor%}
 )
@@ -400,6 +401,18 @@ def test5():
 
     # core.proc_wrapper.LinkAllParameter()
 
+
+
+
+
+    core.proc_wrapper.ShowPorts(basic_component.ClassOutput)
+    print ('--')
+    core.inst_lt[0].ShowPorts(basic_component.ClassOutput)
+    # core.proc_wrapper.ShowParams()
+
+    core.LinkInstIO(core.inst_lt[0].IO_lt[0],core.proc_wrapper.IO_lt[0])
+
+    core.LinkParam(core.proc_wrapper.param_lt[0],core.inst_lt[0].param_lt[0])
 
     core.LinkAllParameter()
     a = 1

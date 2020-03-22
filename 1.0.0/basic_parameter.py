@@ -41,6 +41,6 @@ class Basic_parameter():
 class ClassParameter(Basic_parameter):
     def __init__(self,name_str,value,depth_str=""):
         self.override_txt = value
-        self.override_objID = None
+        self.override_obj = None
         self.ignore = False
         super(ClassParameter, self).__init__(name_str.replace(' ',''),value.replace(' ',''),depth_str)

@@ -8,7 +8,7 @@ class Module():
         self.inout_lt = []
         self.param_lt = []
         self.wire_lt = []
-        self.IO_port_lt = []
+        self.IO_lt = []
         self.name = name
         pass
 
@@ -17,7 +17,7 @@ class Module():
 
     def AddPort(self,port_obj):
         port_obj.SetOwner(self)
-        self.IO_port_lt.append (port_obj)
+        self.IO_lt.append (port_obj)
         pass
 
     def AddParameter(self,param_obj):
@@ -36,18 +36,22 @@ class Module():
                 port.onwer_objID = onwer_objID
     
     def LinkAllParameter(self):
-        for IO_port in self.IO_port_lt:
+        for IO_port in self.IO_lt:
             IO_port.bitwidth.LinkParameter(self.param_lt)
         
         for param in self.param_lt:
             param.LinkParameter(self.param_lt)
     
     
-    def ShowAllPort(self):
-        for port in self.IO_port_lt:
-            print (port.name)
+    def ShowPorts(self,type_class = None):
+        for port in self.IO_lt:
+            if (type_class!=None):
+                if (type(port) == type_class):
+                    print (port.name)
+            else:
+                print (port.name)
     
-    def ShowAllParam(self):
+    def ShowParams(self):
         for param in self.param_lt:
             print (param.name)
 
@@ -56,7 +60,7 @@ class Instance(Module):
         cp = copy.deepcopy (ClassModule)
         super(Instance, self).__init__(cp.name)
 
-        for cp_port in cp.IO_port_lt:
+        for cp_port in cp.IO_lt:
             self.AddPort(cp_port)
         
         for cp_param in cp.param_lt:
