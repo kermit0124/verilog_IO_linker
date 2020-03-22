@@ -26,7 +26,6 @@ class Core():
     def CreateWrapperFromModule(self,module_idx=0):
         sel_mod = self.module_lt[module_idx]
         self.proc_wrapper = module.Wrapper(sel_mod.name)
-        # self.Config_wrapper_linkPoints()
 
         for IO_port in sel_mod.IO_port_lt:
             cp_IO = copy.deepcopy(IO_port)
@@ -58,92 +57,49 @@ class Core():
         temp_inst = module.Instance(temp_module,inst_name)
         self.inst_lt.append (temp_inst)
         self.update_cnt += 1
-        # self.Config_inst_linkPoints(len(self.inst_lt)-1)
-            
-    def Config_inst_linkPoints(self,lt_idx):
-        inst = self.inst_lt[lt_idx]
-        key_lt = ["output","inout"]
-        for key in key_lt:
-            for port in inst.port_dict[key]:
-                str = "_" + inst.inst_name + "__" + port.name
-                port.wrapper_wire_name = str
-                port.scanable_src = True
-                port.assign_txt = port.wrapper_wire_name
-                
-        key_lt = ["input","inout"]
-        for key in key_lt:
-            for port in inst.port_dict[key]:
-                port.scanable_dest = True
-        
-    def Config_wrapper_linkPoints(self):
-        key_lt = ["input","inout","wire"]
-        for key in key_lt:
-            for port in self.proc_wrapper.port_dict[key]:
-                port.wrapper_wire_name = port.name
-                port.scanable_src = True
-        
-        key_lt = ["output","inout","wire"]
-        for key in key_lt:
-            for port in self.proc_wrapper.port_dict[key]:
-                port.scanable_dest = True
-        self.proc_wrapper.SetOnwer(self.proc_wrapper)
 
     
     def Select_procInst(self,idx):
         self.proc_inst = self.inst_lt[idx]
     
     def LinkInstIO(self,src_obj,dest_obj):
-        dest_obj.assign_objID = src_obj
-        dest_obj.assign_txt = src_obj.wrapper_wire_name
-        dest_obj.jump_link_objID = None
-        dest_obj.sample_assign = True
+        # dest_obj.assign_objID = src_obj
+        # dest_obj.assign_txt = src_obj.wrapper_wire_name
+        # dest_obj.jump_link_objID = None
+        # dest_obj.sample_assign = True
         self.update_cnt += 1
 
 
     def LinkWrapWire(self,src_obj,dest_obj):
-        dest_obj.assign_objID = src_obj
-        dest_obj.assign_txt = src_obj.name
-        dest_obj.jump_link_objID = None
-        dest_obj.sample_assign = False
+        # dest_obj.assign_objID = src_obj
+        # dest_obj.assign_txt = src_obj.name
+        # dest_obj.jump_link_objID = None
+        # dest_obj.sample_assign = False
         self.update_cnt += 1
 
     
     def LinkParam(self,src_obj,dest_obj):
-        dest_obj.override_objID = src_obj
-        dest_obj.override_txt = src_obj.name
+        # dest_obj.override_objID = src_obj
+        # dest_obj.override_txt = src_obj.name
         self.update_cnt += 1
 
     
-    def CfgPortParam(self,inst):
-        for key in ["input","inout","output"]:
-            for port in inst.port_dict[key]:
-                temp_str = port.vec_lt[0].verilog_str
-                if (temp_str!=""):
-                    search_succ = False
-                    for param in inst.param_lt:
-                        if (param.name) in temp_str:
-                            port.vec_lt[0].verilog_overrideParam_str  = temp_str.replace(param.name,"("+param.override_txt+")")
+    # def CfgPortParam(self,inst):
+        # for key in ["input","inout","output"]:
+        #     for port in inst.port_dict[key]:
+        #         temp_str = port.vec_lt[0].verilog_str
+        #         if (temp_str!=""):
+        #             search_succ = False
+        #             for param in inst.param_lt:
+        #                 if (param.name) in temp_str:
+        #                     port.vec_lt[0].verilog_overrideParam_str  = temp_str.replace(param.name,"("+param.override_txt+")")
 
 
     def CreateWireToWrapper(self,wireName,wireSeg,vec_d1="[0:0]",vec_d2=None,vec_d3=None,assign_objID=None):
-        # new_wire = basic_component.ClassWire(wireName,vec_d1,vec_d2,vec_d3)
-        # new_wire.assign_txt = wireSeg
-        # new_wire.scanable_src = True
-        # new_wire.sample_assign = False
-        # new_wire.assign_objID = assign_objID
-        # new_wire.wrapper_wire_name = wireName
-        # self.proc_wrapper.AddWire(new_wire)
         temp_wire = basic_component.ClassWire(wireName,vec_d1)
         self.proc_wrapper.AddWire(temp_wire)
 
     def CreateIO_toWrapper(self,itemName,type_str,vec_d1="[0:0]"):
-        # if (type_str=="input"):
-        #     self.proc_wrapper.input_lt.append (basic_component.ClassInput(itemName,vec_d1))
-        # elif (type_str=="inout"):
-        #     self.proc_wrapper.inout_lt.append (basic_component.ClassInout(itemName,vec_d1))
-        # else:
-        #     self.proc_wrapper.output_lt.append (basic_component.ClassOutput(itemName,vec_d1))
-        # self.Config_wrapper_linkPoints()
         dict_class = {
             'input': basic_component.ClassInput(itemName,vec_d1)
             ,'inout':basic_component.ClassInout(itemName,vec_d1)
@@ -154,19 +110,18 @@ class Core():
         self.update_cnt += 1
 
     def CreateParameterToWrapper(self,paramName,value,vec_d1=""):
-        # self.proc_wrapper.param_lt.append (basic_parameter.ClassParameter(paramName,value,vec_d1))
         self.proc_wrapper.AddParameter(basic_parameter.ClassParameter(paramName,value,vec_d1))
 
     def CreateEmptyWrapper(self,wrapperName):
         self.proc_wrapper = module.Wrapper(wrapperName)
         self.update_cnt += 1
 
-    def CfgAllPortOverrider(self):
-        for inst in self.inst_lt:
-            self.CfgPortParam(inst)
+    # def CfgAllPortOverrider(self):
+    #     for inst in self.inst_lt:
+    #         self.CfgPortParam(inst)
 
     def GenerateVerilogCode(self):
-        self.CfgAllPortOverrider()
+        # self.CfgAllPortOverrider()
 
         wrapPort_lt = []
         keys = ["input","output","inout"]
@@ -435,7 +390,6 @@ def test5():
     core.CreateParameterToWrapper('bbb','5')
     core.CreateParameterToWrapper('aa112b','5')
     core.CreateParameterToWrapper('pp','aa112b*bbb-5:0')
-    core.proc_wrapper.LinkAllParameter()
     a = 1
     # core.CreateWrapperFromModule(0)
     # core.LinkInstIO(core.inst_lt[0].port_dict["output"][0],core.inst_lt[1].port_dict["input"][0])

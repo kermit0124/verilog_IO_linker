@@ -1,16 +1,14 @@
 import re
+
 import basic_component
 import basic_parameter
-import module
 import bitwidth
+import module
+
 
 class ClassVerilogParser():
     def __init__(self):
         self.src_txt_all = ""
-        self.input_lt = []
-        self.output_lt = []
-        self.inout_lt = []
-        self.param_lt = []
         self.parse_succ = False
         self.module_lt = []
         pass
@@ -46,24 +44,9 @@ class ClassVerilogParser():
 
                 self.__ParseModuleBody_param()
                 self.__ParseModuleBody_IO_scan()
-                # self.parse_succ = True
-
-                # port_type_lt = [
-                #     self.input_lt
-                #     ,self.output_lt
-                #     ,self.inout_lt
-                # ]
-                # for port_type in port_type_lt:
-                #     for port in port_type:
-                #         self.proc_module.AddPort(port)
-                
-                # for param in self.param_lt:
-                #     self.proc_module.AddParameter(param)
 
                 if (self.parse_succ==True):
                     print ('Module parse success:%s'%(self.proc_module.name))
-
-
                     self.module_lt.append (self.proc_module)
 
 
@@ -74,15 +57,10 @@ class ClassVerilogParser():
     def GetModuleInfo(self):
         return (self.module_lt)
     def ClearAllModuleInfo(self):
-        self.input_lt = []
-        self.output_lt = []
-        self.inout_lt = []
-        self.param_lt = []
         self.parse_succ = False
 
     
     def __ParseModuleTitle(self):
-        # rStr = r"module (.+?)([\s]+|)(#[\w\s\W\S]+?\)|)(\s+|)(\([\w\s\W\S]+\))"
         rStr = r"module (.+?)([\s]+|)(#(\s+|)([\w\s\W\S]+)\)|)(\s+|)(\(([\w\s\W\S]+)\))"
         
         re_res = re.findall(rStr,self.src_module_title)
@@ -129,20 +107,17 @@ class ClassVerilogParser():
         else:
             self.parse_succ = False
 
-    
-        
-
     def __ParseModuleTitle_IO_scan(self):
         self.src_module_title_IO = self.src_module_title_IO.replace("\n","")
         for txt in self.src_module_title_IO.split(","):
-            self.__ParseModuleIO_scan(txt)
+            self.__ParseModule_IOportGenerate(txt)
 
     def __ParseModuleBody_IO_scan(self):
-        type_keys = ["input","inout","output"]
         re_lt = re.findall("([\s\w\S\W]+?);",self.src_body.replace("\n",""))
         for txt in re_lt:
-            self.__ParseModuleIO_scan(txt)
-    def __ParseModuleIO_scan(self,txt):
+            self.__ParseModule_IOportGenerate(txt)
+
+    def __ParseModule_IOportGenerate(self,txt):
         re2_lt = re.findall("(input|output|inout) +(wire|)( +|)(\[.+\]|)( +|)(.+)",txt)
         if (len(re2_lt)>0):
             re2_lt = re2_lt[0]
@@ -151,25 +126,20 @@ class ClassVerilogParser():
             temp_name = re2_lt[5].replace(" ","")
             temp_name_lt = temp_name.split(",")
             for name in temp_name_lt:
-                # print(name , temp_depth ,temp_type)
                 typeError = False
-                if (temp_type =="input"):
-                    new_port = basic_component.ClassInput(name,temp_depth)
-                    # self.input_lt.append (new_port)
-                elif (temp_type == "output"):
-                    new_port = basic_component.ClassOutput(name,temp_depth)
-                    # self.output_lt.append (new_port)
-                elif (temp_type == "inout"):
-                    new_port = basic_component.ClassInout(name,temp_depth)
-                    # self.inout_lt.append (new_port)
-                else:
+                dict_class = {
+                    'input': basic_component.ClassInput(name,temp_depth)
+                    ,'output': basic_component.ClassOutput(name,temp_depth)
+                    ,'inout': basic_component.ClassInout(name,temp_depth)
+                }
+                try:
+                    new_port = dict_class[temp_type]
+                except KeyError:
                     typeError = True
-                    print ("Type error:",name,temp_type,temp_depth)
                 
                 if (typeError == False):
                     self.proc_module.AddPort(new_port)
                     link_res = new_port.bitwidth.LinkParameter(self.proc_module.param_lt)
-                    # new_port.SetOwner(self.proc_module)
                     if (link_res == False):
                         self.parse_succ = False
                 else:
