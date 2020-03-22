@@ -34,7 +34,13 @@ class Module():
         for key in keys:
             for port in self.port_dict[key]:
                 port.onwer_objID = onwer_objID
-
+    
+    def LinkAllParameter(self):
+        for IO_port in self.IO_port_lt:
+            IO_port.bitwidth.LinkParameter(self.param_lt)
+        
+        for param in self.param_lt:
+            param.LinkParameter(self.param_lt)
 
 class Instance(Module):
     def __init__(self,ClassModule,instName):
@@ -56,4 +62,3 @@ class Wrapper(Module):
     def AddWire(self,wire_obj):
         self.wire_lt.append (wire_obj)
         wire_obj.SetOwner(self)
-    

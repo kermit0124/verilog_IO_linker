@@ -99,13 +99,8 @@ class ClassVerilogParser():
 
     def __ParseModule_paramGenerate(self,name,depth,value):
         new_param = basic_parameter.ClassParameter(name,value,depth)
+        self.proc_module.AddParameter(new_param)
 
-        link_res = new_param.LinkParameter(self.proc_module.param_lt)
-        if (link_res==True):
-            self.proc_module.AddParameter(new_param)
-            new_param.SetOwner(self.proc_module)
-        else:
-            self.parse_succ = False
 
     def __ParseModuleTitle_IO_scan(self):
         self.src_module_title_IO = self.src_module_title_IO.replace("\n","")
@@ -139,9 +134,6 @@ class ClassVerilogParser():
                 
                 if (typeError == False):
                     self.proc_module.AddPort(new_port)
-                    link_res = new_port.bitwidth.LinkParameter(self.proc_module.param_lt)
-                    if (link_res == False):
-                        self.parse_succ = False
                 else:
                     self.parse_succ = False
 

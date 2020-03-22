@@ -105,12 +105,14 @@ class Core():
             ,'inout':basic_component.ClassInout(itemName,vec_d1)
             ,'output': basic_component.ClassOutput(itemName,vec_d1)
         }
-        self.proc_wrapper.AddPort(dict_class[type_str])
+        new_port = dict_class[type_str]
+        self.proc_wrapper.AddPort(new_port)
 
         self.update_cnt += 1
 
     def CreateParameterToWrapper(self,paramName,value,vec_d1=""):
-        self.proc_wrapper.AddParameter(basic_parameter.ClassParameter(paramName,value,vec_d1))
+        new_param = basic_parameter.ClassParameter(paramName,value,vec_d1)
+        self.proc_wrapper.AddParameter(new_param)
 
     def CreateEmptyWrapper(self,wrapperName):
         self.proc_wrapper = module.Wrapper(wrapperName)
@@ -119,6 +121,11 @@ class Core():
     # def CfgAllPortOverrider(self):
     #     for inst in self.inst_lt:
     #         self.CfgPortParam(inst)
+
+    def LinkAllParameter(self):
+        self.proc_wrapper.LinkAllParameter()
+        for inst in self.inst_lt:
+            inst.LinkAllParameter()
 
     def GenerateVerilogCode(self):
         # self.CfgAllPortOverrider()
@@ -390,6 +397,9 @@ def test5():
     core.CreateParameterToWrapper('bbb','5')
     core.CreateParameterToWrapper('aa112b','5')
     core.CreateParameterToWrapper('pp','aa112b*bbb-5:0')
+
+    # core.proc_wrapper.LinkAllParameter()
+    core.LinkAllParameter()
     a = 1
     # core.CreateWrapperFromModule(0)
     # core.LinkInstIO(core.inst_lt[0].port_dict["output"][0],core.inst_lt[1].port_dict["input"][0])
