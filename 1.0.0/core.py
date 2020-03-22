@@ -399,6 +399,8 @@ def test5():
     core.CreateParameterToWrapper('pp','aa112b*bbb-5:0')
 
     # core.proc_wrapper.LinkAllParameter()
+
+
     core.LinkAllParameter()
     a = 1
     # core.CreateWrapperFromModule(0)

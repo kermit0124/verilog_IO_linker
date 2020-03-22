@@ -108,7 +108,21 @@ class ClassVerilogParser():
             self.__ParseModule_IOportGenerate(txt)
 
     def __ParseModuleBody_IO_scan(self):
-        re_lt = re.findall("([\s\w\S\W]+?);",self.src_body.replace("\n",""))
+        src_body_clear = self.src_body.replace("\n","")
+
+        clear_re_str_lt = [
+            '\$error\(.+?\);'
+            ,'\$display\(.+?\);'
+        ]
+        for clear_re_str in clear_re_str_lt:
+            re_clear_res = re.findall(clear_re_str,src_body_clear)
+
+            if (re_clear_res!=[]):
+                for re_clear in re_clear_res:
+                    src_body_clear = src_body_clear.replace(re_clear,'')
+
+
+        re_lt = re.findall("([\s\w\S\W]+?);",src_body_clear)
         for txt in re_lt:
             self.__ParseModule_IOportGenerate(txt)
 

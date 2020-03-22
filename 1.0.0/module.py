@@ -41,6 +41,15 @@ class Module():
         
         for param in self.param_lt:
             param.LinkParameter(self.param_lt)
+    
+    
+    def ShowAllPort(self):
+        for port in self.IO_port_lt:
+            print (port.name)
+    
+    def ShowAllParam(self):
+        for param in self.param_lt:
+            print (param.name)
 
 class Instance(Module):
     def __init__(self,ClassModule,instName):
@@ -54,6 +63,7 @@ class Instance(Module):
             self.AddParameter(cp_param)
 
         self.inst_name = instName
+
 
 class Wrapper(Module):
     def __init__(self,wrap_name):
