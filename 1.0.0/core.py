@@ -135,6 +135,8 @@ class Core():
 
         self.GenVerilogCode_Inst()
 
+        self.GenVerilogCode_wireAssign()
+
     
     def GenVerilogCode_WrapHeader(self):
         self.jinja_tmpl = Template(basic_verilog_code_wrapHeader1())
@@ -151,40 +153,82 @@ class Core():
             code_wrapperInst = self.jinja_tmpl.render(
                 inst = inst
             )
-            print (code_wrapperInst)
+            # print (code_wrapperInst)
             self.code_wrapperInst += code_wrapperInst
 
+    def GenVerilogCode_wireAssign(self):
+        self.code_wireAssign = ''
+        self.jinja_tmpl = Template(basic_verilog_code_instWireAssign())
+
+        # Instance wire assign
+        for inst in self.proc_wrapper.inst_lt:
+            any_assign = False
+            filter_assign_IO_lt = []
+            for IO in inst.IO_lt:
+                if (IO.assign_obj!=None):
+                    any_assign = True
+                    filter_assign_IO_lt.append (IO)
+            
+            if (any_assign==True):
+                wire_name_lt = []
+                wire_assignValue_lt = []
+                for IO in filter_assign_IO_lt:
+
+                    if (type(IO.assign_obj.owner_obj)==module.Instance):
+                        # inst link
+                        wire_name = IO.wrap_mapping_obj.name
+                        wire_assignValue = IO.assign_obj.wrap_mapping_obj.name
+                    elif (type(IO.assign_obj.owner_obj)==module.Wrapper):
+                        # wrap wire link to inst
+                        wire_name = IO.wrap_mapping_obj.name
+                        wire_assignValue = IO.assign_obj.name
+                
+                    wire_name_lt.append (wire_name)
+                    wire_assignValue_lt.append (wire_assignValue)
 
 
-        # WIP inst func
+                code_wireAssign = self.jinja_tmpl.render(
+                    inst = inst
+                    ,wire_name_lt = wire_name_lt
+                    ,wire_assignValue_lt = wire_assignValue_lt
+                )
+                print (code_wireAssign)
+                self.code_wireAssign += code_wireAssign
+        
 
-        # self.gen_source = self.jinja_tmpl.render(
-        #     wrapper_name = self.proc_wrapper.name
-        #     ,wrapParams = self.proc_wrapper.param_lt
-        #     ,wrapPort_lt = wrapPort_lt
-        #     ,inst_lt = self.inst_lt
-        #     ,proc_wrapper = self.proc_wrapper
-        # )
-        # print (self.gen_source)
-        # return(self.gen_source)
-    # def GenerateVerilogCode(self):
-    #     # self.CfgAllPortOverrider()
+        # Wrapper wire assign
+        self.jinja_tmpl = Template(basic_verilog_code_wrapWireAssign())
+        
+        wire_assign_lt = []
+        for wire in self.proc_wrapper.wire_lt:
+            if ((wire.assign_obj != None ) & (wire.inst_mapping_obj == None)):
+                wire_name = wire.name
+                if (type(wire.assign_obj.owner_obj)==module.Instance):
+                    wire_assignValue = wire.assign_obj.wrap_mapping_obj.name
+                elif (type(wire.assign_obj.owner_obj)==module.Wrapper):
+                    wire_assignValue = wire.assign_obj.name
 
-    #     wrapPort_lt = []
-    #     keys = ["input","output","inout"]
-    #     for key in keys:
-    #         for port in self.proc_wrapper.port_dict[key]:
-    #             wrapPort_lt.append (port)
+                wire_assign_lt.append ([wire_name,wire_assignValue])
 
-    #     self.gen_source = self.jinja_tmpl.render(
-    #         wrapper_name = self.proc_wrapper.name
-    #         ,wrapParams = self.proc_wrapper.param_lt
-    #         ,wrapPort_lt = wrapPort_lt
-    #         ,inst_lt = self.inst_lt
-    #         ,proc_wrapper = self.proc_wrapper
-    #     )
-    #     print (self.gen_source)
-    #     return(self.gen_source)
+        IO_assign_lt = []
+        for IO in self.proc_wrapper.IO_lt:
+            if (IO.assign_obj != None):
+                IO_name = IO.name
+                if (type(IO.assign_obj.owner_obj)==module.Instance):
+                    IO_assignValue = IO.assign_obj.wrap_mapping_obj.name
+                elif (type(IO.assign_obj.owner_obj)==module.Wrapper):
+                    IO_assignValue = IO.assign_obj.name
+            
+                IO_assign_lt.append ([IO_name,IO_assignValue])
+
+
+        code_wireAssign = self.jinja_tmpl.render(
+            wrap = self.proc_wrapper
+            ,wire_assign_lt = wire_assign_lt
+            ,IO_assign_lt = IO_assign_lt
+        )
+        print (code_wireAssign)
+        self.code_wireAssign += code_wireAssign
 
 
 
@@ -271,10 +315,32 @@ wire [{[outPort.vec_lt[0].verilog_overrideParam_str]}] [{[outPort.wrapper_wire_n
         return (templateTxt)
 
 
+def basic_verilog_code_instWireAssign():
+    templateTxt = u"""
+// ## Wire assign - instance : [{[inst.inst_name]}]
+{%-for wire_name in wire_name_lt%}
+assign [{[wire_name]}] = [{[wire_assignValue_lt[loop.index0]]}] ;
+{%-endfor%}  
+
+"""
+
+    return (templateTxt)
+
+def basic_verilog_code_wrapWireAssign():
+    templateTxt = u"""
+// ## Wire assign - wrapper : [{[wrap.name]}]
+{%-for wire_info_lt in wire_assign_lt%}
+assign [{[wire_info_lt[0]]}] = [{[wire_info_lt[1]]}] ;
+{%-endfor%}  
 
 
+// ## IO assign - wrapper : [{[wrap.name]}]
+{%-for IO_info_lt in IO_assign_lt%}
+assign [{[IO_info_lt[0]]}] = [{[IO_info_lt[1]]}] ;
+{%-endfor%}  
+"""
 
-
+    return (templateTxt)
 
 
 
@@ -539,9 +605,15 @@ def test5():
     # core.inst_lt[0].ShowPorts(basic_component.ClassOutput)
     # core.proc_wrapper.ShowParams()
 
+    core.LinkInstIO(core.inst_lt[0].IO_lt[1],core.inst_lt[1].IO_lt[2])
+
     core.LinkInstIO(core.inst_lt[0].IO_lt[0],core.proc_wrapper.IO_lt[0])
+    core.LinkInstIO(core.proc_wrapper.IO_lt[1],core.inst_lt[0].IO_lt[1])
+    core.LinkInstIO(core.proc_wrapper.IO_lt[1],core.proc_wrapper.wire_lt[1])
+    core.LinkInstIO(core.proc_wrapper.IO_lt[1],core.proc_wrapper.wire_lt[60])
 
     core.LinkParam(core.proc_wrapper.param_lt[0],core.inst_lt[0].param_lt[0])
+    
 
     core.LinkAllParameter()
     core.GenerateVerilogCode()
