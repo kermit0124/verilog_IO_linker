@@ -189,13 +189,15 @@ module [{[proc_wrapper.name]}] #(
 )
 (
 {%-for port in proc_wrapper.IO_lt%}
-    [{[port.type]}] wire [{[port.bitwidth.str]}] [{[port.name]}] {%if loop.last == False%},{%endif%}
+    [{[port.type]}] wire [{[port.bitwidth]}] [{[port.name]}] {%if loop.last == False%},{%endif%}
 {%-endfor%}
 );
 
 // Wrapper wire 
 {%-for wire in proc_wrapper.wire_lt%}
-wire [{[wire.bitwidth.str]}] [{[wire.name]}] ;
+{%-if wire.inst_mapping_obj==None%}
+wire [{[wire.bitwidth]}] [{[wire.name]}] ;
+{%-endif%}
 {%-endfor%}
 
 

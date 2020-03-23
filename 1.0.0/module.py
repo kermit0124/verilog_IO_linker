@@ -46,6 +46,10 @@ class Module():
         
         for param in self.param_lt:
             param.LinkParameter(self.param_lt)
+
+        for wire in self.wire_lt:
+            if (wire.inst_mapping_obj!=None):
+                wire.bitwidth.LinkParameter(wire.inst_mapping_obj.owner_obj.param_lt)
     
     
     def ShowPorts(self,type_class = None):
