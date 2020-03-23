@@ -151,6 +151,7 @@ class Core():
             code_wrapperInst = self.jinja_tmpl.render(
                 inst = inst
             )
+            print (code_wrapperInst)
             self.code_wrapperInst += code_wrapperInst
 
 
@@ -217,10 +218,26 @@ wire [{[wire.bitwidth]}] [{[wire.name]}] ;
 def basic_verilog_code_inst():
         templateTxt = u"""
 // ## Instance: [{[inst.inst_name]}]
+// ## Parameter override
+{%-for param in inst.param_lt%}
+localparam [{[param.GetWrapRuleName()]}] = [{[param.GetWrapMapParamValue()]}] ;
+{%-endfor%}
+
 // ## IO wire
 {%-for IO in inst.IO_lt%}
 wire [{[IO.bitwidth.GetWrapMapWire_bitwidth()]}] [{[IO.wrap_mapping_obj.name]}] ;
 {%-endfor%}
+
+[{[inst.name]}] # (
+    {%-for param in inst.param_lt%}
+    .[{[param.name]}] ( [{[param.GetWrapRuleName()]}] ) {%if loop.last == False%},{%endif%}
+    {%-endfor%}
+)
+[{[inst.inst_name]}] (
+    {%-for IO in inst.IO_lt%}
+    .[{[IO.name]}] ( [{[IO.wrap_mapping_obj.name]}] ) {%if (loop.last == False or last_key==False)%},{%endif%}
+    {%-endfor%}    
+) ;
 """
 # ---------------------
 

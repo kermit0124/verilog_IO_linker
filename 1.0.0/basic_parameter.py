@@ -37,6 +37,18 @@ class Basic_parameter():
                 if (link_succ == False):
                     print ('Parameter: link parameter failed! Can\'t find:%s, parameter:%s, value:%s'%(re_res,self.name,self.value))
         return (link_succ)
+
+    def GetWrapMapParamValue(self):
+        if (self.override_obj==None):
+            value = self.link_value
+            if (self.link_param_obj!=[]):
+                for idx,param_obj in enumerate(self.link_param_obj):
+                    value = value.replace('$%d'%(idx),param_obj.GetWrapRuleName())
+            else:
+                value = self.value
+        else:
+            value = self.override_obj.name
+        return (value)
     
     def GetWrapRuleName(self):
         return (self.owner_obj.inst_name + '__' + self.name)
