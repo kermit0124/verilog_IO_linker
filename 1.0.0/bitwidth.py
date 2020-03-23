@@ -1,9 +1,9 @@
 import re
 class Bitwidth():
     def __init__(self,str = "",owner_obj = None):
+        str = str.replace(' ','').replace('[','').replace(']','')
         self.str = str
         self.link_str = str
-        str = str.replace(' ','').replace('[','').replace(']','')
 
         temp_lt = str.split(':')
         

@@ -137,6 +137,14 @@ class Core():
         )
         print (code_wrapperHeader)
 
+        self.jinja_tmpl = Template(basic_verilog_code_inst())
+        for inst in self.proc_wrapper.inst_lt:
+            code_wrapperInst = self.jinja_tmpl.render(
+                inst = inst
+            )
+            a = 1
+
+
         # WIP inst func
 
         # self.gen_source = self.jinja_tmpl.render(
@@ -193,6 +201,49 @@ wire [{[wire.bitwidth.str]}] [{[wire.name]}] ;
 
 """
         return (templateTxt)
+
+def basic_verilog_code_inst():
+        templateTxt = u"""
+// ## Instance: [{[inst.inst_name]}]
+// ## IO wire
+{%-for IO in inst.IO_lt%}
+wire [{[IO.wrap_mapping_obj.bitwidth]}] [{[IO.wrap_mapping_obj.name]}] ;
+{%-endfor%}
+"""
+
+        b ="""
+// ## Output port
+{%-for IO in inst.IO_lt%}
+wire [{[outPort.vec_lt[0].verilog_overrideParam_str]}] [{[outPort.wrapper_wire_name]}] ;
+{%-endfor%}
+
+[{[inst.name]}] # (
+    {%-for param in inst.param_lt%}
+    {%-if param.override_obj != None %}
+    .[{[param.name]}] ( [{[param.override_obj.name]}] ) {%if loop.last == False%},{%endif%}
+    {%-else%}
+    //.[{[param.name]}] ( [{[param.override_obj.name]}] ) {%if loop.last == False%},{%endif%}
+    {%-endif%}
+    {%-endfor%}
+)
+[{[inst.inst_name]}] (
+    {%-for key in inst_port_keys%}
+    {%-set last_key = loop.last%}
+    {%-for port in inst.port_dict[key]%}
+    .[{[port.name]}] ( [{[port.assign_txt]}] ) {%if (loop.last == False or last_key==False)%},{%endif%}
+    {%-endfor%}    
+    {%-endfor%}    
+);
+
+"""
+        return (templateTxt)
+
+
+
+
+
+
+
 
 
 def basic_verilog_code_wrapHeader():
@@ -277,7 +328,7 @@ endmodule
         return (templateTxt)
 
 
-def basic_verilog_code_inst():
+def basic_verilog_code_inst_2():
         templateTxt = u"""
 axis_async_fifo #(
     .DEPTH(DEPTH),
