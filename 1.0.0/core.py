@@ -56,6 +56,7 @@ class Core():
         temp_module = self.module_lt[module_idx]
         temp_inst = module.Instance(temp_module,inst_name)
         self.inst_lt.append (temp_inst)
+        self.proc_wrapper.AddInst(temp_inst)
         self.update_cnt += 1
 
     
@@ -129,26 +130,69 @@ class Core():
             inst.LinkAllParameter()
 
     def GenerateVerilogCode(self):
-        # self.CfgAllPortOverrider()
-
-        wrapPort_lt = []
-        keys = ["input","output","inout"]
-        for key in keys:
-            for port in self.proc_wrapper.port_dict[key]:
-                wrapPort_lt.append (port)
-
-        self.gen_source = self.jinja_tmpl.render(
-            wrapper_name = self.proc_wrapper.name
-            ,wrapParams = self.proc_wrapper.param_lt
-            ,wrapPort_lt = wrapPort_lt
-            ,inst_lt = self.inst_lt
-            ,proc_wrapper = self.proc_wrapper
+        
+        self.jinja_tmpl = Template(basic_verilog_code_wrapHeader1())
+        code_wrapperHeader = self.jinja_tmpl.render(
+            proc_wrapper = self.proc_wrapper
         )
-        print (self.gen_source)
-        return(self.gen_source)
+        print (code_wrapperHeader)
+
+        # WIP inst func
+
+        # self.gen_source = self.jinja_tmpl.render(
+        #     wrapper_name = self.proc_wrapper.name
+        #     ,wrapParams = self.proc_wrapper.param_lt
+        #     ,wrapPort_lt = wrapPort_lt
+        #     ,inst_lt = self.inst_lt
+        #     ,proc_wrapper = self.proc_wrapper
+        # )
+        # print (self.gen_source)
+        # return(self.gen_source)
+    # def GenerateVerilogCode(self):
+    #     # self.CfgAllPortOverrider()
+
+    #     wrapPort_lt = []
+    #     keys = ["input","output","inout"]
+    #     for key in keys:
+    #         for port in self.proc_wrapper.port_dict[key]:
+    #             wrapPort_lt.append (port)
+
+    #     self.gen_source = self.jinja_tmpl.render(
+    #         wrapper_name = self.proc_wrapper.name
+    #         ,wrapParams = self.proc_wrapper.param_lt
+    #         ,wrapPort_lt = wrapPort_lt
+    #         ,inst_lt = self.inst_lt
+    #         ,proc_wrapper = self.proc_wrapper
+    #     )
+    #     print (self.gen_source)
+    #     return(self.gen_source)
 
 
 
+
+def basic_verilog_code_wrapHeader1():
+        templateTxt = u"""
+`timescale 1ns / 1ps
+
+module [{[proc_wrapper.name]}] #(
+{%-for wrapParam in proc_wrapper.param_lt%}
+    parameter [{[wrapParam.name]}] = [{[wrapParam.value]}] {%if loop.last == False%},{%endif%}
+{%-endfor%}
+)
+(
+{%-for port in proc_wrapper.IO_lt%}
+    [{[port.type]}] wire [{[port.bitwidth.init_str]}] [{[port.name]}] {%if loop.last == False%},{%endif%}
+{%-endfor%}
+);
+
+// Wrapper wire 
+{%-for wire in proc_wrapper.wire_lt%}
+wire [{[wire.bitwidth.init_str]}] [{[wire.name]}] ;
+{%-endfor%}
+
+
+"""
+        return (templateTxt)
 
 
 def basic_verilog_code_wrapHeader():
@@ -381,13 +425,15 @@ def test5():
     core = Core()
     core.ParseVerilogToModule("D:/DevProjects/anaconda/verilog_IO_linker/1.0.0/test.v")
     core.ParseVerilogToModule("D:/DevProjects/anaconda/verilog_IO_linker/1.0.0/test_wrapper.v")
+
+    # core.CreateEmptyWrapper("Top_wrapper")
+    core.CreateWrapperFromModule(2)
+
     core.CreateInstFromModule("instA_0",0)
     core.CreateInstFromModule("instA_1",0)
     core.CreateInstFromModule("instB_1",1)
     core.Select_procInst(0)
 
-    # core.CreateEmptyWrapper("Top_wrapper")
-    core.CreateWrapperFromModule(2)
 
     core.CreateParameterToWrapper("asb",'10',"[abc-1:0]")
     core.CreateIO_toWrapper("abc_o","output","[asb-1:0]")
@@ -397,7 +443,7 @@ def test5():
 
     core.CreateParameterToWrapper('bbb','5')
     core.CreateParameterToWrapper('aa112b','5')
-    core.CreateParameterToWrapper('pp','aa112b*bbb-5:0')
+    core.CreateParameterToWrapper('pp','aa112b*bbb-5')
 
     # core.proc_wrapper.LinkAllParameter()
 
@@ -405,9 +451,9 @@ def test5():
 
 
 
-    core.proc_wrapper.ShowPorts(basic_component.ClassOutput)
-    print ('--')
-    core.inst_lt[0].ShowPorts(basic_component.ClassOutput)
+    # core.proc_wrapper.ShowPorts(basic_component.ClassOutput)
+    # print ('--')
+    # core.inst_lt[0].ShowPorts(basic_component.ClassOutput)
     # core.proc_wrapper.ShowParams()
 
     core.LinkInstIO(core.inst_lt[0].IO_lt[0],core.proc_wrapper.IO_lt[0])
@@ -415,6 +461,8 @@ def test5():
     core.LinkParam(core.proc_wrapper.param_lt[0],core.inst_lt[0].param_lt[0])
 
     core.LinkAllParameter()
+    core.GenerateVerilogCode()
+    # core.proc_wrapper.GenerateWrapperInfo()
     a = 1
     # core.CreateWrapperFromModule(0)
     # core.LinkInstIO(core.inst_lt[0].port_dict["output"][0],core.inst_lt[1].port_dict["input"][0])

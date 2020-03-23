@@ -15,6 +15,10 @@ class Module():
     def SetModuleName(self,name):
         self.name = name
 
+    def AddWire(self,wire_obj):
+        wire_obj.SetOwner(self)
+        self.wire_lt.append (wire_obj)
+
     def AddPort(self,port_obj):
         port_obj.SetOwner(self)
         self.IO_lt.append (port_obj)
@@ -72,7 +76,19 @@ class Instance(Module):
 class Wrapper(Module):
     def __init__(self,wrap_name):
         super(Wrapper, self).__init__(wrap_name)
+        self.inst_lt = []
+
+    def AddInst(self,inst_obj):
+        self.inst_lt.append (inst_obj)
+    
+    def RemoveInst(self,inst_index):
+        del self.inst_lt[inst_index]
 
     def AddWire(self,wire_obj):
         self.wire_lt.append (wire_obj)
         wire_obj.SetOwner(self)
+
+    def GenerateWrapperInfo(self):
+        for inst in self.inst_lt:
+            print (inst.IO_lt)
+            pass
