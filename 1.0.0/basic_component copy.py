@@ -1,16 +1,16 @@
 import re
 class Depth_vector():
-    def __init__(self,init_str = "[0:0]"):
+    def __init__(self,str = "[0:0]"):
         rm_lt = ["[","]"," "]
         for rm_char in rm_lt:
-            init_str = init_str.replace(rm_char,"")
+            str = str.replace(rm_char,"")
 
         self.vec_top = ""
         self.vec_down = ""
         self.verilog_str = ""
         self.verilog_overrideParam_str = ""
         re_txt = r"(.+):(.+)"
-        re_res = re.match(re_txt,init_str)
+        re_res = re.match(re_txt,str)
         if (re_res!=None):
             self.vec_top = re_res.group(1)
             self.vec_down = re_res.group(2)
@@ -61,7 +61,7 @@ class ClassWire(Basic_component):
     def __init__(self,name_str,depth_d1_str="[0:0]",depth_d2_str=None,depth_d3_str=None):
         super(ClassWire, self).__init__(name_str,depth_d1_str,depth_d2_str,depth_d3_str)
         self.assign_txt = ""
-        self.assign_objID = None
+        self.assign_obj = None
         self.sample_assign = True
         self.wrapper_wire_name = None
         self.jump_link_objID = None

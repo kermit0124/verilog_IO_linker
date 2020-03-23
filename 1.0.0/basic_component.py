@@ -6,12 +6,20 @@ class Basic_component():
         self.name = name_str
         self.bitwidth = bitwidth.Bitwidth(depth_d1_str,self)
         self.owner_obj = None
-        self.assign_from_obj = None
+        self.assign_obj = None
+        self.wrap_mapping_obj = None
+        self.inst_mapping_obj = None
     
     def SetOwner(self,owner_obj):
         self.owner_obj = owner_obj
-    def SetAssign(self,assign_from_obj):
-        self.assign_from_obj = assign_from_obj
+    def SetAssign(self,assign_obj):
+        self.assign_obj = assign_obj
+    def SetWrapMapping(self,wrap_mapping_obj):
+        self.wrap_mapping_obj = wrap_mapping_obj
+    def SetInstMapping(self,inst_mapping_obj):
+        self.inst_mapping_obj = inst_mapping_obj
+    def GetWrapWireName(self):
+        return ('_' + self.owner_obj.inst_name + '__' + self.name)
 
 
 class ClassRegister(Basic_component):

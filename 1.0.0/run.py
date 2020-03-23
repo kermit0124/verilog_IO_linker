@@ -145,8 +145,8 @@ class MainFrame ( wx_gui.mainFrame.MainFrame ):
             else:
                 str_depth = ""
             str_port_name = obj.name
-            if (obj.assign_objID!=None):
-                str_src_name = obj.assign_objID.wrapper_wire_name
+            if (obj.assign_obj!=None):
+                str_src_name = obj.assign_obj.wrapper_wire_name
             else:
                 str_src_name = ""
             str = "[%s:%s] %s%s: %s"%(str_inst,type_str,str_depth,str_port_name,str_src_name)

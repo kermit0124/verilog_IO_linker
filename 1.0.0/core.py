@@ -64,16 +64,16 @@ class Core():
         self.proc_inst = self.inst_lt[idx]
     
     def LinkInstIO(self,src_obj,dest_obj):
-        # dest_obj.assign_objID = src_obj
+        # dest_obj.assign_obj = src_obj
         # dest_obj.assign_txt = src_obj.wrapper_wire_name
         # dest_obj.jump_link_objID = None
         # dest_obj.sample_assign = True
-        dest_obj.assign_from_obj = src_obj
+        dest_obj.assign_obj = src_obj
         self.update_cnt += 1
 
 
     def LinkWrapWire(self,src_obj,dest_obj):
-        # dest_obj.assign_objID = src_obj
+        # dest_obj.assign_obj = src_obj
         # dest_obj.assign_txt = src_obj.name
         # dest_obj.jump_link_objID = None
         # dest_obj.sample_assign = False
@@ -97,7 +97,7 @@ class Core():
         #                     port.vec_lt[0].verilog_overrideParam_str  = temp_str.replace(param.name,"("+param.override_txt+")")
 
 
-    def CreateWireToWrapper(self,wireName,wireSeg,vec_d1="[0:0]",vec_d2=None,vec_d3=None,assign_objID=None):
+    def CreateWireToWrapper(self,wireName,wireSeg,vec_d1="[0:0]",vec_d2=None,vec_d3=None,assign_obj=None):
         temp_wire = basic_component.ClassWire(wireName,vec_d1)
         self.proc_wrapper.AddWire(temp_wire)
 
@@ -181,13 +181,13 @@ module [{[proc_wrapper.name]}] #(
 )
 (
 {%-for port in proc_wrapper.IO_lt%}
-    [{[port.type]}] wire [{[port.bitwidth.init_str]}] [{[port.name]}] {%if loop.last == False%},{%endif%}
+    [{[port.type]}] wire [{[port.bitwidth.str]}] [{[port.name]}] {%if loop.last == False%},{%endif%}
 {%-endfor%}
 );
 
 // Wrapper wire 
 {%-for wire in proc_wrapper.wire_lt%}
-wire [{[wire.bitwidth.init_str]}] [{[wire.name]}] ;
+wire [{[wire.bitwidth.str]}] [{[wire.name]}] ;
 {%-endfor%}
 
 
@@ -199,7 +199,7 @@ def basic_verilog_code_wrapHeader():
         templateTxt = u"""
 {%-macro port_link_item(port)%}
 {%-if (port.type != "output")%}
-{%-if (port.assign_objID != None)%}[{[port.assign_objID.wrapper_wire_name]}]
+{%-if (port.assign_obj != None)%}[{[port.assign_obj.wrapper_wire_name]}]
 {%-endif%}
 {%-else%}[{[port.wrapper_wire_name]}]
 {%-endif%}
@@ -264,7 +264,7 @@ assign [{[wire.name]}] = [{[wire.assign_txt]}] ;
 
 // Wrapper IO
 {%-for outPort in proc_wrapper.output_lt%}
-{%-if (outPort.assign_objID != None)%}
+{%-if (outPort.assign_obj != None)%}
 assign [{[outPort.name]}] = [{[outPort.assign_txt]}] ;
 {%-else%}
 //assign [{[outPort.name]}] = [{[outPort.assign_txt]}] ;
@@ -344,8 +344,8 @@ def test2():
     core.CreateWrapperFromModule(0)
     core.LinkInstIO(core.inst_lt[0].port_dict["output"][0],core.inst_lt[1].port_dict["input"][0])
     
-    # core.CreateWireToWrapper("wire_1","~rstn",assign_objID=core.inst_lt[0].port_dict["output"][0])
-    core.CreateWireToWrapper("wire_1","~rstn",assign_objID=core.proc_wrapper.port_dict["input"][1])
+    # core.CreateWireToWrapper("wire_1","~rstn",assign_obj=core.inst_lt[0].port_dict["output"][0])
+    core.CreateWireToWrapper("wire_1","~rstn",assign_obj=core.proc_wrapper.port_dict["input"][1])
     core.LinkWrapWire(core.proc_wrapper.port_dict["wire"][0],core.inst_lt[0].port_dict["input"][1])
     core.LinkParam(core.proc_wrapper.param_lt[0],core.inst_lt[0].param_lt[0])
     # core.CfgPortParam(core.inst_lt[0])
@@ -369,8 +369,8 @@ def test3():
     # core.CreateWrapperFromModule(0)
     # core.LinkInstIO(core.inst_lt[0].port_dict["output"][0],core.inst_lt[1].port_dict["input"][0])
     
-    # # core.CreateWireToWrapper("wire_1","~rstn",assign_objID=core.inst_lt[0].port_dict["output"][0])
-    # core.CreateWireToWrapper("wire_1","~rstn",assign_objID=core.proc_wrapper.port_dict["input"][1])
+    # # core.CreateWireToWrapper("wire_1","~rstn",assign_obj=core.inst_lt[0].port_dict["output"][0])
+    # core.CreateWireToWrapper("wire_1","~rstn",assign_obj=core.proc_wrapper.port_dict["input"][1])
     # core.LinkWrapWire(core.proc_wrapper.port_dict["wire"][0],core.inst_lt[0].port_dict["input"][1])
     # core.LinkParam(core.proc_wrapper.param_lt[0],core.inst_lt[0].param_lt[0])
     # # core.CfgPortParam(core.inst_lt[0])
@@ -467,8 +467,8 @@ def test5():
     # core.CreateWrapperFromModule(0)
     # core.LinkInstIO(core.inst_lt[0].port_dict["output"][0],core.inst_lt[1].port_dict["input"][0])
     
-    # # core.CreateWireToWrapper("wire_1","~rstn",assign_objID=core.inst_lt[0].port_dict["output"][0])
-    # core.CreateWireToWrapper("wire_1","~rstn",assign_objID=core.proc_wrapper.port_dict["input"][1])
+    # # core.CreateWireToWrapper("wire_1","~rstn",assign_obj=core.inst_lt[0].port_dict["output"][0])
+    # core.CreateWireToWrapper("wire_1","~rstn",assign_obj=core.proc_wrapper.port_dict["input"][1])
     # core.LinkWrapWire(core.proc_wrapper.port_dict["wire"][0],core.inst_lt[0].port_dict["input"][1])
     # core.LinkParam(core.proc_wrapper.param_lt[0],core.inst_lt[0].param_lt[0])
     # # core.CfgPortParam(core.inst_lt[0])

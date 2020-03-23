@@ -1,19 +1,19 @@
 import re
 class Bitwidth():
-    def __init__(self,init_str = "",owner_obj = None):
-        self.init_str = init_str
-        self.link_init_str = init_str
-        init_str = init_str.replace(' ','').replace('[','').replace(']','')
+    def __init__(self,str = "",owner_obj = None):
+        self.str = str
+        self.link_str = str
+        str = str.replace(' ','').replace('[','').replace(']','')
 
-        temp_lt = init_str.split(':')
+        temp_lt = str.split(':')
         
         if (len(temp_lt)!=2):
-            if (init_str != ''):
-                print ("Bitwidth error str:" , init_str)
+            if (str != ''):
+                print ("Bitwidth error str:" , str)
             else:
                 self.top_str = '0'
                 self.down_str = '0'
-                self.init_str = '%s:%s'%(self.top_str,self.down_str)
+                self.str = '%s:%s'%(self.top_str,self.down_str)
 
         else:
             self.top_str = temp_lt[0]
@@ -31,7 +31,7 @@ class Bitwidth():
 
     def LinkParameter(self,link_lt):
         re_txt = r'[^\W]+'
-        re_res_lt = re.findall(re_txt,self.link_init_str)
+        re_res_lt = re.findall(re_txt,self.link_str)
         link_succ = True
         for re_res in re_res_lt:
             check_all_num = re.findall(r'[^0-9]',re_res)
@@ -40,7 +40,7 @@ class Bitwidth():
                 for link in link_lt:
                     if ((link.name) == re_res):
                         link_succ = True
-                        self.link_init_str = self.link_init_str.replace(link.name,'$'+str(len(self.link_param_obj)))
+                        self.link_str = self.link_str.replace(link.name,'$'+str(len(self.link_param_obj)))
                         self.link_param_obj.append (link)
                         break
                 
@@ -53,10 +53,10 @@ class Bitwidth():
         return (link_succ)
 
 class Param_bitwidth(Bitwidth):
-    def __init__(self,init_str = "",owner_obj = None):
-        super(Param_bitwidth, self).__init__(init_str,owner_obj)
+    def __init__(self,str = "",owner_obj = None):
+        super(Param_bitwidth, self).__init__(str,owner_obj)
 
-        if (init_str == ''):
+        if (str == ''):
             self.unsize = True
         else:
             self.unsize = False

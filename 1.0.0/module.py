@@ -1,4 +1,5 @@
 import copy
+import basic_component
 class Module():
     def __init__(self
         ,name = ""
@@ -79,7 +80,14 @@ class Wrapper(Module):
         self.inst_lt = []
 
     def AddInst(self,inst_obj):
+        for IO in inst_obj.IO_lt:
+            wire_name = IO.GetWrapWireName()
+            new_wire = basic_component.ClassWire(wire_name,IO.bitwidth.str)
+            new_wire.SetInstMapping(IO)
+            IO.SetWrapMapping(new_wire)
+            self.AddWire(new_wire)
         self.inst_lt.append (inst_obj)
+
     
     def RemoveInst(self,inst_index):
         del self.inst_lt[inst_index]
