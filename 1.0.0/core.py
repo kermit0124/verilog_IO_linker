@@ -131,18 +131,28 @@ class Core():
 
     def GenerateVerilogCode(self):
         
+        self.GenVerilogCode_WrapHeader()
+
+        self.GenVerilogCode_Inst()
+
+    
+    def GenVerilogCode_WrapHeader(self):
         self.jinja_tmpl = Template(basic_verilog_code_wrapHeader1())
-        code_wrapperHeader = self.jinja_tmpl.render(
+        self.code_wrapperHeader = self.jinja_tmpl.render(
             proc_wrapper = self.proc_wrapper
         )
-        print (code_wrapperHeader)
-
+        # print (self.code_wrapperHeader)
+    
+    def GenVerilogCode_Inst(self):
+        self.code_wrapperInst = ''
         self.jinja_tmpl = Template(basic_verilog_code_inst())
         for inst in self.proc_wrapper.inst_lt:
+
             code_wrapperInst = self.jinja_tmpl.render(
                 inst = inst
             )
-            a = 1
+            self.code_wrapperInst += code_wrapperInst
+
 
 
         # WIP inst func
@@ -209,9 +219,12 @@ def basic_verilog_code_inst():
 // ## Instance: [{[inst.inst_name]}]
 // ## IO wire
 {%-for IO in inst.IO_lt%}
-wire [{[IO.wrap_mapping_obj.bitwidth]}] [{[IO.wrap_mapping_obj.name]}] ;
+wire [{[IO.bitwidth.GetWrapMapWire_bitwidth()]}] [{[IO.wrap_mapping_obj.name]}] ;
 {%-endfor%}
 """
+# ---------------------
+
+
 
         b ="""
 // ## Output port

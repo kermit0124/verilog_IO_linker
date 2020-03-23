@@ -37,6 +37,9 @@ class Basic_parameter():
                 if (link_succ == False):
                     print ('Parameter: link parameter failed! Can\'t find:%s, parameter:%s, value:%s'%(re_res,self.name,self.value))
         return (link_succ)
+    
+    def GetWrapRuleName(self):
+        return (self.owner_obj.inst_name + '__' + self.name)
 
 class ClassParameter(Basic_parameter):
     def __init__(self,name_str,value,depth_str=""):

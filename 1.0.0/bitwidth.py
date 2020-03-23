@@ -51,6 +51,17 @@ class Bitwidth():
                         ,self.owner_obj.owner_obj.name
                         ,self.owner_obj.name))
         return (link_succ)
+        
+    def GetWrapMapWire_bitwidth(self):
+        if ((self.top_str=='0') & (self.down_str=='0')):
+            t_name = ''
+        else:
+            t_name = '[%s]'%self.link_str
+            for idx,param_obj in enumerate(self.link_param_obj):
+                param_wrapName = param_obj.GetWrapRuleName()
+                t_name = t_name.replace ('$%d'%(idx),param_wrapName)
+        return (t_name)
+
 
 class Param_bitwidth(Bitwidth):
     def __init__(self,str = "",owner_obj = None):

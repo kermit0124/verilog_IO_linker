@@ -19,7 +19,12 @@ class Basic_component():
     def SetInstMapping(self,inst_mapping_obj):
         self.inst_mapping_obj = inst_mapping_obj
     def GetWrapWireName(self):
-        return ('_' + self.owner_obj.inst_name + '__' + self.name)
+        dict_type_name = {
+            'input': '__i'
+            ,'output': '__o'
+            ,'inout': '__io'
+        }
+        return ('_' + self.owner_obj.inst_name + '__' + self.name + dict_type_name[self.type])
 
 
 class ClassRegister(Basic_component):
