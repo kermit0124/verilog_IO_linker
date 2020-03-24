@@ -1,5 +1,6 @@
 import re
 import bitwidth
+import module
 
 class Basic_component():
     def __init__(self,name_str,depth_d1_str='[0:0]'):
@@ -7,17 +8,45 @@ class Basic_component():
         self.bitwidth = bitwidth.Bitwidth(depth_d1_str,self)
         self.owner_obj = None
         self.assign_obj = None
-        self.wrap_mapping_obj = None
-        self.inst_mapping_obj = None
+        self.mapWrap_obj = None
+        self.mapInst_obj = None
+        self.instIO_assign_obj = None
     
     def SetOwner(self,owner_obj):
         self.owner_obj = owner_obj
     def SetAssign(self,assign_obj):
-        self.assign_obj = assign_obj
-    def SetWrapMapping(self,wrap_mapping_obj):
-        self.wrap_mapping_obj = wrap_mapping_obj
-    def SetInstMapping(self,inst_mapping_obj):
-        self.inst_mapping_obj = inst_mapping_obj
+        case = [isinstance(self,Class_IO_Port),type(assign_obj)==ClassWire]
+        if (case == [True,True]):
+            # assign = wire / self = IO port
+            if (type(self.owner_obj)==module.Wrapper):
+                self.assign_obj = assign_obj
+            else:
+                self.mapWrap_obj.assign_obj = assign_obj
+            self.instIO_assign_obj = None
+
+        elif (case == [True,False]):
+            # assign = IO port / self = IO port
+            if (type(self.owner_obj)==module.Wrapper):
+                self.assign_obj = assign_obj.mapWrap_obj
+            else:
+                self.mapWrap_obj.assign_obj = assign_obj.mapWrap_obj
+            self.instIO_assign_obj = assign_obj
+
+        elif (case == [False,True]):
+            # assign = wire / self = wire
+            self.assign_obj = assign_obj
+
+        else :
+            # assign = IO port / self = wire
+            if (type(assign_obj.owner_obj)==module.Wrapper):
+                self.assign_obj = assign_obj
+            else:
+                self.assign_obj = assign_obj.mapWrap_obj
+        
+    def SetWrapMapping(self,mapWrap_obj):
+        self.mapWrap_obj = mapWrap_obj
+    def SetInstMapping(self,mapInst_obj):
+        self.mapInst_obj = mapInst_obj
     def GetWrapWireName(self):
         dict_type_name = {
             'input': '__i'
@@ -37,17 +66,19 @@ class ClassWire(Basic_component):
         self.scanable_src = False
         self.scanable_dest = False
         self.type = "wire"
-
-class ClassInput(ClassWire):
+class Class_IO_Port(ClassWire):
+    def __init__(self,name_str,depth_d1_str="[0:0]"):
+        super(Class_IO_Port, self).__init__(name_str,depth_d1_str)
+class ClassInput(Class_IO_Port):
     def __init__(self,name_str,depth_d1_str="[0:0]"):
         super(ClassInput, self).__init__(name_str,depth_d1_str)
         self.asloOut = False
         self.type = "input"
-class ClassOutput(ClassWire):
+class ClassOutput(Class_IO_Port):
     def __init__(self,name_str,depth_d1_str="[0:0]"):
         super(ClassOutput, self).__init__(name_str,depth_d1_str)
         self.type = "output"
-class ClassInout(ClassWire):
+class ClassInout(Class_IO_Port):
     def __init__(self,name_str,depth_d1_str="[0:0]"):
         super(ClassInout, self).__init__(name_str,depth_d1_str)
         self.asloOut = True

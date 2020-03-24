@@ -227,7 +227,7 @@ class MainFrame ( wx_gui.mainFrame.MainFrame ):
             src_sel_num = self.m_listBox__src.GetSelections()[0]
             sel_dest = self.destList_objID_lt[dest_sel_num]
             sel_src = self.srcList_objID_lt[src_sel_num]
-            self.core.LinkInstIO(sel_src,sel_dest)
+            self.core.LinkPoint(sel_src,sel_dest)
 
             self.Update_dest_list()
 

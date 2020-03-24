@@ -49,6 +49,11 @@ class Basic_parameter():
         else:
             value = self.override_obj.name
         return (value)
+
+    def GetBitwidth(self):        
+        if (self.bitwidth.unsize==False):
+            return (self.bitwidth)
+        return ('')
     
     def GetWrapRuleName(self):
         return (self.owner_obj.inst_name + '__' + self.name)
