@@ -13,14 +13,15 @@ class Core():
         self.VP = verilog_parser.ClassVerilogParser()
         self.module_lt = []
         self.wrap_module_lt = None
-        self.proc_inst = None
+        # self.proc_inst = None
         self.inst_lt = []
         self.jinja_tmpl = Template(" ")
         self.jinja_tmpl.environment.variable_start_string = "[{["
         self.jinja_tmpl.environment.variable_end_string = "]}]"
-        self.proc_wrapper = None
+        # self.proc_wrapper = None
         self.update_cnt = 0
         self.genVerilogCodeTxt = ''
+        self.CreateEmptyWrapper("new_wrapper")
         pass
 
     def CreateWrapperFromModule(self,module_idx=0):
@@ -34,6 +35,10 @@ class Core():
         for param in sel_mod.param_lt:
             cp_param = copy.deepcopy(param)
             self.proc_wrapper.AddParameter(cp_param)
+
+        if (self.inst_lt!=[]):
+            for inst in self.inst_lt:
+                self.proc_wrapper.AddInst(inst)
 
         self.update_cnt += 1
 
@@ -61,7 +66,8 @@ class Core():
 
 
     def Select_procInst(self,idx):
-        self.proc_inst = self.inst_lt[idx]
+        # self.proc_inst = self.inst_lt[idx]
+        pass
 
     def LinkPoint(self,src_obj,dest_obj):
         dest_obj.SetAssign(src_obj)
@@ -486,4 +492,4 @@ def test5():
     # core.GenerateVerilogCode()
     pass
 
-test5()
+# test5()
