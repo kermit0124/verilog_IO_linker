@@ -190,6 +190,45 @@ class Core():
         # print (code_wrapWireAssign)
         self.code_wrapWireAssign += code_wrapWireAssign
 
+    def GetLinkablePointList(self,scan_dest):
+        rt_lt = []
+
+        if (scan_dest):
+            typeChk_wrap_lt = [
+                basic_component.ClassOutput
+                ,basic_component.ClassInout
+            ]
+            typeChk_inst_lt = [
+                basic_component.ClassInput
+                ,basic_component.ClassInout
+            ]
+        else:
+            typeChk_wrap_lt = [
+                basic_component.ClassInput
+                ,basic_component.ClassInout
+            ]
+            typeChk_inst_lt = [
+                basic_component.ClassOutput
+                ,basic_component.ClassInout
+            ]
+
+        for IO in self.proc_wrapper.IO_lt:
+            
+            for typeChk in typeChk_wrap_lt:
+                if (type(IO)==typeChk):
+                    rt_lt.append (IO)
+        
+        for wire in self.proc_wrapper.wire_lt:
+            if (wire.mapInst_obj==None):
+                rt_lt.append (wire)
+
+        for inst in self.proc_wrapper.inst_lt:
+            for IO in inst.IO_lt:
+                for typeChk in typeChk_inst_lt:
+                    if (type(IO)==typeChk):
+                        rt_lt.append (IO)
+        return (rt_lt)
+
 
 
 
@@ -431,6 +470,8 @@ def test5():
     core.GenerateVerilogCode()
     # core.proc_wrapper.GenerateWrapperInfo()
     print (core.genVerilogCodeTxt)
+    src_lt = core.GetLinkablePointList(False)
+    dest_lt = core.GetLinkablePointList(True)
     a = 1
     # core.CreateWrapperFromModule(0)
     # core.LinkPoint(core.inst_lt[0].port_dict["output"][0],core.inst_lt[1].port_dict["input"][0])
