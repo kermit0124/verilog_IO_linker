@@ -19,9 +19,12 @@ class Core():
         self.jinja_tmpl.environment.variable_start_string = "[{["
         self.jinja_tmpl.environment.variable_end_string = "]}]"
         # self.proc_wrapper = None
-        self.update_cnt = 0
+        self.update = False
         self.genVerilogCodeTxt = ''
         self.CreateEmptyWrapper("new_wrapper")
+        self.src_lt = []
+        self.dest_lt = []
+        self.proc_inst = module.Instance(module.Module("init"),'init')
         pass
 
     def CreateWrapperFromModule(self,module_idx=0):
@@ -40,7 +43,7 @@ class Core():
             for inst in self.inst_lt:
                 self.proc_wrapper.AddInst(inst)
 
-        self.update_cnt += 1
+        self.update = True
 
     def ParseVerilogToModule(self,filePath):
         self.VP.LoadTxt(filePath)
@@ -62,25 +65,25 @@ class Core():
         temp_inst = module.Instance(temp_module,inst_name)
         self.inst_lt.append (temp_inst)
         self.proc_wrapper.AddInst(temp_inst)
-        self.update_cnt += 1
+        self.update = True
 
 
     def Select_procInst(self,idx):
-        # self.proc_inst = self.inst_lt[idx]
+        self.proc_inst = self.inst_lt[idx]
         pass
 
     def LinkPoint(self,src_obj,dest_obj):
         dest_obj.SetAssign(src_obj)
-        self.update_cnt += 1
+        self.update = True
 
 
     def LinkWrapWire(self,src_obj,dest_obj):
-        self.update_cnt += 1
+        self.update = True
 
 
     def LinkParam(self,override_obj,inst_param_obj):
         inst_param_obj.override_obj = override_obj
-        self.update_cnt += 1
+        self.update = True
 
 
     def CreateWireToWrapper(self,wireName,wireSeg,vec_d1="[0:0]",vec_d2=None,vec_d3=None,assign_obj=None):
@@ -96,7 +99,7 @@ class Core():
         new_port = dict_class[type_str]
         self.proc_wrapper.AddPort(new_port)
 
-        self.update_cnt += 1
+        self.update = True
 
     def CreateParameterToWrapper(self,paramName,value,vec_d1=""):
         new_param = basic_parameter.ClassParameter(paramName,value,vec_d1)
@@ -104,7 +107,7 @@ class Core():
 
     def CreateEmptyWrapper(self,wrapperName):
         self.proc_wrapper = module.Wrapper(wrapperName)
-        self.update_cnt += 1
+        self.update = True
 
     # def CfgAllPortOverrider(self):
     #     for inst in self.inst_lt:
@@ -233,8 +236,19 @@ class Core():
                 for typeChk in typeChk_inst_lt:
                     if (type(IO)==typeChk):
                         rt_lt.append (IO)
-        return (rt_lt)
 
+        if (scan_dest):
+            self.dest_lt = rt_lt
+            return (self.dest_lt)
+        else:
+            self.src_lt = rt_lt
+            return (self.src_lt)
+
+    def GetUpdateResult(self):
+        rt = self.update
+        if (self.update):
+            self.update = False
+        return (rt)
 
 
 
