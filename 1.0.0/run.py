@@ -122,6 +122,7 @@ class MainFrame ( wx_gui.mainFrame.MainFrame ):
     def debug(self):
         self.moduleManagerFrame.Show()
         self.moduleManagerFrame.m_filePicker__loadFile.SetPath('D:\\Share\\python\\verilog_IO_linker\\1.0.0\\test.v')
+        self.moduleManagerFrame.filePicker__onFileChanged(None)
     def Update_all_list(self):
         type_str_dict = {
             'input': 'I'
@@ -139,13 +140,29 @@ class MainFrame ( wx_gui.mainFrame.MainFrame ):
             listBox.Clear()
             for point in point_lt:
                 try:
-                    owner_name = point.owner_obj.inst_name
+                    owner_name = point.owner_obj.inst_name + '/'
                 except AttributeError:
-                    owner_name = point.owner_obj.name
-                str = '%s/%s(%s)'%(owner_name,point.name,type_str_dict[point.type])
-                listBox.Append (str)
-        pass
+                    owner_name = ''
+                self.list_item_str = '%s%s(%s)'%(owner_name,point.name,type_str_dict[point.type])
 
+                if (listBox == self.m_listBox__dest):
+                    self.Update_all_list_assign_src_str(point)
+
+                listBox.Append (self.list_item_str)
+        pass
+    def Update_all_list_assign_src_str(self,point):
+            assign_check = False
+            if (point.assign_obj != None):
+                # Inst IO / wrap wire
+                assign_name = point.assign_obj.name
+                assign_check = True
+            elif (point.mapWrap_obj != None):
+                if (point.mapWrap_obj.assign_obj != None):
+                    assign_name = point.owner_obj.inst_name + '/' + point.name
+                    assign_check = True
+
+            if (assign_check):
+                self.list_item_str += '<= %s'%(assign_name)
 
     # event
     def menu_moduleManager__onMenuSel( self , event ):
@@ -163,11 +180,12 @@ class MainFrame ( wx_gui.mainFrame.MainFrame ):
     def connect__onBtnClick( self , event ):
         for dest_sel_num in self.m_listBox__dest.GetSelections():
             src_sel_num = self.m_listBox__src.GetSelections()[0]
-            sel_dest = self.destList_objID_lt[dest_sel_num]
-            sel_src = self.srcList_objID_lt[src_sel_num]
-            self.core.LinkPoint(sel_src,sel_dest)
+            sel_dest_obj = self.core.dest_lt[dest_sel_num]
+            sel_src_obj = self.core.src_lt[src_sel_num]
+            self.core.LinkPoint(sel_src_obj,sel_dest_obj)
 
-            self.Update_dest_list()
+            # self.Update_dest_list()
+            self.Update_all_list()
 
             self.m_listBox__dest.SetSelection((dest_sel_num+1)%self.m_listBox__dest.GetCount())
 
@@ -175,11 +193,12 @@ class MainFrame ( wx_gui.mainFrame.MainFrame ):
             self.m_listBox__src.SetSelection((src_sel_num+1)%self.m_listBox__src.GetCount())
 
     def src__onListBox( self , event ):
-        get_sel = self.m_listBox__src.GetSelections()
-        if (get_sel!=[]):
-            src_sel_num = get_sel[0]
-            sel_src = self.srcList_objID_lt[src_sel_num]
-            self.m_textCtrl__agnModeSeg.SetLabel(sel_src.wrapper_wire_name)
+        # get_sel = self.m_listBox__src.GetSelections()
+        # if (get_sel!=[]):
+        #     src_sel_num = get_sel[0]
+        #     sel_src = self.srcList_objID_lt[src_sel_num]
+        #     self.m_textCtrl__agnModeSeg.SetLabel(sel_src.wrapper_wire_name)
+        pass
 
     def create_wireIO__onBtnClick( self, event ):
         name = self.m_textCtrl__createWireName.GetValue()
@@ -209,6 +228,9 @@ class VerilogCodeFrame ( wx_gui.verilogCodeFrame.VerilogCodeFrame ):
     
     def VerilogCodeFrame__onAct( self, event ):
         pass
+        if (self.core.proc_wrapper!=None):
+            # if (self.core.GetUpdateResult()):
+            self.m_richText__showGen.SetValue(self.core.GenerateVerilogCode())
         # if (self.core.proc_wrapper!=None):
         #     if (self.update_cnt!=self.core.update_cnt):
         #         self.m_richText__showGen.SetValue(self.core.GenerateVerilogCode())

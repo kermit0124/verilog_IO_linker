@@ -73,7 +73,32 @@ class Core():
         pass
 
     def LinkPoint(self,src_obj,dest_obj):
-        dest_obj.SetAssign(src_obj)
+        dest_orig_obj = dest_obj
+        src_orig_obj = src_obj
+        if (isinstance(src_obj,basic_component.Class_IO_Port)):
+            pass
+            if (type(src_obj.owner_obj) == module.Instance):
+                # src is inst IO
+                src_obj = src_obj.mapWrap_obj
+                pass
+            else:
+                # src is wrap IO
+                pass
+        else:
+            # src is wrap wire
+            pass
+
+        if (isinstance(dest_obj,basic_component.Class_IO_Port)):
+            pass
+            if (type(dest_obj.owner_obj) == module.Instance):
+                dest_obj = dest_obj.mapWrap_obj
+                pass
+            else:
+                pass
+        else:
+            pass
+        # dest_obj.SetAssign(src_obj)
+        dest_obj.assign_obj = src_obj
         self.update = True
 
 
@@ -131,6 +156,7 @@ class Core():
             + self.code_wrapWireAssign  \
             + '\nendmodule '
         # print (self.genVerilogCodeTxt)
+        return (self.genVerilogCodeTxt)
 
 
     def GenVerilogCode_WrapHeader(self):
