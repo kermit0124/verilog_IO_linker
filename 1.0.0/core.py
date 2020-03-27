@@ -102,32 +102,28 @@ class Core():
         self.update = True
 
 
-    def LinkWrapWire(self,src_obj,dest_obj):
-        self.update = True
-
-
     def LinkParam(self,override_obj,inst_param_obj):
         inst_param_obj.override_obj = override_obj
         self.update = True
 
 
-    def CreateWireToWrapper(self,wireName,wireSeg,vec_d1="[0:0]",vec_d2=None,vec_d3=None,assign_obj=None):
-        temp_wire = basic_component.ClassWire(wireName,vec_d1)
+    def CreateWireToWrapper(self,wireName,wireSeg,bitwidth="[0:0]"):
+        temp_wire = basic_component.ClassWire(wireName,bitwidth)
         self.proc_wrapper.AddWire(temp_wire)
 
-    def CreateIO_toWrapper(self,itemName,type_str,vec_d1="[0:0]"):
+    def CreateIO_toWrapper(self,itemName,type_str,bitwidth="[0:0]"):
         dict_class = {
-            'input': basic_component.ClassInput(itemName,vec_d1)
-            ,'inout':basic_component.ClassInout(itemName,vec_d1)
-            ,'output': basic_component.ClassOutput(itemName,vec_d1)
+            'input': basic_component.ClassInput(itemName,bitwidth)
+            ,'inout':basic_component.ClassInout(itemName,bitwidth)
+            ,'output': basic_component.ClassOutput(itemName,bitwidth)
         }
         new_port = dict_class[type_str]
         self.proc_wrapper.AddPort(new_port)
 
         self.update = True
 
-    def CreateParameterToWrapper(self,paramName,value,vec_d1=""):
-        new_param = basic_parameter.ClassParameter(paramName,value,vec_d1)
+    def CreateParameterToWrapper(self,paramName,value,bitwidth=""):
+        new_param = basic_parameter.ClassParameter(paramName,value,bitwidth)
         self.proc_wrapper.AddParameter(new_param)
 
     def CreateEmptyWrapper(self,wrapperName):

@@ -150,21 +150,28 @@ class MainFrame ( wx_gui.mainFrame.MainFrame ):
 
                 listBox.Append (self.list_item_str)
         pass
-    def Update_all_list_assign_src_str(self,point):
+    def Update_all_list_assign_src_str(self,dest_obj):
             assign_check = False
-            if (point.assign_obj != None):
-                # Inst IO / wrap wire
-                if (point.assign_obj.mapInst_obj!=None):
-                    redir_obj = point.assign_obj.mapInst_obj
-                    assign_name = redir_obj.owner_obj.inst_name + '/' + redir_obj.name
+            if (isinstance(dest_obj,core.basic_component.Class_IO_Port)):
+                # dest is IO (inst or wrap)
+                if (dest_obj.mapWrap_obj==None):
+                    # dest is wrap IO
+                    src_obj = dest_obj.assign_obj
                 else:
-                    assign_name = point.assign_obj.name
+                    # dest is inst IO
+                    src_obj = dest_obj.mapWrap_obj.assign_obj
+
+            if (src_obj != None):
+                # src is wire (wrap or mapInst)
                 assign_check = True
-            elif (point.mapWrap_obj != None):
-                if (point.mapWrap_obj.assign_obj != None):
-                    # assign_name = point.owner_obj.inst_name + '/' + point.name
-                    assign_name = point.name
-                    assign_check = True
+                if (src_obj.mapInst_obj==None):
+                    # src is wrap wire
+                    assign_name = src_obj.name
+                else:
+                    # src is inst IO
+                    redir_obj = src_obj.mapInst_obj
+                    assign_name = redir_obj.owner_obj.inst_name + '/' + redir_obj.name
+
 
             if (assign_check):
                 self.list_item_str += '<= %s'%(assign_name)
