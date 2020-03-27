@@ -308,7 +308,7 @@ def basic_verilog_code_inst():
         templateTxt = u"""
 
 // -----------------------------------------------------
-// ### Instance: [{[inst.inst_name]}] ###
+// ### Instance: [[{[inst.inst_name]}]] ###
 // ## Parameter override
 {%-for param in inst.param_lt%}
 localparam [{[param.GetBitwidth()]}] [{[param.GetWrapRuleName()]}] = [{[param.GetWrapMapParamValue()]}] ;
@@ -329,7 +329,7 @@ wire [{[IO.bitwidth.GetWrapMapWire_bitwidth()]}] [{[IO.mapWrap_obj.name]}] ;
     .[{[IO.name]}] ( [{[IO.mapWrap_obj.name]}] ) {%if (loop.last == False or last_key==False)%},{%endif%}
     {%-endfor%}
 ) ;
-// ### Instance: [{[inst.inst_name]}] ###
+// ### Instance: [[{[inst.inst_name]}]] ###
 // -----------------------------------------------------
 
 """
@@ -341,11 +341,10 @@ def basic_verilog_code_instWireAssign():
     templateTxt = u"""
 
 // -----------------------------------------------------
-// ### Wire assign - instance : [{[inst.inst_name]}] ###
+// ### Wire assign - instance : [[{[inst.inst_name]}]] ###
 {%-for IO in IO_lt%}
 assign [{[IO.mapWrap_obj.name]}] = [{[IO.mapWrap_obj.assign_obj.name]}] ;
 {%-endfor%}
-// ### Wire assign - instance : [{[inst.inst_name]}] ###
 // -----------------------------------------------------
 
 """
@@ -355,20 +354,20 @@ assign [{[IO.mapWrap_obj.name]}] = [{[IO.mapWrap_obj.assign_obj.name]}] ;
 def basic_verilog_code_wrapWireAssign():
     templateTxt = u"""
 
+{%-if wire_lt != []%}
 // -----------------------------------------------------
-// ### Wire assign - wrapper : [{[wrap.name]}] ###
+// ### Wire assign - wrapper : [[{[wrap.name]}]] ###
 {%-for wire in wire_lt%}
 assign [{[wire.name]}] = [{[wire.assign_obj.name]}] ;
 {%-endfor%}
-// ### Wire assign - wrapper : [{[wrap.name]}] ###
 // -----------------------------------------------------
+{%-endif%}
 
 // -----------------------------------------------------
-// ### IO assign - wrapper : [{[wrap.name]}] ###
+// ### IO assign - wrapper : [[{[wrap.name]}]] ###
 {%-for IO in IO_lt%}
 assign [{[IO.name]}] = [{[IO.assign_obj.name]}] ;
 {%-endfor%}
-// ### IO assign - wrapper : [{[wrap.name]}] ###
 // -----------------------------------------------------
 """
 

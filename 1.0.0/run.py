@@ -169,11 +169,6 @@ class MainFrame ( wx_gui.mainFrame.MainFrame ):
         self.moduleManagerFrame.Show()
 
     def mainFrame__onAct( self , event ):
-        pass
-        # if (self.core.update_cnt!=self.update_cnt):
-        #     self.update_cnt = self.core.update_cnt
-        #     self.Update_all_list()
-
         if (self.core.GetUpdateResult()):
             self.Update_all_list()
             
@@ -184,7 +179,6 @@ class MainFrame ( wx_gui.mainFrame.MainFrame ):
             sel_src_obj = self.core.src_lt[src_sel_num]
             self.core.LinkPoint(sel_src_obj,sel_dest_obj)
 
-            # self.Update_dest_list()
             self.Update_all_list()
 
             self.m_listBox__dest.SetSelection((dest_sel_num+1)%self.m_listBox__dest.GetCount())
@@ -229,12 +223,7 @@ class VerilogCodeFrame ( wx_gui.verilogCodeFrame.VerilogCodeFrame ):
     def VerilogCodeFrame__onAct( self, event ):
         pass
         if (self.core.proc_wrapper!=None):
-            # if (self.core.GetUpdateResult()):
             self.m_richText__showGen.SetValue(self.core.GenerateVerilogCode())
-        # if (self.core.proc_wrapper!=None):
-        #     if (self.update_cnt!=self.core.update_cnt):
-        #         self.m_richText__showGen.SetValue(self.core.GenerateVerilogCode())
-        #         self.update_cnt = self.core.update_cnt
 
 
 def main():
