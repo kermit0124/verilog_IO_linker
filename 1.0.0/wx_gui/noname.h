@@ -62,7 +62,7 @@ class MainFrame : public wxFrame
 		wxComboBox* m_comboBox__dest_inst_filter;
 		wxCheckBox* m_checkBox7;
 		wxListBox* m_listBox__dest;
-		wxButton* m_button__disconnect_input;
+		wxButton* m_button__destDisconnect;
 		wxMenuBar* m_menubar1;
 		wxMenu* m_menu2;
 		wxMenu* m_menu21;
@@ -74,6 +74,7 @@ class MainFrame : public wxFrame
 		virtual void assign__onBtnClick( wxCommandEvent& event ) { event.Skip(); }
 		virtual void create_wireIO__onBtnClick( wxCommandEvent& event ) { event.Skip(); }
 		virtual void dest__onListBox( wxCommandEvent& event ) { event.Skip(); }
+		virtual void destDisconnect__onBtnClick( wxCommandEvent& event ) { event.Skip(); }
 		virtual void menu_moduleManager__onMenuSel( wxCommandEvent& event ) { event.Skip(); }
 
 

@@ -102,6 +102,19 @@ class Core():
         self.update = True
 
 
+
+    def RemoveLinkPoint(self,dest_obj):
+        if (isinstance(dest_obj,basic_component.Class_IO_Port)):
+            if (dest_obj.mapWrap_obj == None):
+                # wrap IO
+                dest_obj.assign_obj = None
+            else:
+                # inst IO
+                dest_obj.mapWrap_obj.assign_obj = None
+        else:
+            # wire
+            dest_obj.assign_obj = None
+
     def LinkParam(self,override_obj,inst_param_obj):
         inst_param_obj.override_obj = override_obj
         self.update = True

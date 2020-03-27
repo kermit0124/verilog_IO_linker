@@ -146,8 +146,8 @@ class MainFrame ( wx.Frame ):
 
 		sbSizer4.Add( sbSizer51, 1, wx.EXPAND, 5 )
 
-		self.m_button__disconnect_input = wx.Button( sbSizer4.GetStaticBox(), wx.ID_ANY, u"Disconnect", wx.DefaultPosition, wx.DefaultSize, 0 )
-		sbSizer4.Add( self.m_button__disconnect_input, 0, wx.ALL|wx.ALIGN_CENTER_HORIZONTAL, 5 )
+		self.m_button__destDisconnect = wx.Button( sbSizer4.GetStaticBox(), wx.ID_ANY, u"Disconnect", wx.DefaultPosition, wx.DefaultSize, 0 )
+		sbSizer4.Add( self.m_button__destDisconnect, 0, wx.ALL|wx.ALIGN_CENTER_HORIZONTAL, 5 )
 
 
 		bSizer19.Add( sbSizer4, 1, wx.EXPAND, 5 )
@@ -184,6 +184,7 @@ class MainFrame ( wx.Frame ):
 		self.m_button__assign.Bind( wx.EVT_BUTTON, self.assign__onBtnClick )
 		self.m_button__create_wireIO.Bind( wx.EVT_BUTTON, self.create_wireIO__onBtnClick )
 		self.m_listBox__dest.Bind( wx.EVT_LISTBOX, self.dest__onListBox )
+		self.m_button__destDisconnect.Bind( wx.EVT_BUTTON, self.destDisconnect__onBtnClick )
 		self.Bind( wx.EVT_MENU, self.menu_moduleManager__onMenuSel, id = self.m_menuItem11.GetId() )
 
 	def __del__( self ):
@@ -207,6 +208,9 @@ class MainFrame ( wx.Frame ):
 		event.Skip()
 
 	def dest__onListBox( self, event ):
+		event.Skip()
+
+	def destDisconnect__onBtnClick( self, event ):
 		event.Skip()
 
 	def menu_moduleManager__onMenuSel( self, event ):

@@ -226,6 +226,13 @@ class MainFrame ( wx_gui.mainFrame.MainFrame ):
         
         self.Update_all_list()
 
+    def destDisconnect__onBtnClick( self, event ):
+        sel_num_lt = self.m_listBox__dest.GetSelections()
+        for sel_num in sel_num_lt:
+            dest_obj = self.core.dest_lt[sel_num]
+            self.core.RemoveLinkPoint(dest_obj)
+            self.Update_all_list()
+
 class VerilogCodeFrame ( wx_gui.verilogCodeFrame.VerilogCodeFrame ):	
     def __init__( self, parent , core):
         super(VerilogCodeFrame,self).__init__(parent)

@@ -143,8 +143,8 @@ MainFrame::MainFrame( wxWindow* parent, wxWindowID id, const wxString& title, co
 
 	sbSizer4->Add( sbSizer51, 1, wxEXPAND, 5 );
 
-	m_button__disconnect_input = new wxButton( sbSizer4->GetStaticBox(), wxID_ANY, wxT("Disconnect"), wxDefaultPosition, wxDefaultSize, 0 );
-	sbSizer4->Add( m_button__disconnect_input, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
+	m_button__destDisconnect = new wxButton( sbSizer4->GetStaticBox(), wxID_ANY, wxT("Disconnect"), wxDefaultPosition, wxDefaultSize, 0 );
+	sbSizer4->Add( m_button__destDisconnect, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
 
 
 	bSizer19->Add( sbSizer4, 1, wxEXPAND, 5 );
@@ -183,6 +183,7 @@ MainFrame::MainFrame( wxWindow* parent, wxWindowID id, const wxString& title, co
 	m_button__assign->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainFrame::assign__onBtnClick ), NULL, this );
 	m_button__create_wireIO->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainFrame::create_wireIO__onBtnClick ), NULL, this );
 	m_listBox__dest->Connect( wxEVT_COMMAND_LISTBOX_SELECTED, wxCommandEventHandler( MainFrame::dest__onListBox ), NULL, this );
+	m_button__destDisconnect->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainFrame::destDisconnect__onBtnClick ), NULL, this );
 	m_menu2->Bind(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainFrame::menu_moduleManager__onMenuSel ), this, m_menuItem11->GetId());
 }
 
@@ -195,6 +196,7 @@ MainFrame::~MainFrame()
 	m_button__assign->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainFrame::assign__onBtnClick ), NULL, this );
 	m_button__create_wireIO->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainFrame::create_wireIO__onBtnClick ), NULL, this );
 	m_listBox__dest->Disconnect( wxEVT_COMMAND_LISTBOX_SELECTED, wxCommandEventHandler( MainFrame::dest__onListBox ), NULL, this );
+	m_button__destDisconnect->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainFrame::destDisconnect__onBtnClick ), NULL, this );
 
 }
 
