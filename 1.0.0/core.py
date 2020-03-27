@@ -145,6 +145,8 @@ class Core():
 
     def GenerateVerilogCode(self):
 
+        self.LinkAllParameter()
+
         self.GenVerilogCode_WrapHeader()
         self.GenVerilogCode_Inst()
         self.GenVerilogCode_instWireAssign()
@@ -289,7 +291,7 @@ module [{[proc_wrapper.name]}] #(
 )
 (
 {%-for port in proc_wrapper.IO_lt%}
-    [{[port.type]}] wire [{[port.bitwidth]}] [{[port.name]}] {%if loop.last == False%},{%endif%}
+    [{[port.type]}] wire[{[port.bitwidth]}] [{[port.name]}] {%if loop.last == False%},{%endif%}
 {%-endfor%}
 );
 
@@ -311,7 +313,7 @@ def basic_verilog_code_inst():
 // ### Instance: [[{[inst.inst_name]}]] ###
 // ## Parameter override
 {%-for param in inst.param_lt%}
-localparam [{[param.GetBitwidth()]}] [{[param.GetWrapRuleName()]}] = [{[param.GetWrapMapParamValue()]}] ;
+localparam[{[param.GetBitwidth()]}] [{[param.GetWrapRuleName()]}] = [{[param.GetWrapMapParamValue()]}] ;
 {%-endfor%}
 
 // ## IO wire

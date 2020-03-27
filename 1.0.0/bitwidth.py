@@ -23,7 +23,10 @@ class Bitwidth():
         self.link_param_obj = []
         pass
     def __repr__(self):
-        return ('[%s]'%(self.str))
+        if ((self.top_str == '0') & (self.down_str == '0')):
+            return ('')
+        else:
+            return (' '+self.GetWrapMapWire_bitwidth())
         pass
 
     def SetOwner(owner_obj):

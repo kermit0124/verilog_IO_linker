@@ -154,11 +154,16 @@ class MainFrame ( wx_gui.mainFrame.MainFrame ):
             assign_check = False
             if (point.assign_obj != None):
                 # Inst IO / wrap wire
-                assign_name = point.assign_obj.name
+                if (point.assign_obj.mapInst_obj!=None):
+                    redir_obj = point.assign_obj.mapInst_obj
+                    assign_name = redir_obj.owner_obj.inst_name + '/' + redir_obj.name
+                else:
+                    assign_name = point.assign_obj.name
                 assign_check = True
             elif (point.mapWrap_obj != None):
                 if (point.mapWrap_obj.assign_obj != None):
-                    assign_name = point.owner_obj.inst_name + '/' + point.name
+                    # assign_name = point.owner_obj.inst_name + '/' + point.name
+                    assign_name = point.name
                     assign_check = True
 
             if (assign_check):
