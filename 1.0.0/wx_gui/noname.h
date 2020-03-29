@@ -18,17 +18,20 @@
 #include <wx/sizer.h>
 #include <wx/statbox.h>
 #include <wx/listbox.h>
+#include <wx/textctrl.h>
+#include <wx/panel.h>
 #include <wx/bitmap.h>
 #include <wx/image.h>
 #include <wx/icon.h>
+#include <wx/notebook.h>
 #include <wx/button.h>
-#include <wx/statline.h>
-#include <wx/stattext.h>
-#include <wx/textctrl.h>
-#include <wx/choice.h>
 #include <wx/checkbox.h>
 #include <wx/menu.h>
 #include <wx/frame.h>
+#include <wx/choice.h>
+#include <wx/stattext.h>
+#include <wx/statline.h>
+#include <wx/dialog.h>
 #include <wx/richtext/richtextctrl.h>
 #include <wx/filepicker.h>
 
@@ -45,44 +48,73 @@ class MainFrame : public wxFrame
 	protected:
 		wxComboBox* m_comboBox__src_inst_filter;
 		wxListBox* m_listBox__src;
+		wxNotebook* m_notebook7;
+		wxPanel* m_panel3;
+		wxTextCtrl* m_textCtrl__src_info;
+		wxPanel* m_panel4;
+		wxListBox* m_listBox__src_linkTo;
 		wxButton* m_button__output_tracer;
 		wxButton* m_button__connect;
-		wxStaticLine* m_staticline5;
-		wxStaticText* m_staticText7;
-		wxTextCtrl* m_textCtrl__agnModeName;
-		wxStaticText* m_staticText6;
-		wxTextCtrl* m_textCtrl__agnModeSeg;
-		wxStaticText* m_staticText5;
-		wxButton* m_button__assign;
-		wxStaticLine* m_staticline6;
-		wxTextCtrl* m_textCtrl__createWireName;
-		wxChoice* m_choice__create_wireIO_type;
-		wxTextCtrl* m_textCtrl__createWireSeg;
-		wxButton* m_button__create_wireIO;
 		wxComboBox* m_comboBox__dest_inst_filter;
 		wxCheckBox* m_checkBox7;
 		wxListBox* m_listBox__dest;
+		wxNotebook* m_notebook71;
+		wxPanel* m_panel31;
+		wxTextCtrl* m_textCtrl__dest_info;
 		wxButton* m_button__destDisconnect;
 		wxMenuBar* m_menubar1;
 		wxMenu* m_menu2;
 		wxMenu* m_menu21;
+		wxMenu* m_menu5;
+		wxMenu* m_menu4;
 
 		// Virtual event handlers, overide them in your derived class
 		virtual void mainFrame__onAct( wxActivateEvent& event ) { event.Skip(); }
 		virtual void src__onListBox( wxCommandEvent& event ) { event.Skip(); }
 		virtual void connect__onBtnClick( wxCommandEvent& event ) { event.Skip(); }
-		virtual void assign__onBtnClick( wxCommandEvent& event ) { event.Skip(); }
-		virtual void create_wireIO__onBtnClick( wxCommandEvent& event ) { event.Skip(); }
 		virtual void dest__onListBox( wxCommandEvent& event ) { event.Skip(); }
 		virtual void destDisconnect__onBtnClick( wxCommandEvent& event ) { event.Skip(); }
 		virtual void menu_moduleManager__onMenuSel( wxCommandEvent& event ) { event.Skip(); }
+		virtual void menu_addPoint__onMenuSel( wxCommandEvent& event ) { event.Skip(); }
+		virtual void menu_addPoint__destMultSel( wxCommandEvent& event ) { event.Skip(); }
+		virtual void menu_addPoint__autoSel( wxCommandEvent& event ) { event.Skip(); }
 
 
 	public:
 
-		MainFrame( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 983,624 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
+		MainFrame( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 1096,684 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
 
 		~MainFrame();
+
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class CreatePointDialog
+///////////////////////////////////////////////////////////////////////////////
+class CreatePointDialog : public wxDialog
+{
+	private:
+
+	protected:
+		wxChoice* m_choice__create_wireIO_type;
+		wxTextCtrl* m_textCtrl__createName;
+		wxStaticText* m_staticText144;
+		wxTextCtrl* m_textCtrl__createBit;
+		wxStaticText* m_staticText140;
+		wxTextCtrl* m_textCtrl__createWireSeg;
+		wxStaticLine* m_staticline8;
+		wxStaticText* m_staticText44;
+		wxStaticText* m_staticText__pointInfo;
+		wxButton* m_button__create_wireIO;
+
+		// Virtual event handlers, overide them in your derived class
+		virtual void create_wireIO__onBtnClick( wxCommandEvent& event ) { event.Skip(); }
+
+
+	public:
+
+		CreatePointDialog( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Create point"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 477,220 ), long style = wxDEFAULT_DIALOG_STYLE );
+		~CreatePointDialog();
 
 };
 

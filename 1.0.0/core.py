@@ -143,9 +143,43 @@ class Core():
         self.proc_wrapper = module.Wrapper(wrapperName)
         self.update = True
 
-    # def CfgAllPortOverrider(self):
-    #     for inst in self.inst_lt:
-    #         self.CfgPortParam(inst)
+    def GetPointFullName(self,point_obj):
+        try:
+            owner_name = point_obj.owner_obj.inst_name + '/'
+        except AttributeError:
+            owner_name = ''
+        
+        owner_name += point_obj.name
+        return (owner_name)
+
+    def GetPointLinkObj(self,point_obj):
+        src_obj = None
+        if (isinstance(point_obj,basic_component.Class_IO_Port)):
+            # dest is IO (inst or wrap)
+            if (point_obj.mapWrap_obj==None):
+                # dest is wrap IO
+                src_obj = point_obj.assign_obj
+            else:
+                # dest is inst IO
+                src_obj = point_obj.mapWrap_obj.assign_obj
+
+        if (src_obj != None):
+            # src is wire (wrap or mapInst)
+            if (src_obj.mapInst_obj==None):
+                # src is wrap wire
+                pass
+            else:
+                # src is inst IO
+                src_obj = src_obj.mapInst_obj
+        
+        return (src_obj)
+
+    def GetPointLinkFullName(self,point_obj):
+        src_obj = self.GetPointLinkObj(point_obj)
+        rt_str = ''
+        if (src_obj!=None):
+            rt_str = self.GetPointFullName(src_obj)
+        return (rt_str)
 
     def LinkAllParameter(self):
         self.proc_wrapper.LinkAllParameter()

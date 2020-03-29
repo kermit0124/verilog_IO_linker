@@ -3,9 +3,16 @@ import wx
 import wx_gui.mainFrame
 import wx_gui.moduleManagerFrame
 import wx_gui.verilogCodeFrame
+import wx_gui.createPointDialog
 import verilog_parser
 import linker
 import core
+
+class CreatePointDialog ( wx_gui.createPointDialog.CreatePointDialog):	
+    def __init__( self, parent ,core):
+        wx_gui.createPointDialog.CreatePointDialog.__init__(self,parent)
+        # core.Core.__init__(self)
+        self.core = core
 
 class ModuleManagerFrame ( wx_gui.moduleManagerFrame.ModuleManagerFrame):	
     def __init__( self, parent ,core):
@@ -115,6 +122,8 @@ class MainFrame ( wx_gui.mainFrame.MainFrame ):
         self.moduleManagerFrame = ModuleManagerFrame(None,self.core)
         self.verilogCodeFrame = VerilogCodeFrame(None,self.core)
         self.verilogCodeFrame.Show()
+        self.createPointDialog = CreatePointDialog(None,self.core)
+        self.createPointDialog.Hide()
 
         self.debug()
     
@@ -139,11 +148,7 @@ class MainFrame ( wx_gui.mainFrame.MainFrame ):
         for listBox,point_lt in list_func_lt:
             listBox.Clear()
             for point in point_lt:
-                try:
-                    owner_name = point.owner_obj.inst_name + '/'
-                except AttributeError:
-                    owner_name = ''
-                self.list_item_str = '%s%s(%s)'%(owner_name,point.name,type_str_dict[point.type])
+                self.list_item_str = '%s(%s)'%(self.core.GetPointFullName(point),type_str_dict[point.type])
 
                 if (listBox == self.m_listBox__dest):
                     self.Update_all_list_assign_src_str(point)
@@ -151,30 +156,63 @@ class MainFrame ( wx_gui.mainFrame.MainFrame ):
                 listBox.Append (self.list_item_str)
         pass
     def Update_all_list_assign_src_str(self,dest_obj):
-            assign_check = False
-            if (isinstance(dest_obj,core.basic_component.Class_IO_Port)):
-                # dest is IO (inst or wrap)
-                if (dest_obj.mapWrap_obj==None):
-                    # dest is wrap IO
-                    src_obj = dest_obj.assign_obj
-                else:
-                    # dest is inst IO
-                    src_obj = dest_obj.mapWrap_obj.assign_obj
+        assign_name = self.core.GetPointLinkFullName(dest_obj)
+        if (assign_name!=''):
+            self.list_item_str += '<= %s'%(assign_name)
+    def ShowPointMessage(self,call_by_dest=False):
+        point_lt = self.core.src_lt
+        ctrlList_obj = self.m_listBox__src
+        basic_info = self.m_textCtrl__src_info
 
-            if (src_obj != None):
-                # src is wire (wrap or mapInst)
-                assign_check = True
-                if (src_obj.mapInst_obj==None):
-                    # src is wrap wire
-                    assign_name = src_obj.name
-                else:
-                    # src is inst IO
-                    redir_obj = src_obj.mapInst_obj
-                    assign_name = redir_obj.owner_obj.inst_name + '/' + redir_obj.name
+        if (call_by_dest):
+            point_lt = self.core.dest_lt
+            ctrlList_obj = self.m_listBox__dest
+            basic_info = self.m_textCtrl__dest_info
 
+        sel_num = None
+        sel_lt = ctrlList_obj.GetSelections()
+        if (sel_lt != []):
+            sel_num = sel_lt [0]
 
-            if (assign_check):
-                self.list_item_str += '<= %s'%(assign_name)
+        if (sel_num!=None):
+            sel_point_obj = point_lt [sel_num]
+
+            if (type(sel_point_obj.owner_obj)==core.module.Instance):
+                owner_type = 'Inst'
+            else:
+                owner_type = 'Wrap'
+
+            bitwidth_str = str(sel_point_obj.bitwidth)
+            if (bitwidth_str==''):
+                bitwidth_str = '[0:0]'
+
+            basic_info_str = 'Name: %s\nType: %s\nBitwidth: %s\nOwner: [%s]%s \n' %(
+                sel_point_obj.name
+                ,sel_point_obj.type
+                ,bitwidth_str
+                ,owner_type
+                ,sel_point_obj.owner_obj.name
+            )
+
+            if (call_by_dest):
+                sel_assign_name = self.core.GetPointLinkFullName(sel_point_obj)
+                if (sel_assign_name!=''):
+                    basic_info_str += 'Assign: %s'%(sel_assign_name)
+            else:
+                self.m_listBox__src_linkTo.Clear()
+                cnt = 0
+                for dest in self.core.dest_lt:
+                    if (self.core.GetPointLinkObj(dest)==sel_point_obj):
+                        dest_name = self.core.GetPointFullName(dest)
+                        cnt += 1
+                        linkTo_str = '%d - %s'%(cnt,dest_name)
+                        self.m_listBox__src_linkTo.Append (dest_name)
+                        if (cnt == 1):
+                            basic_info_str += 'Link to:\n'
+                        basic_info_str += linkTo_str + '\n'
+            
+            basic_info.SetValue(basic_info_str)
+
 
     # event
     def menu_moduleManager__onMenuSel( self , event ):
@@ -199,32 +237,33 @@ class MainFrame ( wx_gui.mainFrame.MainFrame ):
             self.m_listBox__src.SetSelection((src_sel_num+1)%self.m_listBox__src.GetCount())
 
     def src__onListBox( self , event ):
-        # get_sel = self.m_listBox__src.GetSelections()
-        # if (get_sel!=[]):
-        #     src_sel_num = get_sel[0]
-        #     sel_src = self.srcList_objID_lt[src_sel_num]
-        #     self.m_textCtrl__agnModeSeg.SetLabel(sel_src.wrapper_wire_name)
-        pass
+        self.ShowPointMessage(False)
+        
+
+    def dest__onListBox( self , event ):
+        self.ShowPointMessage(True)
+        
 
     def create_wireIO__onBtnClick( self, event ):
-        name = self.m_textCtrl__createWireName.GetValue()
-        segm = self.m_textCtrl__createWireSeg.GetValue()
+        # name = self.m_textCtrl__createWireName.GetValue()
+        # segm = self.m_textCtrl__createWireSeg.GetValue()
 
-        re_res_lt = re.findall(r"(input|output|inout|wire|)( |)(\[.+\]|)(.+)",name)
-        if (len(re_res_lt)>0):
-            re_res_lt = re_res_lt[0]
-            # IO_type = re_res_lt[0]
-            IO_type = self.m_choice__create_wireIO_type.GetStringSelection()
-            if (IO_type=='wire'):
-                if (segm.replace(' ','') == ''):
-                    segm = '0'
-                self.core.CreateWireToWrapper(name,segm)
-            else:
-                IO_depth = re_res_lt[2]
-                IO_name = re_res_lt[3].replace(' ','')
-                self.core.CreateIO_toWrapper(IO_name,IO_type,IO_depth)
+        # re_res_lt = re.findall(r"(input|output|inout|wire|)( |)(\[.+\]|)(.+)",name)
+        # if (len(re_res_lt)>0):
+        #     re_res_lt = re_res_lt[0]
+        #     # IO_type = re_res_lt[0]
+        #     IO_type = self.m_choice__create_wireIO_type.GetStringSelection()
+        #     if (IO_type=='wire'):
+        #         if (segm.replace(' ','') == ''):
+        #             segm = '0'
+        #         self.core.CreateWireToWrapper(name,segm)
+        #     else:
+        #         IO_depth = re_res_lt[2]
+        #         IO_name = re_res_lt[3].replace(' ','')
+        #         self.core.CreateIO_toWrapper(IO_name,IO_type,IO_depth)
         
-        self.Update_all_list()
+        # self.Update_all_list()
+        pass
 
     def destDisconnect__onBtnClick( self, event ):
         sel_num_lt = self.m_listBox__dest.GetSelections()
@@ -232,6 +271,10 @@ class MainFrame ( wx_gui.mainFrame.MainFrame ):
             dest_obj = self.core.dest_lt[sel_num]
             self.core.RemoveLinkPoint(dest_obj)
             self.Update_all_list()
+    
+    
+    def menu_addPoint__onMenuSel( self, event ):
+        self.createPointDialog.Show()
 
 class VerilogCodeFrame ( wx_gui.verilogCodeFrame.VerilogCodeFrame ):	
     def __init__( self, parent , core):
