@@ -235,34 +235,35 @@ CreatePointDialog::CreatePointDialog( wxWindow* parent, wxWindowID id, const wxS
 	fgSizer4->SetFlexibleDirection( wxBOTH );
 	fgSizer4->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 
-	wxString m_choice__create_wireIO_typeChoices[] = { wxT("input"), wxT("output"), wxT("inout"), wxT("wire") };
-	int m_choice__create_wireIO_typeNChoices = sizeof( m_choice__create_wireIO_typeChoices ) / sizeof( wxString );
-	m_choice__create_wireIO_type = new wxChoice( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_choice__create_wireIO_typeNChoices, m_choice__create_wireIO_typeChoices, 0 );
-	m_choice__create_wireIO_type->SetSelection( 0 );
-	fgSizer4->Add( m_choice__create_wireIO_type, 0, wxALL, 5 );
+	wxString m_choice__create_point_typeChoices[] = { wxT("input"), wxT("output"), wxT("inout"), wxT("wire") };
+	int m_choice__create_point_typeNChoices = sizeof( m_choice__create_point_typeChoices ) / sizeof( wxString );
+	m_choice__create_point_type = new wxChoice( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_choice__create_point_typeNChoices, m_choice__create_point_typeChoices, 0 );
+	m_choice__create_point_type->SetSelection( 0 );
+	fgSizer4->Add( m_choice__create_point_type, 0, wxALL, 5 );
 
-	m_textCtrl__createName = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	m_textCtrl__createName->SetMinSize( wxSize( 300,-1 ) );
+	m_textCtrl__point_name = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_textCtrl__point_name->SetMinSize( wxSize( 300,-1 ) );
 
-	fgSizer4->Add( m_textCtrl__createName, 1, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
+	fgSizer4->Add( m_textCtrl__point_name, 1, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
 
 	m_staticText144 = new wxStaticText( this, wxID_ANY, wxT("Bit width"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText144->Wrap( -1 );
 	fgSizer4->Add( m_staticText144, 0, wxALL, 5 );
 
-	m_textCtrl__createBit = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	m_textCtrl__createBit->SetMinSize( wxSize( 300,-1 ) );
+	m_textCtrl__point_bit = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_textCtrl__point_bit->SetMinSize( wxSize( 300,-1 ) );
 
-	fgSizer4->Add( m_textCtrl__createBit, 1, wxALL, 5 );
+	fgSizer4->Add( m_textCtrl__point_bit, 1, wxALL, 5 );
 
 	m_staticText140 = new wxStaticText( this, wxID_ANY, wxT("Wire assign code"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText140->Wrap( -1 );
 	fgSizer4->Add( m_staticText140, 0, wxALL, 5 );
 
-	m_textCtrl__createWireSeg = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	m_textCtrl__createWireSeg->SetMinSize( wxSize( 300,-1 ) );
+	m_textCtrl__wire_assign_code = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_textCtrl__wire_assign_code->Enable( false );
+	m_textCtrl__wire_assign_code->SetMinSize( wxSize( 300,-1 ) );
 
-	fgSizer4->Add( m_textCtrl__createWireSeg, 1, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
+	fgSizer4->Add( m_textCtrl__wire_assign_code, 1, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
 
 
 	bSizer44->Add( fgSizer4, 1, wxEXPAND, 5 );
@@ -273,9 +274,9 @@ CreatePointDialog::CreatePointDialog( wxWindow* parent, wxWindowID id, const wxS
 	wxBoxSizer* bSizer45;
 	bSizer45 = new wxBoxSizer( wxHORIZONTAL );
 
-	m_staticText44 = new wxStaticText( this, wxID_ANY, wxT("Point info."), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText44->Wrap( -1 );
-	bSizer45->Add( m_staticText44, 0, wxALL, 5 );
+	m_staticText1 = new wxStaticText( this, wxID_ANY, wxT("Point info."), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText1->Wrap( -1 );
+	bSizer45->Add( m_staticText1, 0, wxALL, 5 );
 
 	m_staticText__pointInfo = new wxStaticText( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText__pointInfo->Wrap( -1 );
@@ -284,8 +285,8 @@ CreatePointDialog::CreatePointDialog( wxWindow* parent, wxWindowID id, const wxS
 
 	bSizer44->Add( bSizer45, 0, wxEXPAND, 5 );
 
-	m_button__create_wireIO = new wxButton( this, wxID_ANY, wxT("Create wire/IO"), wxDefaultPosition, wxDefaultSize, 0 );
-	bSizer44->Add( m_button__create_wireIO, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
+	m_button__create_point = new wxButton( this, wxID_ANY, wxT("Create wire/IO to wrapper"), wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer44->Add( m_button__create_point, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
 
 
 	this->SetSizer( bSizer44 );
@@ -294,13 +295,21 @@ CreatePointDialog::CreatePointDialog( wxWindow* parent, wxWindowID id, const wxS
 	this->Centre( wxBOTH );
 
 	// Connect Events
-	m_button__create_wireIO->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( CreatePointDialog::create_wireIO__onBtnClick ), NULL, this );
+	m_choice__create_point_type->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( CreatePointDialog::point_type__onChoice ), NULL, this );
+	m_textCtrl__point_name->Connect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( CreatePointDialog::point_name__onText ), NULL, this );
+	m_textCtrl__point_bit->Connect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( CreatePointDialog::point_bit__onText ), NULL, this );
+	m_textCtrl__wire_assign_code->Connect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( CreatePointDialog::wire_assign_code__onText ), NULL, this );
+	m_button__create_point->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( CreatePointDialog::create_point__onBtnClick ), NULL, this );
 }
 
 CreatePointDialog::~CreatePointDialog()
 {
 	// Disconnect Events
-	m_button__create_wireIO->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( CreatePointDialog::create_wireIO__onBtnClick ), NULL, this );
+	m_choice__create_point_type->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( CreatePointDialog::point_type__onChoice ), NULL, this );
+	m_textCtrl__point_name->Disconnect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( CreatePointDialog::point_name__onText ), NULL, this );
+	m_textCtrl__point_bit->Disconnect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( CreatePointDialog::point_bit__onText ), NULL, this );
+	m_textCtrl__wire_assign_code->Disconnect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( CreatePointDialog::wire_assign_code__onText ), NULL, this );
+	m_button__create_point->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( CreatePointDialog::create_point__onBtnClick ), NULL, this );
 
 }
 

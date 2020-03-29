@@ -96,19 +96,23 @@ class CreatePointDialog : public wxDialog
 	private:
 
 	protected:
-		wxChoice* m_choice__create_wireIO_type;
-		wxTextCtrl* m_textCtrl__createName;
+		wxChoice* m_choice__create_point_type;
+		wxTextCtrl* m_textCtrl__point_name;
 		wxStaticText* m_staticText144;
-		wxTextCtrl* m_textCtrl__createBit;
+		wxTextCtrl* m_textCtrl__point_bit;
 		wxStaticText* m_staticText140;
-		wxTextCtrl* m_textCtrl__createWireSeg;
+		wxTextCtrl* m_textCtrl__wire_assign_code;
 		wxStaticLine* m_staticline8;
-		wxStaticText* m_staticText44;
+		wxStaticText* m_staticText1;
 		wxStaticText* m_staticText__pointInfo;
-		wxButton* m_button__create_wireIO;
+		wxButton* m_button__create_point;
 
 		// Virtual event handlers, overide them in your derived class
-		virtual void create_wireIO__onBtnClick( wxCommandEvent& event ) { event.Skip(); }
+		virtual void point_type__onChoice( wxCommandEvent& event ) { event.Skip(); }
+		virtual void point_name__onText( wxCommandEvent& event ) { event.Skip(); }
+		virtual void point_bit__onText( wxCommandEvent& event ) { event.Skip(); }
+		virtual void wire_assign_code__onText( wxCommandEvent& event ) { event.Skip(); }
+		virtual void create_point__onBtnClick( wxCommandEvent& event ) { event.Skip(); }
 
 
 	public:

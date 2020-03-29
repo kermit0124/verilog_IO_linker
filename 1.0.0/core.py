@@ -129,9 +129,13 @@ class Core():
             'input': basic_component.ClassInput(itemName,bitwidth)
             ,'inout':basic_component.ClassInout(itemName,bitwidth)
             ,'output': basic_component.ClassOutput(itemName,bitwidth)
+            ,'wire': basic_component.ClassWire(itemName,bitwidth)
         }
         new_port = dict_class[type_str]
-        self.proc_wrapper.AddPort(new_port)
+        if (type_str == 'wire'):
+            self.proc_wrapper.AddWire(new_port)
+        else:
+            self.proc_wrapper.AddPort(new_port)
 
         self.update = True
 

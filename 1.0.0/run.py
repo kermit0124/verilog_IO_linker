@@ -11,8 +11,42 @@ import core
 class CreatePointDialog ( wx_gui.createPointDialog.CreatePointDialog):	
     def __init__( self, parent ,core):
         wx_gui.createPointDialog.CreatePointDialog.__init__(self,parent)
-        # core.Core.__init__(self)
         self.core = core
+
+    def UpdatePointInfo(self):
+        name = self.m_textCtrl__point_name.GetValue()
+        bit = self.m_textCtrl__point_bit.GetValue()
+        if (bit==''):
+            bit = '0:0'
+        wire_assign_code = self.m_textCtrl__wire_assign_code.GetValue()
+        point_type = self.m_choice__create_point_type.GetStringSelection()
+        info_str = '(%s) [%s] %s'%(point_type,bit,name)
+        if (point_type=='wire'):
+            info_str += ' = %s'%(wire_assign_code)
+        self.m_staticText__pointInfo.SetLabel(info_str)
+
+    def point_type__onChoice( self, event ):
+        if (self.m_choice__create_point_type.GetStringSelection()=='wire'):
+            self.m_textCtrl__wire_assign_code.Enable()
+        else:
+            self.m_textCtrl__wire_assign_code.Disable()
+        self.UpdatePointInfo()
+
+    def point_bit__onText( self, event ):
+        self.UpdatePointInfo()
+
+    def wire_assign_code__onText( self, event ):
+        self.UpdatePointInfo()
+
+    def point_name__onText( self, event ):
+        self.UpdatePointInfo()
+
+    def create_point__onBtnClick( self, event ):
+        name = self.m_textCtrl__point_name.GetValue()
+        bit = self.m_textCtrl__point_bit.GetValue()
+        wire_assign_code = self.m_textCtrl__wire_assign_code.GetValue()
+        point_type = self.m_choice__create_point_type.GetStringSelection()
+        self.core.CreateIO_toWrapper(name,point_type,bit)
 
 class ModuleManagerFrame ( wx_gui.moduleManagerFrame.ModuleManagerFrame):	
     def __init__( self, parent ,core):
