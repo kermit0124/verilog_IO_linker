@@ -114,7 +114,7 @@ MainFrame::MainFrame( wxWindow* parent, wxWindowID id, const wxString& title, co
 	wxStaticBoxSizer* sbSizer51;
 	sbSizer51 = new wxStaticBoxSizer( new wxStaticBox( sbSizer4->GetStaticBox(), wxID_ANY, wxT("Pins") ), wxVERTICAL );
 
-	m_listBox__dest = new wxListBox( sbSizer51->GetStaticBox(), wxID_ANY, wxDefaultPosition, wxDefaultSize, 0, NULL, wxLB_HSCROLL );
+	m_listBox__dest = new wxListBox( sbSizer51->GetStaticBox(), wxID_ANY, wxDefaultPosition, wxDefaultSize, 0, NULL, wxLB_HSCROLL|wxLB_MULTIPLE );
 	sbSizer51->Add( m_listBox__dest, 1, wxALL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
 
 
@@ -183,15 +183,14 @@ MainFrame::MainFrame( wxWindow* parent, wxWindowID id, const wxString& title, co
 	m_menubar1->Append( m_menu5, wxT("Add") );
 
 	m_menu4 = new wxMenu();
-	wxMenuItem* m_menuItem41;
-	m_menuItem41 = new wxMenuItem( m_menu4, wxID_ANY, wxString( wxT("Destination multiple selection") ) , wxEmptyString, wxITEM_CHECK );
-	m_menu4->Append( m_menuItem41 );
-	m_menuItem41->Check( true );
+	wxMenuItem* m_menuItem__multSel;
+	m_menuItem__multSel = new wxMenuItem( m_menu4, wxID_ANY, wxString( wxT("Destination multiple selection") ) , wxEmptyString, wxITEM_CHECK );
+	m_menu4->Append( m_menuItem__multSel );
 
-	wxMenuItem* m_menuItem5;
-	m_menuItem5 = new wxMenuItem( m_menu4, wxID_ANY, wxString( wxT("Auto select to next after link") ) , wxEmptyString, wxITEM_CHECK );
-	m_menu4->Append( m_menuItem5 );
-	m_menuItem5->Check( true );
+	wxMenuItem* m_menuItem__autoNext;
+	m_menuItem__autoNext = new wxMenuItem( m_menu4, wxID_ANY, wxString( wxT("Auto select to next after link") ) , wxEmptyString, wxITEM_CHECK );
+	m_menu4->Append( m_menuItem__autoNext );
+	m_menuItem__autoNext->Check( true );
 
 	m_menubar1->Append( m_menu4, wxT("Mode") );
 
@@ -208,8 +207,8 @@ MainFrame::MainFrame( wxWindow* parent, wxWindowID id, const wxString& title, co
 	m_button__destDisconnect->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainFrame::destDisconnect__onBtnClick ), NULL, this );
 	m_menu2->Bind(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainFrame::menu_moduleManager__onMenuSel ), this, m_menuItem11->GetId());
 	m_menu5->Bind(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainFrame::menu_addPoint__onMenuSel ), this, m_menuItem4->GetId());
-	m_menu4->Bind(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainFrame::menu_addPoint__destMultSel ), this, m_menuItem41->GetId());
-	m_menu4->Bind(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainFrame::menu_addPoint__autoSel ), this, m_menuItem5->GetId());
+	m_menu4->Bind(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainFrame::menu_addPoint__destMultSel ), this, m_menuItem__multSel->GetId());
+	m_menu4->Bind(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainFrame::menu_addPoint__autoSel ), this, m_menuItem__autoNext->GetId());
 }
 
 MainFrame::~MainFrame()

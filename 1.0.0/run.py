@@ -124,6 +124,7 @@ class MainFrame ( wx_gui.mainFrame.MainFrame ):
         self.verilogCodeFrame.Show()
         self.createPointDialog = CreatePointDialog(None,self.core)
         self.createPointDialog.Hide()
+        self.listBoxDest_selection = []
 
         self.debug()
     
@@ -231,16 +232,29 @@ class MainFrame ( wx_gui.mainFrame.MainFrame ):
 
             self.Update_all_list()
 
-            self.m_listBox__dest.SetSelection((dest_sel_num+1)%self.m_listBox__dest.GetCount())
+            if (self.m_menuItem__autoNext.IsChecked()):
+                self.m_listBox__dest.SetSelection((dest_sel_num+1)%self.m_listBox__dest.GetCount())
 
-            self.m_listBox__src.Deselect(src_sel_num)
-            self.m_listBox__src.SetSelection((src_sel_num+1)%self.m_listBox__src.GetCount())
+                self.m_listBox__src.Deselect(src_sel_num)
+                self.m_listBox__src.SetSelection((src_sel_num+1)%self.m_listBox__src.GetCount())
+            else:
+                self.m_listBox__src.SetSelection(src_sel_num)
+                self.m_listBox__dest.SetSelection(dest_sel_num)
 
     def src__onListBox( self , event ):
         self.ShowPointMessage(False)
         
 
     def dest__onListBox( self , event ):
+        if (self.m_menuItem__multSel.IsChecked()==False):
+            if (self.listBoxDest_selection!=[]):
+                temp_sel = self.m_listBox__dest.GetSelections()
+                new_sel = list(set(temp_sel).difference(set(self.listBoxDest_selection)))
+                old_sel = list(set(temp_sel).difference(set(new_sel)))
+                for sel in old_sel:
+                    self.m_listBox__dest.Deselect(sel)
+        self.listBoxDest_selection = self.m_listBox__dest.GetSelections()
+
         self.ShowPointMessage(True)
         
 
