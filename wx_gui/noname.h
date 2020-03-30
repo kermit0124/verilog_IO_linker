@@ -71,6 +71,7 @@ class MainFrame : public wxFrame
 
 		// Virtual event handlers, overide them in your derived class
 		virtual void mainFrame__onAct( wxActivateEvent& event ) { event.Skip(); }
+		virtual void mainFrame__onClose( wxCloseEvent& event ) { event.Skip(); }
 		virtual void src__onListBox( wxCommandEvent& event ) { event.Skip(); }
 		virtual void connect__onBtnClick( wxCommandEvent& event ) { event.Skip(); }
 		virtual void codeWin__onBtnClick( wxCommandEvent& event ) { event.Skip(); }

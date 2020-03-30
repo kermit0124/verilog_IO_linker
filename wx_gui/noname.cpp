@@ -218,6 +218,7 @@ MainFrame::MainFrame( wxWindow* parent, wxWindowID id, const wxString& title, co
 
 	// Connect Events
 	this->Connect( wxEVT_ACTIVATE, wxActivateEventHandler( MainFrame::mainFrame__onAct ) );
+	this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( MainFrame::mainFrame__onClose ) );
 	m_listBox__src->Connect( wxEVT_COMMAND_LISTBOX_SELECTED, wxCommandEventHandler( MainFrame::src__onListBox ), NULL, this );
 	m_button__connect->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainFrame::connect__onBtnClick ), NULL, this );
 	m_button__codeWin->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainFrame::codeWin__onBtnClick ), NULL, this );
@@ -233,6 +234,7 @@ MainFrame::~MainFrame()
 {
 	// Disconnect Events
 	this->Disconnect( wxEVT_ACTIVATE, wxActivateEventHandler( MainFrame::mainFrame__onAct ) );
+	this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( MainFrame::mainFrame__onClose ) );
 	m_listBox__src->Disconnect( wxEVT_COMMAND_LISTBOX_SELECTED, wxCommandEventHandler( MainFrame::src__onListBox ), NULL, this );
 	m_button__connect->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainFrame::connect__onBtnClick ), NULL, this );
 	m_button__codeWin->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainFrame::codeWin__onBtnClick ), NULL, this );

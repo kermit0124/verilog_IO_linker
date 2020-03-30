@@ -1,283 +1,380 @@
+import re
+
+import wx
+import wx._adv
+import wx._html
+
+import wx_gui.mainFrame
+import wx_gui.moduleManagerFrame
+import wx_gui.verilogCodeFrame
+import wx_gui.createPointDialog
+
 import verilog_parser
-class class__verilog_IO_linker():
-	def __init__(self, fileName):
-		self.version = "0.2.1"
+import core
 
-		fileTxt = ""
-		try:
-			self.fp = open (fileName,'r')
-			fileTxt = self.fp.read()
-			self.fp.close()
-		except:
-			self.fp = ''
-			# print ("File path error")
-		
+class CreatePointDialog ( wx_gui.createPointDialog.CreatePointDialog):	
+    def __init__( self, parent ,core):
+        wx_gui.createPointDialog.CreatePointDialog.__init__(self,parent)
+        self.core = core
 
-		self.parser = verilog_parser.class__parser(fileTxt)
-		self.module_data_list = self.parser.get_module_data()
-		self.link_prefix = "pf_"
-		self.link_suffix = ""
-		self.link_inst_name = "inst_name"
-		self.comma_left = 0
-		self.tab_char = '\t'
-		self.gen_para_assign_mode = 1
-		self.templateCode_list = []
-		self.link_actIdx = 0
-		self.MOD_DATA__MODULE_INFO = 0
-		self.MOD_DATA__MODULE_INFO_NAME = 0
-		self.MOD_DATA__IO_INFO = 1
-		self.MOD_DATA__IO_INFO_NAME = 0
-		self.MOD_DATA__IO_INFO_TYPE = 1
-		self.MOD_DATA__IO_INFO_BIT = 2
-		self.MOD_DATA__PARA_INFO = 2
-		self.MOD_DATA__PARA_INFO_NAME = 0
-		self.MOD_DATA__PARA_INFO_VAL = 1
-		self.gen_assign_tmpl_input = 0
-		self.gen_assign_tmpl_output = 0
-		self.link_param_keep_name = 1
-		self.link_wire_add_under_line = 1
-	
-	def __gen__str_show_module(self):
-		return ("// *** module: "+self.link_inst_name+" ( "+self.module_data_list[self.link_actIdx][self.MOD_DATA__MODULE_INFO][self.MOD_DATA__MODULE_INFO_NAME]+" ) ***\n")
-	
-	def __gen__tmpl_assign(self,modData):
-		if (self.gen_assign_tmpl_input):
-			self.templateCode_list.append ("\n// --- assign input/inout ---\n")
-			self.templateCode_list.append (self.__gen__str_show_module())
+    def UpdatePointInfo(self):
+        name = self.m_textCtrl__point_name.GetValue()
+        bit = self.m_textCtrl__point_bit.GetValue()
+        if (bit==''):
+            bit = '0:0'
+        wire_assign_code = self.m_textCtrl__wire_assign_code.GetValue()
+        point_type = self.m_choice__create_point_type.GetStringSelection()
+        info_str = '(%s) [%s] %s'%(point_type,bit,name)
+        if (point_type=='wire'):
+            info_str += ' = %s'%(wire_assign_code)
+        self.m_staticText__pointInfo.SetLabel(info_str)
 
-			for IO_info in modData[self.MOD_DATA__IO_INFO]:
-				IO_name = IO_info[self.MOD_DATA__IO_INFO_NAME].strip()
-				IO_type = IO_info[self.MOD_DATA__IO_INFO_TYPE].strip()
-				if ((IO_type == "input")|(IO_type == "inout")):
-					lineTxt = "assign "
-					if (self.link_wire_add_under_line):
-						lineTxt += '_' + self.link_prefix + IO_name + self.link_suffix
-					else:
-						lineTxt += self.link_prefix + IO_name + self.link_suffix
-					lineTxt += " = "
-					lineTxt += " ;\n"
-					self.templateCode_list.append (lineTxt)
-		
-		if (self.gen_assign_tmpl_output):
-			self.templateCode_list.append ("\n// --- assign output ---\n")
-			self.templateCode_list.append (self.__gen__str_show_module())
-			
-			for IO_info in modData[self.MOD_DATA__IO_INFO]:
-				IO_name = IO_info[self.MOD_DATA__IO_INFO_NAME].strip()
-				IO_type = IO_info[self.MOD_DATA__IO_INFO_TYPE].strip()
-				if (IO_type == "output"):					
-					lineTxt = "assign "
-					lineTxt += " = "
-					lineTxt += self.link_prefix + IO_name + self.link_suffix + " ;\n"
-					self.templateCode_list.append (lineTxt)
+    def point_type__onChoice( self, event ):
+        if (self.m_choice__create_point_type.GetStringSelection()=='wire'):
+            self.m_textCtrl__wire_assign_code.Enable()
+        else:
+            self.m_textCtrl__wire_assign_code.Disable()
+        self.UpdatePointInfo()
 
+    def point_bit__onText( self, event ):
+        self.UpdatePointInfo()
 
-	
-	def __gen__tmpl_def_IOs(self,modData):
-		self.templateCode_list.append ("\n// --- input/output ---\n")
-		self.templateCode_list.append (self.__gen__str_show_module())
+    def wire_assign_code__onText( self, event ):
+        self.UpdatePointInfo()
 
-		for IO_info in modData[self.MOD_DATA__IO_INFO]:
-			IO_name = IO_info[self.MOD_DATA__IO_INFO_NAME].strip()
-			IO_type = IO_info[self.MOD_DATA__IO_INFO_TYPE].strip()
-			IO_bit_list = IO_info[self.MOD_DATA__IO_INFO_BIT]
-			lineTxt = "wire "
-			if (IO_bit_list):
-				lineTxt += '[ '
+    def point_name__onText( self, event ):
+        self.UpdatePointInfo()
 
-				# Auto link parameter
-				for bit_word in IO_bit_list:
-					temp = bit_word.strip()
-					for paraInfo in self.module_data_list[self.link_actIdx][self.MOD_DATA__PARA_INFO]:
-						paraName = paraInfo[self.MOD_DATA__PARA_INFO_NAME].strip()
-						if (paraName) in temp:
-							# find linker para
-							temp = temp.replace(paraName,self.link_prefix+paraName+self.link_suffix)
-							break
+    def create_point__onBtnClick( self, event ):
+        name = self.m_textCtrl__point_name.GetValue()
+        bit = self.m_textCtrl__point_bit.GetValue()
+        wire_assign_code = self.m_textCtrl__wire_assign_code.GetValue()
+        point_type = self.m_choice__create_point_type.GetStringSelection()
+        self.core.CreateIO_toWrapper(name,point_type,bit)
 
-					lineTxt += temp
-				lineTxt += ' ] '
-			
-			if (self.link_wire_add_under_line):
-				lineTxt += '_' + self.link_prefix + IO_name + self.link_suffix
-			else:
-				lineTxt += self.link_prefix + IO_name + self.link_suffix
-			lineTxt += " ;\n"
-			self.templateCode_list.append (lineTxt)
-
-	def __gen__tmpl_def_paras(self,modData):
-		self.templateCode_list.append ("\n// --- parameter ---\n")
-		self.templateCode_list.append (self.__gen__str_show_module())
-
-		for paraInfo in modData[self.MOD_DATA__PARA_INFO]:
-			paraName = paraInfo[self.MOD_DATA__PARA_INFO_NAME].strip()
-			paraVal_list = paraInfo[self.MOD_DATA__PARA_INFO_VAL]
-			lineTxt = "localparam "
-			lineTxt += self.link_prefix + paraName + self.link_suffix
-			lineTxt += " = "
-			if (self.gen_para_assign_mode):
-				for word in paraVal_list:
-					
-					# auto link parameter
-					replace_paraName_word = word.strip()
-					for cmpParaInfo in modData[self.MOD_DATA__PARA_INFO]:
-						cmpParaName = cmpParaInfo[self.MOD_DATA__PARA_INFO_NAME].strip()
-						if (cmpParaName==replace_paraName_word):
-							replace_paraName_word = replace_paraName_word.replace(cmpParaName,	self.link_prefix+cmpParaName+self.link_suffix)
-							break
-					
-					if (self.link_param_keep_name):
-						replace_paraName_word = paraName
-
-					lineTxt += replace_paraName_word+' '
-			lineTxt += " ;\n"
-			self.templateCode_list.append (lineTxt)
-	
-
-	def __gen__tmpl_inst(self,modData):
-		self.templateCode_list.append ("\n// --- instance module ---\n")
-		self.templateCode_list.append (self.__gen__str_show_module())
-
-		lineTxt = ""
-		lineTxt = modData[self.MOD_DATA__MODULE_INFO][self.MOD_DATA__MODULE_INFO_NAME] + " # " + chr(40) + '\n'
-		self.templateCode_list.append (lineTxt)
-		lineTxt = ""
-
-		# Parameters
-		self.__gen__tmpl_inst_link(modData[self.MOD_DATA__PARA_INFO],1)
-				
-		self.templateCode_list.append (chr(41) + '\n')
-
-		self.templateCode_list.append (self.link_inst_name+'\n')
-
-		self.templateCode_list.append (chr(40) + '\n')
-
-		# IOs		
-		self.__gen__tmpl_inst_link(modData[self.MOD_DATA__IO_INFO])
-
-		self.templateCode_list.append (chr(41) + ' ; \n')
-
-	def __gen__tmpl_inst_link(self,IO_or_para_list,isParam=0):		
-		lineTxt = ""
-		for idx,data in enumerate(IO_or_para_list):
-			lineTxt = lineTxt + self.tab_char
-			if ((self.comma_left)&(idx!=0)):
-				lineTxt += ','
-			lineTxt = lineTxt + '.' + data[0].strip() + ' ( ' 
-			if (self.link_wire_add_under_line & (isParam==0)):
-				lineTxt += '_'+ self.link_prefix + data[0].strip() + self.link_suffix
-			else:
-				lineTxt += self.link_prefix + data[0].strip() + self.link_suffix
-			lineTxt += ' ) '
-			if ((self.comma_left==0)&(idx!=(len(IO_or_para_list)-1))):
-				lineTxt += ','
-			lineTxt += '\n'
-			self.templateCode_list.append (lineTxt)
-			lineTxt = ""
-
-	def gen_code(self):
-		self.templateCode_list = []
-		self.templateCode_list.append ("// ----- verilog IO linker generated -----\n")
-		self.__gen__tmpl_def_paras(self.module_data_list[self.link_actIdx])
-		self.__gen__tmpl_def_IOs(self.module_data_list[self.link_actIdx])
-		self.__gen__tmpl_inst(self.module_data_list[self.link_actIdx])
-		self.__gen__tmpl_assign(self.module_data_list[self.link_actIdx])
-		return (self.templateCode_list)
-	
-	def gen_code_file(self,filePath):
-		code_list = self.gen_code()
-		fp = open(filePath, "w")
-		for line in self.templateCode_list:
-			fp.write (line)
-		fp.close()
-		return (code_list)
-
-	def show_code(self):
-		for line in self.templateCode_list:
-			p_line = line
-			if (line[len(line)-1:]=='\n'):
-				p_line = line[:len(line)-1]
-			print (p_line)
-	
-	def reparse_file(self,fileName):
-		self.fp = open (fileName,'r')
-		self.reparse_txt(self.fp.read())
-		self.fp.close()
-	
-	def reparse_txt(self,all_txt):
-		self.parser = verilog_parser.class__parser(all_txt)
-		self.module_data_list = self.parser.get_module_data()
+class ModuleManagerFrame ( wx_gui.moduleManagerFrame.ModuleManagerFrame):	
+    def __init__( self, parent ,core):
+        wx_gui.moduleManagerFrame.ModuleManagerFrame.__init__(self,parent)
+        self.core = core
+    
+    def SetObject(self):
+        pass
+    def GenNewVerilogParser(self):
+        pass
+    
+    def UpdateInstList(self):
+        self.m_listBox__inst.Clear()
+        for inst in self.core.inst_lt:
+            self.m_listBox__inst.Append(inst.inst_name)
+        pass
+    def UpdateInstParam(self):
+        self.m_listBox__override_param.Clear()
+        for param in self.core.proc_inst.param_lt:
+            str = param.name
+            if (param.override_obj != None):
+                str += " :: " + param.override_obj.name
+            
+            self.m_listBox__override_param.Append (str)
+        pass
+    def UpdateWrapperParam(self):
+        self.m_listBox__wrapper_param.Clear()
+        for param in self.core.proc_wrapper.param_lt:
+            str = '%s = %s'%(param.name,param.value)
+            self.m_listBox__wrapper_param.Append(str)
+        pass
 
 
-	def select_modulde(self,module_idx):
-		if (module_idx<len(self.module_data_list)):
-			self.link_actIdx = module_idx
-		else:
-			self.link_actIdx = 0
-			print ("Error index, select default (0)")
-	
-	def get_num_module(self):
-		return (self.parser.__num_module)
-	
-	def get_module_name_list(self):
-		nameList = []
-		for moduleData in self.module_data_list:
-			nameList.append (moduleData[self.MOD_DATA__MODULE_INFO])
-		return (nameList)
+    # wx gui event
+    def filePicker__onFileChanged(self,event):
+        fp = self.m_filePicker__loadFile.GetPath()
+        try:
+            f = open (fp,"r")
+            f.close()
+            self.core.ParseVerilogToModule(fp)
+            self.m_listBox__parser_module.Clear()
+            for moduleInfo in self.core.module_lt:
+                self.m_listBox__parser_module.Append(moduleInfo.name)
+        except FileNotFoundError:
+            print("File error")
+            pass
+    def parser_module__onListBox( self, event ):
+        tempStr = self.m_listBox__parser_module.GetStringSelection()
+        self.m_textCtrl__inst_name.SetValue(tempStr+"_inst")
+    def inst__onButtonClick( self, event ):
+        sel_num = self.m_listBox__parser_module.GetSelection()
+        module_sel = self.core.module_lt[sel_num]
+        inst_name = self.m_textCtrl__inst_name.GetValue()
+        self.core.CreateInstFromModule(inst_name,sel_num)
+        self.UpdateInstList()
+    def inst__onListBox( self, event ):
+        self.core.Select_procInst(self.m_listBox__inst.GetSelection())
+        self.UpdateInstParam()
+        pass
+    def loadAsWrapper__onBtnClick( self, event ):
+        sel_num = self.m_listBox__parser_module.GetSelection()
+        self.core.CreateWrapperFromModule(sel_num)
+        self.UpdateWrapperParam()
+    def mapping__onBtnClick( self, event ):
+        num_instParam = self.m_listBox__override_param.GetSelection()
+        num_wrapParam = self.m_listBox__wrapper_param.GetSelection()
+        wrap_param_obj = self.core.proc_wrapper.param_lt[num_wrapParam]
+        inst_param_obj = self.core.proc_inst.param_lt[num_instParam]
+        
+        self.core.LinkParam(wrap_param_obj,inst_param_obj)
+        self.UpdateInstParam()
 
-def input_int():
-	tempIn = input()
-	if (tempIn==''):
-		return (0)
-	else:
-		return (int(tempIn))
+        self.m_listBox__override_param.Select((num_instParam+1)%self.m_listBox__override_param.GetCount())
+        self.m_listBox__wrapper_param.Select((num_wrapParam+1)%self.m_listBox__wrapper_param.GetCount())
+        pass
+    
+    def createNewWrapper__onBtnClick( self, event ):
+        wrapName = self.m_textCtrl__createNewWrapper.GetValue()
+        self.core.CreateEmptyWrapper(wrapName)
+
+    def overrideParamByConst__onBtnClick( self, event ):
+        value = self.m_textCtrl__setInstParamByConst.GetValue()
+        if (value.replace(' ','')!=''):
+            param_num = self.m_listBox__override_param.GetSelection()
+            param_obj = self.core.proc_inst.param_lt[param_num]
+            param_obj.value = value
+            self.UpdateInstParam()
+        pass
+    
+    def createNewParam__onBtnClick( self, event ):
+        paramName = self.m_textCtrl__newParam_name.GetValue()
+        paramValue = self.m_textCtrl_newParam_value.GetValue()
+        paramName = paramName.replace(" ","")
+        re_res_lt = re.findall(r"(\[.+\])(.+)",paramName)
+        paramBit = ''
+        if (len(re_res_lt)>0):
+            re_res_lt = re_res_lt[0]
+            paramName = re_res_lt[1]
+            paramBit = re_res_lt[0]
+
+        if ((paramName!='') & (paramValue!='')):
+            self.core.CreateParameterToWrapper(paramName,paramValue,paramBit)
+            self.UpdateWrapperParam()
+        pass
+
+    def delWrapParam__onBtnClick( self,event ):
+        param_num = self.m_listBox__wrapper_param.GetSelection()
+        self.core.proc_wrapper.RemoveParam(param_num)
+        self.UpdateWrapperParam()
+        self.UpdateInstParam()
+    
+    def clearInstParamOverride__onBtnClick( self,event ):
+        param_num = self.m_listBox__override_param.GetSelection()
+        self.core.proc_inst.param_lt[param_num].override_obj = None
+        self.UpdateInstParam()
+        
+    def moduleManagerFrame__onClose( self,event ):
+        self.Hide()
+
+class MainFrame ( wx_gui.mainFrame.MainFrame ):	
+    def __init__( self, parent ):
+        super(MainFrame,self).__init__(parent)
+        self.core = core.Core()
+        self.update_cnt = 0
+
+        self.wx_windows_lt = []
+        self.moduleManagerFrame = ModuleManagerFrame(None,self.core)
+        self.wx_windows_lt.append (self.moduleManagerFrame)
+        self.verilogCodeFrame = VerilogCodeFrame(None,self.core)
+        self.wx_windows_lt.append (self.verilogCodeFrame)
+        self.createPointDialog = CreatePointDialog(None,self.core)
+        self.wx_windows_lt.append (self.createPointDialog)
+
+        self.verilogCodeFrame.Show()
+        self.createPointDialog.Hide()
+        self.listBoxDest_selection = []
+        self.version_str = '1.0.0'
+        self.SetTitle('Verilog IO Linker v' + self.version_str)
+
+        # self.debug()
+    
+    
+    def debug(self):
+        self.moduleManagerFrame.Show()
+        self.moduleManagerFrame.m_filePicker__loadFile.SetPath('D:\\Share\\python\\verilog_IO_linker\\1.0.0\\test.v')
+        self.moduleManagerFrame.filePicker__onFileChanged(None)
+    def Update_all_list(self):
+        type_str_dict = {
+            'input': 'I'
+            ,'inout': 'IO'
+            ,'output': 'O'
+            ,'wire': 'W'
+        }
+
+        self.core.GetLinkablePointList(False)
+        self.core.GetLinkablePointList(True)
+
+        list_func_lt = [[self.m_listBox__src,self.core.src_lt],[self.m_listBox__dest,self.core.dest_lt]]
+        
+        for listBox,point_lt in list_func_lt:
+            listBox.Clear()
+            for point in point_lt:
+                self.list_item_str = '%s(%s)'%(self.core.GetPointFullName(point),type_str_dict[point.type])
+
+                if (listBox == self.m_listBox__dest):
+                    self.Update_all_list_assign_src_str(point)
+
+                listBox.Append (self.list_item_str)
+        pass
+    def Update_all_list_assign_src_str(self,dest_obj):
+        assign_name = self.core.GetPointLinkFullName(dest_obj)
+        if (assign_name!=''):
+            self.list_item_str += '<= %s'%(assign_name)
+    def ShowPointMessage(self,call_by_dest=False):
+        point_lt = self.core.src_lt
+        ctrlList_obj = self.m_listBox__src
+        basic_info = self.m_textCtrl__src_info
+
+        if (call_by_dest):
+            point_lt = self.core.dest_lt
+            ctrlList_obj = self.m_listBox__dest
+            basic_info = self.m_textCtrl__dest_info
+
+        sel_num = None
+        sel_lt = ctrlList_obj.GetSelections()
+        if (sel_lt != []):
+            sel_num = sel_lt [0]
+
+        if (sel_num!=None):
+            sel_point_obj = point_lt [sel_num]
+
+            if (type(sel_point_obj.owner_obj)==core.module.Instance):
+                owner_type = 'Inst'
+            else:
+                owner_type = 'Wrap'
+
+            bitwidth_str = str(sel_point_obj.bitwidth)
+            if (bitwidth_str==''):
+                bitwidth_str = '[0:0]'
+
+            basic_info_str = 'Name: %s\nType: %s\nBitwidth: %s\nOwner: [%s]%s \n' %(
+                sel_point_obj.name
+                ,sel_point_obj.type
+                ,bitwidth_str
+                ,owner_type
+                ,sel_point_obj.owner_obj.name
+            )
+
+            if (call_by_dest):
+                sel_assign_name = self.core.GetPointLinkFullName(sel_point_obj)
+                if (sel_assign_name!=''):
+                    basic_info_str += 'Assign: %s'%(sel_assign_name)
+            else:
+                self.m_listBox__src_linkTo.Clear()
+                cnt = 0
+                for dest in self.core.dest_lt:
+                    if (self.core.GetPointLinkObj(dest)==sel_point_obj):
+                        dest_name = self.core.GetPointFullName(dest)
+                        cnt += 1
+                        linkTo_str = '%d - %s'%(cnt,dest_name)
+                        self.m_listBox__src_linkTo.Append (dest_name)
+                        if (cnt == 1):
+                            basic_info_str += 'Link to:\n'
+                        basic_info_str += linkTo_str + '\n'
+            
+            basic_info.SetValue(basic_info_str)
+
+
+    # event
+    def mainFrame__onClose( self , event ):
+        for window in self.wx_windows_lt:
+            window.Destroy()
+        self.Destroy()
+        
+    def menu_moduleManager__onMenuSel( self , event ):
+        self.moduleManagerFrame.Show()
+        self.moduleManagerFrame.SetFocus()
+
+    def mainFrame__onAct( self , event ):
+        if (self.core.GetUpdateResult()):
+            self.Update_all_list()
+            
+    def connect__onBtnClick( self , event ):
+        for dest_sel_num in self.m_listBox__dest.GetSelections():
+            src_sel_num = self.m_listBox__src.GetSelections()[0]
+            sel_dest_obj = self.core.dest_lt[dest_sel_num]
+            sel_src_obj = self.core.src_lt[src_sel_num]
+            self.core.LinkPoint(sel_src_obj,sel_dest_obj)
+
+            self.Update_all_list()
+
+            if (self.m_menuItem__autoNext.IsChecked()):
+                self.m_listBox__dest.SetSelection((dest_sel_num+1)%self.m_listBox__dest.GetCount())
+
+                self.m_listBox__src.Deselect(src_sel_num)
+                self.m_listBox__src.SetSelection((src_sel_num+1)%self.m_listBox__src.GetCount())
+            else:
+                self.m_listBox__src.SetSelection(src_sel_num)
+                self.m_listBox__dest.SetSelection(dest_sel_num)
+
+    def src__onListBox( self , event ):
+        self.ShowPointMessage(False)
+        
+
+    def dest__onListBox( self , event ):
+        if (self.m_menuItem__multSel.IsChecked()==False):
+            if (self.listBoxDest_selection!=[]):
+                temp_sel = self.m_listBox__dest.GetSelections()
+                new_sel = list(set(temp_sel).difference(set(self.listBoxDest_selection)))
+                old_sel = list(set(temp_sel).difference(set(new_sel)))
+                for sel in old_sel:
+                    self.m_listBox__dest.Deselect(sel)
+        self.listBoxDest_selection = self.m_listBox__dest.GetSelections()
+
+        self.ShowPointMessage(True)
+        
+
+    def destDisconnect__onBtnClick( self, event ):
+        sel_num_lt = self.m_listBox__dest.GetSelections()
+        for sel_num in sel_num_lt:
+            dest_obj = self.core.dest_lt[sel_num]
+            self.core.RemoveLinkPoint(dest_obj)
+            self.Update_all_list()
+    
+    
+    def menu_addPoint__onMenuSel( self, event ):
+        self.createPointDialog.Show()
+
+    def codeWin__onBtnClick( self, event ):
+        self.verilogCodeFrame.Show()
+        self.verilogCodeFrame.SetFocus()
+
+class VerilogCodeFrame ( wx_gui.verilogCodeFrame.VerilogCodeFrame ):	
+    def __init__( self, parent , core):
+        super(VerilogCodeFrame,self).__init__(parent)
+        self.core = core
+        self.update_cnt = 0
+    
+    def VerilogCodeFrame__onAct( self, event ):
+        pass
+        if (self.core.proc_wrapper!=None):
+            self.m_richText__showGen.SetValue(self.core.GenerateVerilogCode())
+
+    def genFile__onBtnClick( self, event ):
+        file_dir = self.m_dirPicker1.GetPath()
+        file_name = self.m_textCtrl__fileName.GetValue()
+
+        if ((file_dir != '')&(file_name != '')):
+            f_fp = file_dir+'\\'+file_name+'.v'
+            fp = open(f_fp,'w+')
+            fp.write (self.m_richText__showGen.GetValue())
+            fp.close ()
+
+            wx.MessageBox('Generate file success!\nFile: %s'%(f_fp), 'Info', wx.OK | wx.ICON_INFORMATION)
+
+
+    def VerilogCodeFrame__onClose( self, event ):
+        self.Hide()
 
 def main():
-	pass
-def ui():
-	print ("File:")
-	# filePath = input()
-	# filePath = "D:\\DevProjects\\anaconda\\verilog_IO_linker\\axis_async_fifo_adapter.v"
-	# filePath = ""
-	
-	VIOL = class__verilog_IO_linker(filePath)
-	print ("Module:")
-	for idx, module_info in enumerate(VIOL.module_data_list):
-		for module_name in module_info[VIOL.MOD_DATA__MODULE_INFO_NAME]:
-			print (idx," : ",module_name)
-
-	print ("Select module 0~%d : "%(len(VIOL.module_data_list)-1),end="")
-	VIOL.select_modulde (input_int())
-
-	print ("prefix : ",end="")
-	VIOL.link_prefix = input()
-
-	print ("suffix : ",end="")
-	VIOL.link_suffix = input()
-
-	print ("left comma mode (0 or 1) : ",end="")
-	VIOL.comma_left = input_int()
-	
-
-	print ("Instance name : ",end="")
-	VIOL.link_inst_name = input()
-
-	print ("Generate...\n\n")
-	code_list = VIOL.gen_code_file("D:\\DevProjects\\anaconda\\verilog_IO_linker\\gen.v")
-	VIOL.show_code()
+    app=wx.App()
+    mainFrame=MainFrame(None)
+    mainFrame.Show()
+    app.MainLoop()
 
 
-	# code_list = VIOL.gen_code()
-
-	# VIOL.gen_code_file("D:\\DevProjects\\anaconda\\verilog_IO_linker\\gen.v")
-
-	# VIOL.show_code()
-
-	# VIOL.select_modulde(1)
-	# VIOL.gen_code_file("D:\\DevProjects\\anaconda\\verilog_IO_linker\\gen_2.v")
-	
-	print ("\n\n\n\nfinish")
-
-
-if __name__ =="__main__":
-	main()
+main()

@@ -3,7 +3,6 @@ import copy
 from jinja2 import Template
 
 import module
-import wrapper
 import verilog_parser
 import basic_component
 import basic_parameter

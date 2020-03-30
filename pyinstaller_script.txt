@@ -1,1 +1,1 @@
-pyinstaller -F -w run_gui.py
+pyinstaller -F -w Verilog_IO_Linker.py
