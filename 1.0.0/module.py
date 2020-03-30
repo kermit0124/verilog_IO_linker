@@ -95,6 +95,16 @@ class Wrapper(Module):
     
     def RemoveInst(self,inst_index):
         del self.inst_lt[inst_index]
+    
+    def RemoveParam(self,param_idx):
+        param_obj = self.param_lt[param_idx]
+        
+        for inst in self.inst_lt:
+            for inst_param in inst.param_lt:
+                if (inst_param.override_obj == param_obj):
+                    inst_param.override_obj = None
+
+        del self.param_lt[param_idx]
 
     def AddWire(self,wire_obj):
         self.wire_lt.append (wire_obj)

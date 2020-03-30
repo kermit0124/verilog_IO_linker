@@ -56,7 +56,11 @@ class Basic_parameter():
         return ('')
     
     def GetWrapRuleName(self):
-        return (self.owner_obj.inst_name + '__' + self.name)
+        try:
+            str = self.owner_obj.inst_name + '__' + self.name
+        except AttributeError:
+            str = self.name
+        return (str)
 
 class ClassParameter(Basic_parameter):
     def __init__(self,name_str,value,depth_str=""):

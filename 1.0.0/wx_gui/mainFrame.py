@@ -17,12 +17,14 @@ import wx.xrc
 class MainFrame ( wx.Frame ):
 
 	def __init__( self, parent ):
-		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = wx.EmptyString, pos = wx.DefaultPosition, size = wx.Size( 983,624 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
+		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = wx.EmptyString, pos = wx.DefaultPosition, size = wx.Size( 1096,684 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
 
 		self.SetSizeHints( wx.DefaultSize, wx.DefaultSize )
 		self.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_WINDOW ) )
 
 		bSizer2 = wx.BoxSizer( wx.VERTICAL )
+
+		bSizer68 = wx.BoxSizer( wx.VERTICAL )
 
 		bSizer19 = wx.BoxSizer( wx.HORIZONTAL )
 
@@ -40,11 +42,47 @@ class MainFrame ( wx.Frame ):
 		sbSizer5 = wx.StaticBoxSizer( wx.StaticBox( sbSizer2.GetStaticBox(), wx.ID_ANY, u"Pins" ), wx.VERTICAL )
 
 		m_listBox__srcChoices = []
-		self.m_listBox__src = wx.ListBox( sbSizer5.GetStaticBox(), wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, m_listBox__srcChoices, wx.LB_HSCROLL|wx.LB_MULTIPLE )
+		self.m_listBox__src = wx.ListBox( sbSizer5.GetStaticBox(), wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, m_listBox__srcChoices, wx.LB_HSCROLL )
 		sbSizer5.Add( self.m_listBox__src, 1, wx.ALL|wx.ALIGN_CENTER_VERTICAL|wx.EXPAND, 5 )
 
 
 		sbSizer2.Add( sbSizer5, 1, wx.EXPAND, 5 )
+
+		sbSizer44 = wx.StaticBoxSizer( wx.StaticBox( sbSizer2.GetStaticBox(), wx.ID_ANY, u"Detials" ), wx.VERTICAL )
+
+		self.m_notebook7 = wx.Notebook( sbSizer44.GetStaticBox(), wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.NB_BOTTOM )
+		self.m_notebook7.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_WINDOW ) )
+
+		self.m_panel3 = wx.Panel( self.m_notebook7, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
+		bSizer70 = wx.BoxSizer( wx.VERTICAL )
+
+		self.m_textCtrl__src_info = wx.TextCtrl( self.m_panel3, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_DONTWRAP|wx.TE_MULTILINE )
+		self.m_textCtrl__src_info.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_WINDOW ) )
+
+		bSizer70.Add( self.m_textCtrl__src_info, 1, wx.ALL|wx.EXPAND, 5 )
+
+
+		self.m_panel3.SetSizer( bSizer70 )
+		self.m_panel3.Layout()
+		bSizer70.Fit( self.m_panel3 )
+		self.m_notebook7.AddPage( self.m_panel3, u"Information", True )
+		self.m_panel4 = wx.Panel( self.m_notebook7, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
+		bSizer71 = wx.BoxSizer( wx.VERTICAL )
+
+		m_listBox__src_linkToChoices = []
+		self.m_listBox__src_linkTo = wx.ListBox( self.m_panel4, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, m_listBox__src_linkToChoices, 0 )
+		bSizer71.Add( self.m_listBox__src_linkTo, 1, wx.ALL|wx.EXPAND, 5 )
+
+
+		self.m_panel4.SetSizer( bSizer71 )
+		self.m_panel4.Layout()
+		bSizer71.Fit( self.m_panel4 )
+		self.m_notebook7.AddPage( self.m_panel4, u"Link to", False )
+
+		sbSizer44.Add( self.m_notebook7, 1, wx.EXPAND |wx.ALL, 5 )
+
+
+		sbSizer2.Add( sbSizer44, 1, wx.EXPAND, 5 )
 
 		self.m_button__output_tracer = wx.Button( sbSizer2.GetStaticBox(), wx.ID_ANY, u"Tracer link", wx.DefaultPosition, wx.DefaultSize, 0 )
 		sbSizer2.Add( self.m_button__output_tracer, 0, wx.ALL|wx.ALIGN_CENTER_HORIZONTAL, 5 )
@@ -52,73 +90,10 @@ class MainFrame ( wx.Frame ):
 
 		bSizer19.Add( sbSizer2, 1, wx.EXPAND, 5 )
 
-		bSizer22 = wx.BoxSizer( wx.VERTICAL )
+		self.m_button__connect = wx.Button( self, wx.ID_ANY, u"Link\n>--->", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_button__connect.SetMaxSize( wx.Size( 60,-1 ) )
 
-
-		bSizer22.Add( ( 0, 0), 1, wx.EXPAND, 5 )
-
-		self.m_button__connect = wx.Button( self, wx.ID_ANY, u">> Connect >>", wx.DefaultPosition, wx.DefaultSize, 0 )
-		bSizer22.Add( self.m_button__connect, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_CENTER_HORIZONTAL, 5 )
-
-		self.m_staticline5 = wx.StaticLine( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
-		bSizer22.Add( self.m_staticline5, 0, wx.EXPAND |wx.ALL, 5 )
-
-		sbSizer8 = wx.StaticBoxSizer( wx.StaticBox( self, wx.ID_ANY, u"Modify assign mode" ), wx.VERTICAL )
-
-		self.m_staticText7 = wx.StaticText( sbSizer8.GetStaticBox(), wx.ID_ANY, u"Wire name", wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_staticText7.Wrap( -1 )
-
-		sbSizer8.Add( self.m_staticText7, 0, wx.ALL, 5 )
-
-		self.m_textCtrl__agnModeName = wx.TextCtrl( sbSizer8.GetStaticBox(), wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
-		sbSizer8.Add( self.m_textCtrl__agnModeName, 0, wx.ALL|wx.ALIGN_CENTER_HORIZONTAL, 5 )
-
-		self.m_staticText6 = wx.StaticText( sbSizer8.GetStaticBox(), wx.ID_ANY, u"Assign segment", wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_staticText6.Wrap( -1 )
-
-		sbSizer8.Add( self.m_staticText6, 0, wx.ALL, 5 )
-
-		self.m_textCtrl__agnModeSeg = wx.TextCtrl( sbSizer8.GetStaticBox(), wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
-		sbSizer8.Add( self.m_textCtrl__agnModeSeg, 0, wx.ALL|wx.ALIGN_CENTER_HORIZONTAL|wx.EXPAND, 5 )
-
-		self.m_staticText5 = wx.StaticText( sbSizer8.GetStaticBox(), wx.ID_ANY, u"Verilog:", wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_staticText5.Wrap( -1 )
-
-		sbSizer8.Add( self.m_staticText5, 0, wx.ALL|wx.ALIGN_CENTER_HORIZONTAL, 5 )
-
-		self.m_button__assign = wx.Button( sbSizer8.GetStaticBox(), wx.ID_ANY, u"Assign", wx.DefaultPosition, wx.DefaultSize, 0 )
-		sbSizer8.Add( self.m_button__assign, 0, wx.ALL|wx.ALIGN_CENTER_HORIZONTAL, 5 )
-
-		self.m_staticline6 = wx.StaticLine( sbSizer8.GetStaticBox(), wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
-		sbSizer8.Add( self.m_staticline6, 0, wx.EXPAND |wx.ALL, 5 )
-
-		bSizer33 = wx.BoxSizer( wx.HORIZONTAL )
-
-		self.m_textCtrl__createWireName = wx.TextCtrl( sbSizer8.GetStaticBox(), wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
-		bSizer33.Add( self.m_textCtrl__createWireName, 1, wx.ALL|wx.ALIGN_CENTER_HORIZONTAL, 5 )
-
-		m_choice__create_wireIO_typeChoices = [ u"input", u"output", u"inout", u"wire" ]
-		self.m_choice__create_wireIO_type = wx.Choice( sbSizer8.GetStaticBox(), wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, m_choice__create_wireIO_typeChoices, 0 )
-		self.m_choice__create_wireIO_type.SetSelection( 0 )
-		bSizer33.Add( self.m_choice__create_wireIO_type, 0, wx.ALL, 5 )
-
-
-		sbSizer8.Add( bSizer33, 1, wx.EXPAND, 5 )
-
-		self.m_textCtrl__createWireSeg = wx.TextCtrl( sbSizer8.GetStaticBox(), wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
-		sbSizer8.Add( self.m_textCtrl__createWireSeg, 0, wx.ALL|wx.ALIGN_CENTER_HORIZONTAL|wx.EXPAND, 5 )
-
-		self.m_button__create_wireIO = wx.Button( sbSizer8.GetStaticBox(), wx.ID_ANY, u"Create wire/IO", wx.DefaultPosition, wx.DefaultSize, 0 )
-		sbSizer8.Add( self.m_button__create_wireIO, 0, wx.ALL|wx.ALIGN_CENTER_HORIZONTAL, 5 )
-
-
-		bSizer22.Add( sbSizer8, 1, wx.EXPAND, 5 )
-
-
-		bSizer22.Add( ( 0, 0), 1, wx.EXPAND, 5 )
-
-
-		bSizer19.Add( bSizer22, 1, wx.EXPAND|wx.ALIGN_CENTER_VERTICAL, 5 )
+		bSizer19.Add( self.m_button__connect, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_CENTER_HORIZONTAL, 5 )
 
 		sbSizer4 = wx.StaticBoxSizer( wx.StaticBox( self, wx.ID_ANY, u"Destination port" ), wx.VERTICAL )
 
@@ -146,14 +121,39 @@ class MainFrame ( wx.Frame ):
 
 		sbSizer4.Add( sbSizer51, 1, wx.EXPAND, 5 )
 
-		self.m_button__disconnect_input = wx.Button( sbSizer4.GetStaticBox(), wx.ID_ANY, u"Disconnect", wx.DefaultPosition, wx.DefaultSize, 0 )
-		sbSizer4.Add( self.m_button__disconnect_input, 0, wx.ALL|wx.ALIGN_CENTER_HORIZONTAL, 5 )
+		sbSizer441 = wx.StaticBoxSizer( wx.StaticBox( sbSizer4.GetStaticBox(), wx.ID_ANY, u"Detials" ), wx.VERTICAL )
+
+		self.m_notebook71 = wx.Notebook( sbSizer441.GetStaticBox(), wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.NB_BOTTOM )
+		self.m_notebook71.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_WINDOW ) )
+
+		self.m_panel31 = wx.Panel( self.m_notebook71, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
+		bSizer701 = wx.BoxSizer( wx.VERTICAL )
+
+		self.m_textCtrl__dest_info = wx.TextCtrl( self.m_panel31, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_DONTWRAP|wx.TE_MULTILINE )
+		bSizer701.Add( self.m_textCtrl__dest_info, 1, wx.ALL|wx.EXPAND, 5 )
+
+
+		self.m_panel31.SetSizer( bSizer701 )
+		self.m_panel31.Layout()
+		bSizer701.Fit( self.m_panel31 )
+		self.m_notebook71.AddPage( self.m_panel31, u"Information", False )
+
+		sbSizer441.Add( self.m_notebook71, 1, wx.EXPAND |wx.ALL, 5 )
+
+
+		sbSizer4.Add( sbSizer441, 1, wx.EXPAND, 5 )
+
+		self.m_button__destDisconnect = wx.Button( sbSizer4.GetStaticBox(), wx.ID_ANY, u"Disconnect", wx.DefaultPosition, wx.DefaultSize, 0 )
+		sbSizer4.Add( self.m_button__destDisconnect, 0, wx.ALL|wx.ALIGN_CENTER_HORIZONTAL, 5 )
 
 
 		bSizer19.Add( sbSizer4, 1, wx.EXPAND, 5 )
 
 
-		bSizer2.Add( bSizer19, 1, wx.EXPAND, 5 )
+		bSizer68.Add( bSizer19, 1, wx.EXPAND, 5 )
+
+
+		bSizer2.Add( bSizer68, 1, wx.EXPAND, 5 )
 
 
 		self.SetSizer( bSizer2 )
@@ -172,6 +172,22 @@ class MainFrame ( wx.Frame ):
 
 		self.m_menubar1.Append( self.m_menu21, u"View" )
 
+		self.m_menu5 = wx.Menu()
+		self.m_menuItem4 = wx.MenuItem( self.m_menu5, wx.ID_ANY, u"point", wx.EmptyString, wx.ITEM_NORMAL )
+		self.m_menu5.Append( self.m_menuItem4 )
+
+		self.m_menubar1.Append( self.m_menu5, u"Add" )
+
+		self.m_menu4 = wx.Menu()
+		self.m_menuItem__multSel = wx.MenuItem( self.m_menu4, wx.ID_ANY, u"Destination multiple selection", wx.EmptyString, wx.ITEM_CHECK )
+		self.m_menu4.Append( self.m_menuItem__multSel )
+
+		self.m_menuItem__autoNext = wx.MenuItem( self.m_menu4, wx.ID_ANY, u"Auto select to next after link", wx.EmptyString, wx.ITEM_CHECK )
+		self.m_menu4.Append( self.m_menuItem__autoNext )
+		self.m_menuItem__autoNext.Check( True )
+
+		self.m_menubar1.Append( self.m_menu4, u"Mode" )
+
 		self.SetMenuBar( self.m_menubar1 )
 
 
@@ -181,10 +197,12 @@ class MainFrame ( wx.Frame ):
 		self.Bind( wx.EVT_ACTIVATE, self.mainFrame__onAct )
 		self.m_listBox__src.Bind( wx.EVT_LISTBOX, self.src__onListBox )
 		self.m_button__connect.Bind( wx.EVT_BUTTON, self.connect__onBtnClick )
-		self.m_button__assign.Bind( wx.EVT_BUTTON, self.assign__onBtnClick )
-		self.m_button__create_wireIO.Bind( wx.EVT_BUTTON, self.create_wireIO__onBtnClick )
 		self.m_listBox__dest.Bind( wx.EVT_LISTBOX, self.dest__onListBox )
+		self.m_button__destDisconnect.Bind( wx.EVT_BUTTON, self.destDisconnect__onBtnClick )
 		self.Bind( wx.EVT_MENU, self.menu_moduleManager__onMenuSel, id = self.m_menuItem11.GetId() )
+		self.Bind( wx.EVT_MENU, self.menu_addPoint__onMenuSel, id = self.m_menuItem4.GetId() )
+		self.Bind( wx.EVT_MENU, self.menu_addPoint__destMultSel, id = self.m_menuItem__multSel.GetId() )
+		self.Bind( wx.EVT_MENU, self.menu_addPoint__autoSel, id = self.m_menuItem__autoNext.GetId() )
 
 	def __del__( self ):
 		pass
@@ -200,16 +218,22 @@ class MainFrame ( wx.Frame ):
 	def connect__onBtnClick( self, event ):
 		event.Skip()
 
-	def assign__onBtnClick( self, event ):
-		event.Skip()
-
-	def create_wireIO__onBtnClick( self, event ):
-		event.Skip()
-
 	def dest__onListBox( self, event ):
 		event.Skip()
 
+	def destDisconnect__onBtnClick( self, event ):
+		event.Skip()
+
 	def menu_moduleManager__onMenuSel( self, event ):
+		event.Skip()
+
+	def menu_addPoint__onMenuSel( self, event ):
+		event.Skip()
+
+	def menu_addPoint__destMultSel( self, event ):
+		event.Skip()
+
+	def menu_addPoint__autoSel( self, event ):
 		event.Skip()
 
 
