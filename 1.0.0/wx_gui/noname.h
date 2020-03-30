@@ -55,6 +55,7 @@ class MainFrame : public wxFrame
 		wxListBox* m_listBox__src_linkTo;
 		wxButton* m_button__output_tracer;
 		wxButton* m_button__connect;
+		wxButton* m_button__codeWin;
 		wxComboBox* m_comboBox__dest_inst_filter;
 		wxCheckBox* m_checkBox7;
 		wxListBox* m_listBox__dest;
@@ -72,6 +73,7 @@ class MainFrame : public wxFrame
 		virtual void mainFrame__onAct( wxActivateEvent& event ) { event.Skip(); }
 		virtual void src__onListBox( wxCommandEvent& event ) { event.Skip(); }
 		virtual void connect__onBtnClick( wxCommandEvent& event ) { event.Skip(); }
+		virtual void codeWin__onBtnClick( wxCommandEvent& event ) { event.Skip(); }
 		virtual void dest__onListBox( wxCommandEvent& event ) { event.Skip(); }
 		virtual void destDisconnect__onBtnClick( wxCommandEvent& event ) { event.Skip(); }
 		virtual void menu_moduleManager__onMenuSel( wxCommandEvent& event ) { event.Skip(); }
@@ -137,12 +139,13 @@ class VerilogCodeFrame : public wxFrame
 
 		// Virtual event handlers, overide them in your derived class
 		virtual void VerilogCodeFrame__onAct( wxActivateEvent& event ) { event.Skip(); }
+		virtual void VerilogCodeFrame__onClose( wxCloseEvent& event ) { event.Skip(); }
 		virtual void genFile__onBtnClick( wxCommandEvent& event ) { event.Skip(); }
 
 
 	public:
 
-		VerilogCodeFrame( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 909,669 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
+		VerilogCodeFrame( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Verilog Code Generator"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 909,669 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
 
 		~VerilogCodeFrame();
 
@@ -183,6 +186,7 @@ class ModuleManagerFrame : public wxFrame
 		wxTextCtrl* m_textCtrl_newParam_value;
 
 		// Virtual event handlers, overide them in your derived class
+		virtual void moduleManagerFrame__onClose( wxCloseEvent& event ) { event.Skip(); }
 		virtual void filePicker__onFileChanged( wxFileDirPickerEvent& event ) { event.Skip(); }
 		virtual void parser_module__onListBox( wxCommandEvent& event ) { event.Skip(); }
 		virtual void inst__onButtonClick( wxCommandEvent& event ) { event.Skip(); }
@@ -198,7 +202,7 @@ class ModuleManagerFrame : public wxFrame
 
 	public:
 
-		ModuleManagerFrame( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 974,760 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
+		ModuleManagerFrame( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Module Manager"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 974,760 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
 
 		~ModuleManagerFrame();
 

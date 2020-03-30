@@ -90,10 +90,26 @@ class MainFrame ( wx.Frame ):
 
 		bSizer19.Add( sbSizer2, 1, wx.EXPAND, 5 )
 
-		self.m_button__connect = wx.Button( self, wx.ID_ANY, u"Link\n>--->", wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_button__connect.SetMaxSize( wx.Size( 60,-1 ) )
+		bSizer24 = wx.BoxSizer( wx.VERTICAL )
 
-		bSizer19.Add( self.m_button__connect, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_CENTER_HORIZONTAL, 5 )
+
+		bSizer24.Add( ( 0, 0), 1, wx.EXPAND, 5 )
+
+		self.m_button__connect = wx.Button( self, wx.ID_ANY, u"Link\n>--->", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_button__connect.SetMaxSize( wx.Size( 70,-1 ) )
+
+		bSizer24.Add( self.m_button__connect, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_CENTER_HORIZONTAL, 5 )
+
+
+		bSizer24.Add( ( 0, 0), 1, wx.EXPAND, 5 )
+
+		self.m_button__codeWin = wx.Button( self, wx.ID_ANY, u"Code\nwindow", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_button__codeWin.SetMaxSize( wx.Size( 70,-1 ) )
+
+		bSizer24.Add( self.m_button__codeWin, 0, wx.ALL, 5 )
+
+
+		bSizer19.Add( bSizer24, 0, wx.EXPAND, 5 )
 
 		sbSizer4 = wx.StaticBoxSizer( wx.StaticBox( self, wx.ID_ANY, u"Destination port" ), wx.VERTICAL )
 
@@ -163,7 +179,7 @@ class MainFrame ( wx.Frame ):
 		self.m_menuItem11 = wx.MenuItem( self.m_menu2, wx.ID_ANY, u"Module manager", wx.EmptyString, wx.ITEM_NORMAL )
 		self.m_menu2.Append( self.m_menuItem11 )
 
-		self.m_menubar1.Append( self.m_menu2, u"File" )
+		self.m_menubar1.Append( self.m_menu2, u"Window" )
 
 		self.m_menu21 = wx.Menu()
 		self.m_menuItem1 = wx.MenuItem( self.m_menu21, wx.ID_ANY, u"Replace bit width by wrapper parameter", wx.EmptyString, wx.ITEM_CHECK )
@@ -173,10 +189,10 @@ class MainFrame ( wx.Frame ):
 		self.m_menubar1.Append( self.m_menu21, u"View" )
 
 		self.m_menu5 = wx.Menu()
-		self.m_menuItem4 = wx.MenuItem( self.m_menu5, wx.ID_ANY, u"point", wx.EmptyString, wx.ITEM_NORMAL )
+		self.m_menuItem4 = wx.MenuItem( self.m_menu5, wx.ID_ANY, u"Add a point", wx.EmptyString, wx.ITEM_NORMAL )
 		self.m_menu5.Append( self.m_menuItem4 )
 
-		self.m_menubar1.Append( self.m_menu5, u"Add" )
+		self.m_menubar1.Append( self.m_menu5, u"Edit" )
 
 		self.m_menu4 = wx.Menu()
 		self.m_menuItem__multSel = wx.MenuItem( self.m_menu4, wx.ID_ANY, u"Destination multiple selection", wx.EmptyString, wx.ITEM_CHECK )
@@ -197,6 +213,7 @@ class MainFrame ( wx.Frame ):
 		self.Bind( wx.EVT_ACTIVATE, self.mainFrame__onAct )
 		self.m_listBox__src.Bind( wx.EVT_LISTBOX, self.src__onListBox )
 		self.m_button__connect.Bind( wx.EVT_BUTTON, self.connect__onBtnClick )
+		self.m_button__codeWin.Bind( wx.EVT_BUTTON, self.codeWin__onBtnClick )
 		self.m_listBox__dest.Bind( wx.EVT_LISTBOX, self.dest__onListBox )
 		self.m_button__destDisconnect.Bind( wx.EVT_BUTTON, self.destDisconnect__onBtnClick )
 		self.Bind( wx.EVT_MENU, self.menu_moduleManager__onMenuSel, id = self.m_menuItem11.GetId() )
@@ -216,6 +233,9 @@ class MainFrame ( wx.Frame ):
 		event.Skip()
 
 	def connect__onBtnClick( self, event ):
+		event.Skip()
+
+	def codeWin__onBtnClick( self, event ):
 		event.Skip()
 
 	def dest__onListBox( self, event ):

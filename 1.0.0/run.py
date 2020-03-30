@@ -51,7 +51,6 @@ class CreatePointDialog ( wx_gui.createPointDialog.CreatePointDialog):
 class ModuleManagerFrame ( wx_gui.moduleManagerFrame.ModuleManagerFrame):	
     def __init__( self, parent ,core):
         wx_gui.moduleManagerFrame.ModuleManagerFrame.__init__(self,parent)
-        # core.Core.__init__(self)
         self.core = core
     
     def SetObject(self):
@@ -163,7 +162,9 @@ class ModuleManagerFrame ( wx_gui.moduleManagerFrame.ModuleManagerFrame):
         param_num = self.m_listBox__override_param.GetSelection()
         self.core.proc_inst.param_lt[param_num].override_obj = None
         self.UpdateInstParam()
-
+        
+    def moduleManagerFrame__onClose( self,event ):
+        self.Hide()
 
 class MainFrame ( wx_gui.mainFrame.MainFrame ):	
     def __init__( self, parent ):
@@ -176,8 +177,10 @@ class MainFrame ( wx_gui.mainFrame.MainFrame ):
         self.createPointDialog = CreatePointDialog(None,self.core)
         self.createPointDialog.Hide()
         self.listBoxDest_selection = []
+        self.version_str = '1.0.0'
+        self.SetTitle('Verilog IO Linker v' + self.version_str)
 
-        self.debug()
+        # self.debug()
     
     
     def debug(self):
@@ -269,6 +272,7 @@ class MainFrame ( wx_gui.mainFrame.MainFrame ):
     # event
     def menu_moduleManager__onMenuSel( self , event ):
         self.moduleManagerFrame.Show()
+        self.moduleManagerFrame.SetFocus()
 
     def mainFrame__onAct( self , event ):
         if (self.core.GetUpdateResult()):
@@ -309,27 +313,6 @@ class MainFrame ( wx_gui.mainFrame.MainFrame ):
         self.ShowPointMessage(True)
         
 
-    def create_wireIO__onBtnClick( self, event ):
-        # name = self.m_textCtrl__createWireName.GetValue()
-        # segm = self.m_textCtrl__createWireSeg.GetValue()
-
-        # re_res_lt = re.findall(r"(input|output|inout|wire|)( |)(\[.+\]|)(.+)",name)
-        # if (len(re_res_lt)>0):
-        #     re_res_lt = re_res_lt[0]
-        #     # IO_type = re_res_lt[0]
-        #     IO_type = self.m_choice__create_wireIO_type.GetStringSelection()
-        #     if (IO_type=='wire'):
-        #         if (segm.replace(' ','') == ''):
-        #             segm = '0'
-        #         self.core.CreateWireToWrapper(name,segm)
-        #     else:
-        #         IO_depth = re_res_lt[2]
-        #         IO_name = re_res_lt[3].replace(' ','')
-        #         self.core.CreateIO_toWrapper(IO_name,IO_type,IO_depth)
-        
-        # self.Update_all_list()
-        pass
-
     def destDisconnect__onBtnClick( self, event ):
         sel_num_lt = self.m_listBox__dest.GetSelections()
         for sel_num in sel_num_lt:
@@ -340,6 +323,10 @@ class MainFrame ( wx_gui.mainFrame.MainFrame ):
     
     def menu_addPoint__onMenuSel( self, event ):
         self.createPointDialog.Show()
+
+    def codeWin__onBtnClick( self, event ):
+        self.verilogCodeFrame.Show()
+        self.verilogCodeFrame.SetFocus()
 
 class VerilogCodeFrame ( wx_gui.verilogCodeFrame.VerilogCodeFrame ):	
     def __init__( self, parent , core):
@@ -363,6 +350,10 @@ class VerilogCodeFrame ( wx_gui.verilogCodeFrame.VerilogCodeFrame ):
             fp.close ()
 
             wx.MessageBox('Generate file success!\nFile: %s'%(f_fp), 'Info', wx.OK | wx.ICON_INFORMATION)
+
+
+    def VerilogCodeFrame__onClose( self, event ):
+        self.Hide()
 
 def main():
     app=wx.App()

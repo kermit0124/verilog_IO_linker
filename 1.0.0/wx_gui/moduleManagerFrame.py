@@ -17,7 +17,7 @@ import wx.xrc
 class ModuleManagerFrame ( wx.Frame ):
 
 	def __init__( self, parent ):
-		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = wx.EmptyString, pos = wx.DefaultPosition, size = wx.Size( 974,760 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
+		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = u"Module Manager", pos = wx.DefaultPosition, size = wx.Size( 974,760 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
 
 		self.SetSizeHints( wx.DefaultSize, wx.DefaultSize )
 		self.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_WINDOW ) )
@@ -208,6 +208,7 @@ class ModuleManagerFrame ( wx.Frame ):
 		self.Centre( wx.BOTH )
 
 		# Connect Events
+		self.Bind( wx.EVT_CLOSE, self.moduleManagerFrame__onClose )
 		self.m_filePicker__loadFile.Bind( wx.EVT_FILEPICKER_CHANGED, self.filePicker__onFileChanged )
 		self.m_listBox__parser_module.Bind( wx.EVT_LISTBOX, self.parser_module__onListBox )
 		self.m_button__inst.Bind( wx.EVT_BUTTON, self.inst__onButtonClick )
@@ -225,6 +226,9 @@ class ModuleManagerFrame ( wx.Frame ):
 
 
 	# Virtual event handlers, overide them in your derived class
+	def moduleManagerFrame__onClose( self, event ):
+		event.Skip()
+
 	def filePicker__onFileChanged( self, event ):
 		event.Skip()
 

@@ -18,7 +18,7 @@ import wx.richtext
 class VerilogCodeFrame ( wx.Frame ):
 
 	def __init__( self, parent ):
-		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = wx.EmptyString, pos = wx.DefaultPosition, size = wx.Size( 909,669 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
+		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = u"Verilog Code Generator", pos = wx.DefaultPosition, size = wx.Size( 909,669 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
 
 		self.SetSizeHints( wx.DefaultSize, wx.DefaultSize )
 		self.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_WINDOW ) )
@@ -74,6 +74,7 @@ class VerilogCodeFrame ( wx.Frame ):
 
 		# Connect Events
 		self.Bind( wx.EVT_ACTIVATE, self.VerilogCodeFrame__onAct )
+		self.Bind( wx.EVT_CLOSE, self.VerilogCodeFrame__onClose )
 		self.m_button__genFile.Bind( wx.EVT_BUTTON, self.genFile__onBtnClick )
 
 	def __del__( self ):
@@ -82,6 +83,9 @@ class VerilogCodeFrame ( wx.Frame ):
 
 	# Virtual event handlers, overide them in your derived class
 	def VerilogCodeFrame__onAct( self, event ):
+		event.Skip()
+
+	def VerilogCodeFrame__onClose( self, event ):
 		event.Skip()
 
 	def genFile__onBtnClick( self, event ):

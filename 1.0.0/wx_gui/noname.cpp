@@ -88,10 +88,27 @@ MainFrame::MainFrame( wxWindow* parent, wxWindowID id, const wxString& title, co
 
 	bSizer19->Add( sbSizer2, 1, wxEXPAND, 5 );
 
-	m_button__connect = new wxButton( this, wxID_ANY, wxT("Link\n>--->"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_button__connect->SetMaxSize( wxSize( 60,-1 ) );
+	wxBoxSizer* bSizer24;
+	bSizer24 = new wxBoxSizer( wxVERTICAL );
 
-	bSizer19->Add( m_button__connect, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
+
+	bSizer24->Add( 0, 0, 1, wxEXPAND, 5 );
+
+	m_button__connect = new wxButton( this, wxID_ANY, wxT("Link\n>--->"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_button__connect->SetMaxSize( wxSize( 70,-1 ) );
+
+	bSizer24->Add( m_button__connect, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
+
+
+	bSizer24->Add( 0, 0, 1, wxEXPAND, 5 );
+
+	m_button__codeWin = new wxButton( this, wxID_ANY, wxT("Code\nwindow"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_button__codeWin->SetMaxSize( wxSize( 70,-1 ) );
+
+	bSizer24->Add( m_button__codeWin, 0, wxALL, 5 );
+
+
+	bSizer19->Add( bSizer24, 0, wxEXPAND, 5 );
 
 	wxStaticBoxSizer* sbSizer4;
 	sbSizer4 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("Destination port") ), wxVERTICAL );
@@ -165,7 +182,7 @@ MainFrame::MainFrame( wxWindow* parent, wxWindowID id, const wxString& title, co
 	m_menuItem11 = new wxMenuItem( m_menu2, wxID_ANY, wxString( wxT("Module manager") ) , wxEmptyString, wxITEM_NORMAL );
 	m_menu2->Append( m_menuItem11 );
 
-	m_menubar1->Append( m_menu2, wxT("File") );
+	m_menubar1->Append( m_menu2, wxT("Window") );
 
 	m_menu21 = new wxMenu();
 	wxMenuItem* m_menuItem1;
@@ -177,10 +194,10 @@ MainFrame::MainFrame( wxWindow* parent, wxWindowID id, const wxString& title, co
 
 	m_menu5 = new wxMenu();
 	wxMenuItem* m_menuItem4;
-	m_menuItem4 = new wxMenuItem( m_menu5, wxID_ANY, wxString( wxT("point") ) , wxEmptyString, wxITEM_NORMAL );
+	m_menuItem4 = new wxMenuItem( m_menu5, wxID_ANY, wxString( wxT("Add a point") ) , wxEmptyString, wxITEM_NORMAL );
 	m_menu5->Append( m_menuItem4 );
 
-	m_menubar1->Append( m_menu5, wxT("Add") );
+	m_menubar1->Append( m_menu5, wxT("Edit") );
 
 	m_menu4 = new wxMenu();
 	wxMenuItem* m_menuItem__multSel;
@@ -203,6 +220,7 @@ MainFrame::MainFrame( wxWindow* parent, wxWindowID id, const wxString& title, co
 	this->Connect( wxEVT_ACTIVATE, wxActivateEventHandler( MainFrame::mainFrame__onAct ) );
 	m_listBox__src->Connect( wxEVT_COMMAND_LISTBOX_SELECTED, wxCommandEventHandler( MainFrame::src__onListBox ), NULL, this );
 	m_button__connect->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainFrame::connect__onBtnClick ), NULL, this );
+	m_button__codeWin->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainFrame::codeWin__onBtnClick ), NULL, this );
 	m_listBox__dest->Connect( wxEVT_COMMAND_LISTBOX_SELECTED, wxCommandEventHandler( MainFrame::dest__onListBox ), NULL, this );
 	m_button__destDisconnect->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainFrame::destDisconnect__onBtnClick ), NULL, this );
 	m_menu2->Bind(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainFrame::menu_moduleManager__onMenuSel ), this, m_menuItem11->GetId());
@@ -217,6 +235,7 @@ MainFrame::~MainFrame()
 	this->Disconnect( wxEVT_ACTIVATE, wxActivateEventHandler( MainFrame::mainFrame__onAct ) );
 	m_listBox__src->Disconnect( wxEVT_COMMAND_LISTBOX_SELECTED, wxCommandEventHandler( MainFrame::src__onListBox ), NULL, this );
 	m_button__connect->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainFrame::connect__onBtnClick ), NULL, this );
+	m_button__codeWin->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainFrame::codeWin__onBtnClick ), NULL, this );
 	m_listBox__dest->Disconnect( wxEVT_COMMAND_LISTBOX_SELECTED, wxCommandEventHandler( MainFrame::dest__onListBox ), NULL, this );
 	m_button__destDisconnect->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainFrame::destDisconnect__onBtnClick ), NULL, this );
 
@@ -375,6 +394,7 @@ VerilogCodeFrame::VerilogCodeFrame( wxWindow* parent, wxWindowID id, const wxStr
 
 	// Connect Events
 	this->Connect( wxEVT_ACTIVATE, wxActivateEventHandler( VerilogCodeFrame::VerilogCodeFrame__onAct ) );
+	this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( VerilogCodeFrame::VerilogCodeFrame__onClose ) );
 	m_button__genFile->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( VerilogCodeFrame::genFile__onBtnClick ), NULL, this );
 }
 
@@ -382,6 +402,7 @@ VerilogCodeFrame::~VerilogCodeFrame()
 {
 	// Disconnect Events
 	this->Disconnect( wxEVT_ACTIVATE, wxActivateEventHandler( VerilogCodeFrame::VerilogCodeFrame__onAct ) );
+	this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( VerilogCodeFrame::VerilogCodeFrame__onClose ) );
 	m_button__genFile->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( VerilogCodeFrame::genFile__onBtnClick ), NULL, this );
 
 }
@@ -587,6 +608,7 @@ ModuleManagerFrame::ModuleManagerFrame( wxWindow* parent, wxWindowID id, const w
 	this->Centre( wxBOTH );
 
 	// Connect Events
+	this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( ModuleManagerFrame::moduleManagerFrame__onClose ) );
 	m_filePicker__loadFile->Connect( wxEVT_COMMAND_FILEPICKER_CHANGED, wxFileDirPickerEventHandler( ModuleManagerFrame::filePicker__onFileChanged ), NULL, this );
 	m_listBox__parser_module->Connect( wxEVT_COMMAND_LISTBOX_SELECTED, wxCommandEventHandler( ModuleManagerFrame::parser_module__onListBox ), NULL, this );
 	m_button__inst->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ModuleManagerFrame::inst__onButtonClick ), NULL, this );
@@ -603,6 +625,7 @@ ModuleManagerFrame::ModuleManagerFrame( wxWindow* parent, wxWindowID id, const w
 ModuleManagerFrame::~ModuleManagerFrame()
 {
 	// Disconnect Events
+	this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( ModuleManagerFrame::moduleManagerFrame__onClose ) );
 	m_filePicker__loadFile->Disconnect( wxEVT_COMMAND_FILEPICKER_CHANGED, wxFileDirPickerEventHandler( ModuleManagerFrame::filePicker__onFileChanged ), NULL, this );
 	m_listBox__parser_module->Disconnect( wxEVT_COMMAND_LISTBOX_SELECTED, wxCommandEventHandler( ModuleManagerFrame::parser_module__onListBox ), NULL, this );
 	m_button__inst->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ModuleManagerFrame::inst__onButtonClick ), NULL, this );
