@@ -316,12 +316,56 @@ CreatePointDialog::~CreatePointDialog()
 VerilogCodeFrame::VerilogCodeFrame( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxFrame( parent, id, title, pos, size, style )
 {
 	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+	this->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_WINDOW ) );
 
 	wxBoxSizer* bSizer15;
 	bSizer15 = new wxBoxSizer( wxVERTICAL );
 
-	m_richText__showGen = new wxRichTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0|wxVSCROLL|wxHSCROLL|wxNO_BORDER|wxWANTS_CHARS );
-	bSizer15->Add( m_richText__showGen, 1, wxEXPAND | wxALL, 5 );
+	wxStaticBoxSizer* sbSizer16;
+	sbSizer16 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("Generate code") ), wxVERTICAL );
+
+	m_richText__showGen = new wxRichTextCtrl( sbSizer16->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0|wxVSCROLL|wxHSCROLL|wxNO_BORDER|wxWANTS_CHARS );
+	m_richText__showGen->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_INFOBK ) );
+
+	sbSizer16->Add( m_richText__showGen, 1, wxEXPAND | wxALL, 5 );
+
+
+	bSizer15->Add( sbSizer16, 1, wxEXPAND, 5 );
+
+	wxBoxSizer* bSizer26;
+	bSizer26 = new wxBoxSizer( wxHORIZONTAL );
+
+	wxStaticBoxSizer* sbSizer14;
+	sbSizer14 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("File directory") ), wxVERTICAL );
+
+	m_dirPicker1 = new wxDirPickerCtrl( sbSizer14->GetStaticBox(), wxID_ANY, wxEmptyString, wxT("Select a folder"), wxDefaultPosition, wxDefaultSize, wxDIRP_DEFAULT_STYLE );
+	sbSizer14->Add( m_dirPicker1, 1, wxALL|wxEXPAND, 5 );
+
+
+	bSizer26->Add( sbSizer14, 1, wxEXPAND, 5 );
+
+	wxStaticBoxSizer* sbSizer15;
+	sbSizer15 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("File name(.v)") ), wxVERTICAL );
+
+	wxBoxSizer* bSizer27;
+	bSizer27 = new wxBoxSizer( wxHORIZONTAL );
+
+	m_textCtrl__fileName = new wxTextCtrl( sbSizer15->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_textCtrl__fileName->SetMinSize( wxSize( 150,-1 ) );
+
+	bSizer27->Add( m_textCtrl__fileName, 0, wxALL, 5 );
+
+	m_button__genFile = new wxButton( sbSizer15->GetStaticBox(), wxID_ANY, wxT("Generate file"), wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer27->Add( m_button__genFile, 0, wxALL, 5 );
+
+
+	sbSizer15->Add( bSizer27, 1, wxEXPAND, 5 );
+
+
+	bSizer26->Add( sbSizer15, 0, wxEXPAND, 5 );
+
+
+	bSizer15->Add( bSizer26, 0, wxEXPAND, 5 );
 
 
 	this->SetSizer( bSizer15 );
@@ -331,12 +375,14 @@ VerilogCodeFrame::VerilogCodeFrame( wxWindow* parent, wxWindowID id, const wxStr
 
 	// Connect Events
 	this->Connect( wxEVT_ACTIVATE, wxActivateEventHandler( VerilogCodeFrame::VerilogCodeFrame__onAct ) );
+	m_button__genFile->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( VerilogCodeFrame::genFile__onBtnClick ), NULL, this );
 }
 
 VerilogCodeFrame::~VerilogCodeFrame()
 {
 	// Disconnect Events
 	this->Disconnect( wxEVT_ACTIVATE, wxActivateEventHandler( VerilogCodeFrame::VerilogCodeFrame__onAct ) );
+	m_button__genFile->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( VerilogCodeFrame::genFile__onBtnClick ), NULL, this );
 
 }
 

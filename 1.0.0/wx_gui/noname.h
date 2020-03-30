@@ -131,9 +131,13 @@ class VerilogCodeFrame : public wxFrame
 
 	protected:
 		wxRichTextCtrl* m_richText__showGen;
+		wxDirPickerCtrl* m_dirPicker1;
+		wxTextCtrl* m_textCtrl__fileName;
+		wxButton* m_button__genFile;
 
 		// Virtual event handlers, overide them in your derived class
 		virtual void VerilogCodeFrame__onAct( wxActivateEvent& event ) { event.Skip(); }
+		virtual void genFile__onBtnClick( wxCommandEvent& event ) { event.Skip(); }
 
 
 	public:

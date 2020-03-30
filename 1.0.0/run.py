@@ -352,6 +352,17 @@ class VerilogCodeFrame ( wx_gui.verilogCodeFrame.VerilogCodeFrame ):
         if (self.core.proc_wrapper!=None):
             self.m_richText__showGen.SetValue(self.core.GenerateVerilogCode())
 
+    def genFile__onBtnClick( self, event ):
+        file_dir = self.m_dirPicker1.GetPath()
+        file_name = self.m_textCtrl__fileName.GetValue()
+
+        if ((file_dir != '')&(file_name != '')):
+            f_fp = file_dir+'\\'+file_name+'.v'
+            fp = open(f_fp,'w+')
+            fp.write (self.m_richText__showGen.GetValue())
+            fp.close ()
+
+            wx.MessageBox('Generate file success!\nFile: %s'%(f_fp), 'Info', wx.OK | wx.ICON_INFORMATION)
 
 def main():
     app=wx.App()
