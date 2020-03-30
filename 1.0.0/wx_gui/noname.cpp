@@ -363,8 +363,14 @@ ModuleManagerFrame::ModuleManagerFrame( wxWindow* parent, wxWindowID id, const w
 	wxBoxSizer* bSizer241;
 	bSizer241 = new wxBoxSizer( wxHORIZONTAL );
 
-	m_listBox__parser_module = new wxListBox( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0, NULL, 0 );
-	bSizer241->Add( m_listBox__parser_module, 1, wxALL|wxEXPAND, 5 );
+	wxStaticBoxSizer* sbSizer10;
+	sbSizer10 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("Module list") ), wxVERTICAL );
+
+	m_listBox__parser_module = new wxListBox( sbSizer10->GetStaticBox(), wxID_ANY, wxDefaultPosition, wxDefaultSize, 0, NULL, 0 );
+	sbSizer10->Add( m_listBox__parser_module, 1, wxALL|wxEXPAND, 5 );
+
+
+	bSizer241->Add( sbSizer10, 1, wxEXPAND, 5 );
 
 	wxStaticBoxSizer* sbSizer13;
 	sbSizer13 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("Configuration") ), wxVERTICAL );
@@ -415,8 +421,14 @@ ModuleManagerFrame::ModuleManagerFrame( wxWindow* parent, wxWindowID id, const w
 
 	bSizer241->Add( sbSizer13, 1, wxEXPAND, 5 );
 
-	m_listBox__inst = new wxListBox( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0, NULL, 0 );
-	bSizer241->Add( m_listBox__inst, 1, wxALL|wxEXPAND, 5 );
+	wxStaticBoxSizer* sbSizer11;
+	sbSizer11 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("Instance list") ), wxVERTICAL );
+
+	m_listBox__inst = new wxListBox( sbSizer11->GetStaticBox(), wxID_ANY, wxDefaultPosition, wxDefaultSize, 0, NULL, 0 );
+	sbSizer11->Add( m_listBox__inst, 1, wxALL|wxEXPAND, 5 );
+
+
+	bSizer241->Add( sbSizer11, 1, wxEXPAND, 5 );
 
 
 	bSizer23->Add( bSizer241, 1, wxEXPAND, 5 );
@@ -427,80 +439,62 @@ ModuleManagerFrame::ModuleManagerFrame( wxWindow* parent, wxWindowID id, const w
 	wxBoxSizer* bSizer30;
 	bSizer30 = new wxBoxSizer( wxHORIZONTAL );
 
-	wxBoxSizer* bSizer31;
-	bSizer31 = new wxBoxSizer( wxVERTICAL );
+	wxStaticBoxSizer* sbSizer12;
+	sbSizer12 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("Instance parameters") ), wxVERTICAL );
 
-	m_staticText411 = new wxStaticText( this, wxID_ANY, wxT("Overrider parameters"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText411->Wrap( -1 );
-	bSizer31->Add( m_staticText411, 0, wxALL, 5 );
+	m_listBox__override_param = new wxListBox( sbSizer12->GetStaticBox(), wxID_ANY, wxDefaultPosition, wxDefaultSize, 0, NULL, 0 );
+	sbSizer12->Add( m_listBox__override_param, 1, wxALL|wxEXPAND, 5 );
 
-	m_listBox__override_param = new wxListBox( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0, NULL, 0 );
-	bSizer31->Add( m_listBox__override_param, 1, wxALL|wxEXPAND, 5 );
+	m_button12 = new wxButton( sbSizer12->GetStaticBox(), wxID_ANY, wxT("Clear override"), wxDefaultPosition, wxDefaultSize, 0 );
+	sbSizer12->Add( m_button12, 0, wxALL|wxEXPAND, 5 );
+
+	wxBoxSizer* bSizer25;
+	bSizer25 = new wxBoxSizer( wxHORIZONTAL );
+
+	m_button__overrideParamByConst = new wxButton( sbSizer12->GetStaticBox(), wxID_ANY, wxT("Set constant"), wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer25->Add( m_button__overrideParamByConst, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
+
+	m_textCtrl__setInstParamByConst = new wxTextCtrl( sbSizer12->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer25->Add( m_textCtrl__setInstParamByConst, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
 
 
-	bSizer30->Add( bSizer31, 1, wxEXPAND, 5 );
+	sbSizer12->Add( bSizer25, 0, wxEXPAND, 5 );
+
+
+	bSizer30->Add( sbSizer12, 1, wxEXPAND, 5 );
 
 	wxBoxSizer* bSizer32;
 	bSizer32 = new wxBoxSizer( wxVERTICAL );
 
-	wxBoxSizer* bSizer35;
-	bSizer35 = new wxBoxSizer( wxVERTICAL );
+
+	bSizer32->Add( 0, 0, 1, wxEXPAND, 5 );
+
+	m_button__param_mapping = new wxButton( this, wxID_ANY, wxT("<<-- Override --<"), wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer32->Add( m_button__param_mapping, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
 
 
-	bSizer35->Add( 0, 0, 1, wxEXPAND, 5 );
-
-	m_button__param_mapping = new wxButton( this, wxID_ANY, wxT("Mapping ->>"), wxDefaultPosition, wxDefaultSize, 0 );
-	bSizer35->Add( m_button__param_mapping, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
-
-	m_staticline4 = new wxStaticLine( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL );
-	bSizer35->Add( m_staticline4, 0, wxEXPAND | wxALL, 5 );
-
-	wxBoxSizer* bSizer36;
-	bSizer36 = new wxBoxSizer( wxHORIZONTAL );
-
-	m_button__overrideParamByConst = new wxButton( this, wxID_ANY, wxT("<<- Set constant"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_button__overrideParamByConst->Hide();
-
-	bSizer36->Add( m_button__overrideParamByConst, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
-
-	m_textCtrl3 = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	m_textCtrl3->Hide();
-
-	bSizer36->Add( m_textCtrl3, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
-
-
-	bSizer35->Add( bSizer36, 1, wxEXPAND, 5 );
-
-
-	bSizer35->Add( 0, 0, 1, wxEXPAND, 5 );
-
-
-	bSizer32->Add( bSizer35, 1, wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5 );
+	bSizer32->Add( 0, 0, 1, wxEXPAND, 5 );
 
 
 	bSizer30->Add( bSizer32, 1, wxEXPAND, 5 );
 
-	wxBoxSizer* bSizer33;
-	bSizer33 = new wxBoxSizer( wxVERTICAL );
+	wxStaticBoxSizer* sbSizer131;
+	sbSizer131 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("Wrapper parameters") ), wxVERTICAL );
 
-	m_staticText4111 = new wxStaticText( this, wxID_ANY, wxT("Wrapper parameters"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText4111->Wrap( -1 );
-	bSizer33->Add( m_staticText4111, 0, wxALL, 5 );
-
-	m_listBox__wrapper_param = new wxListBox( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0, NULL, 0 );
-	bSizer33->Add( m_listBox__wrapper_param, 1, wxALL|wxEXPAND, 5 );
+	m_listBox__wrapper_param = new wxListBox( sbSizer131->GetStaticBox(), wxID_ANY, wxDefaultPosition, wxDefaultSize, 0, NULL, 0 );
+	sbSizer131->Add( m_listBox__wrapper_param, 1, wxALL|wxEXPAND, 5 );
 
 	wxBoxSizer* bSizer34;
 	bSizer34 = new wxBoxSizer( wxHORIZONTAL );
 
-	m_button__createNewParam = new wxButton( this, wxID_ANY, wxT("Add"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_button__createNewParam = new wxButton( sbSizer131->GetStaticBox(), wxID_ANY, wxT("Add"), wxDefaultPosition, wxDefaultSize, 0 );
 	bSizer34->Add( m_button__createNewParam, 1, wxALL, 5 );
 
-	m_button__del_wrapper_param = new wxButton( this, wxID_ANY, wxT("Delete"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_button__del_wrapper_param = new wxButton( sbSizer131->GetStaticBox(), wxID_ANY, wxT("Delete"), wxDefaultPosition, wxDefaultSize, 0 );
 	bSizer34->Add( m_button__del_wrapper_param, 1, wxALL, 5 );
 
 
-	bSizer33->Add( bSizer34, 0, wxEXPAND, 5 );
+	sbSizer131->Add( bSizer34, 0, wxEXPAND, 5 );
 
 	wxBoxSizer* bSizer20;
 	bSizer20 = new wxBoxSizer( wxHORIZONTAL );
@@ -508,11 +502,11 @@ ModuleManagerFrame::ModuleManagerFrame( wxWindow* parent, wxWindowID id, const w
 	wxBoxSizer* bSizer21;
 	bSizer21 = new wxBoxSizer( wxVERTICAL );
 
-	m_staticText19 = new wxStaticText( this, wxID_ANY, wxT("name"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText19 = new wxStaticText( sbSizer131->GetStaticBox(), wxID_ANY, wxT("name"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText19->Wrap( -1 );
 	bSizer21->Add( m_staticText19, 0, wxALL, 5 );
 
-	m_staticText20 = new wxStaticText( this, wxID_ANY, wxT("value"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText20 = new wxStaticText( sbSizer131->GetStaticBox(), wxID_ANY, wxT("value"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText20->Wrap( -1 );
 	bSizer21->Add( m_staticText20, 0, wxALL, 5 );
 
@@ -522,20 +516,20 @@ ModuleManagerFrame::ModuleManagerFrame( wxWindow* parent, wxWindowID id, const w
 	wxBoxSizer* bSizer211;
 	bSizer211 = new wxBoxSizer( wxVERTICAL );
 
-	m_textCtrl__newParam_name = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_textCtrl__newParam_name = new wxTextCtrl( sbSizer131->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
 	bSizer211->Add( m_textCtrl__newParam_name, 0, wxALL|wxEXPAND, 5 );
 
-	m_textCtrl_newParam_value = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_textCtrl_newParam_value = new wxTextCtrl( sbSizer131->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
 	bSizer211->Add( m_textCtrl_newParam_value, 0, wxALL|wxEXPAND, 5 );
 
 
 	bSizer20->Add( bSizer211, 1, wxEXPAND, 5 );
 
 
-	bSizer33->Add( bSizer20, 0, wxEXPAND, 5 );
+	sbSizer131->Add( bSizer20, 0, wxEXPAND, 5 );
 
 
-	bSizer30->Add( bSizer33, 1, wxEXPAND, 5 );
+	bSizer30->Add( sbSizer131, 1, wxEXPAND, 5 );
 
 
 	bSizer23->Add( bSizer30, 1, wxEXPAND, 5 );
@@ -553,9 +547,11 @@ ModuleManagerFrame::ModuleManagerFrame( wxWindow* parent, wxWindowID id, const w
 	m_button__set_wrapper->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ModuleManagerFrame::loadAsWrapper__onBtnClick ), NULL, this );
 	m_button__createNewWrapper->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ModuleManagerFrame::createNewWrapper__onBtnClick ), NULL, this );
 	m_listBox__inst->Connect( wxEVT_COMMAND_LISTBOX_SELECTED, wxCommandEventHandler( ModuleManagerFrame::inst__onListBox ), NULL, this );
-	m_button__param_mapping->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ModuleManagerFrame::mapping__onBtnClick ), NULL, this );
+	m_button12->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ModuleManagerFrame::clearInstParamOverride__onBtnClick ), NULL, this );
 	m_button__overrideParamByConst->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ModuleManagerFrame::overrideParamByConst__onBtnClick ), NULL, this );
+	m_button__param_mapping->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ModuleManagerFrame::mapping__onBtnClick ), NULL, this );
 	m_button__createNewParam->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ModuleManagerFrame::createNewParam__onBtnClick ), NULL, this );
+	m_button__del_wrapper_param->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ModuleManagerFrame::delWrapParam__onBtnClick ), NULL, this );
 }
 
 ModuleManagerFrame::~ModuleManagerFrame()
@@ -567,8 +563,10 @@ ModuleManagerFrame::~ModuleManagerFrame()
 	m_button__set_wrapper->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ModuleManagerFrame::loadAsWrapper__onBtnClick ), NULL, this );
 	m_button__createNewWrapper->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ModuleManagerFrame::createNewWrapper__onBtnClick ), NULL, this );
 	m_listBox__inst->Disconnect( wxEVT_COMMAND_LISTBOX_SELECTED, wxCommandEventHandler( ModuleManagerFrame::inst__onListBox ), NULL, this );
-	m_button__param_mapping->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ModuleManagerFrame::mapping__onBtnClick ), NULL, this );
+	m_button12->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ModuleManagerFrame::clearInstParamOverride__onBtnClick ), NULL, this );
 	m_button__overrideParamByConst->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ModuleManagerFrame::overrideParamByConst__onBtnClick ), NULL, this );
+	m_button__param_mapping->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ModuleManagerFrame::mapping__onBtnClick ), NULL, this );
 	m_button__createNewParam->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ModuleManagerFrame::createNewParam__onBtnClick ), NULL, this );
+	m_button__del_wrapper_param->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ModuleManagerFrame::delWrapParam__onBtnClick ), NULL, this );
 
 }

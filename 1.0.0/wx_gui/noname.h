@@ -165,13 +165,11 @@ class ModuleManagerFrame : public wxFrame
 		wxTextCtrl* m_textCtrl__createNewWrapper;
 		wxListBox* m_listBox__inst;
 		wxStaticLine* m_staticline51;
-		wxStaticText* m_staticText411;
 		wxListBox* m_listBox__override_param;
-		wxButton* m_button__param_mapping;
-		wxStaticLine* m_staticline4;
+		wxButton* m_button12;
 		wxButton* m_button__overrideParamByConst;
-		wxTextCtrl* m_textCtrl3;
-		wxStaticText* m_staticText4111;
+		wxTextCtrl* m_textCtrl__setInstParamByConst;
+		wxButton* m_button__param_mapping;
 		wxListBox* m_listBox__wrapper_param;
 		wxButton* m_button__createNewParam;
 		wxButton* m_button__del_wrapper_param;
@@ -187,14 +185,16 @@ class ModuleManagerFrame : public wxFrame
 		virtual void loadAsWrapper__onBtnClick( wxCommandEvent& event ) { event.Skip(); }
 		virtual void createNewWrapper__onBtnClick( wxCommandEvent& event ) { event.Skip(); }
 		virtual void inst__onListBox( wxCommandEvent& event ) { event.Skip(); }
-		virtual void mapping__onBtnClick( wxCommandEvent& event ) { event.Skip(); }
+		virtual void clearInstParamOverride__onBtnClick( wxCommandEvent& event ) { event.Skip(); }
 		virtual void overrideParamByConst__onBtnClick( wxCommandEvent& event ) { event.Skip(); }
+		virtual void mapping__onBtnClick( wxCommandEvent& event ) { event.Skip(); }
 		virtual void createNewParam__onBtnClick( wxCommandEvent& event ) { event.Skip(); }
+		virtual void delWrapParam__onBtnClick( wxCommandEvent& event ) { event.Skip(); }
 
 
 	public:
 
-		ModuleManagerFrame( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 1250,765 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
+		ModuleManagerFrame( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 974,760 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
 
 		~ModuleManagerFrame();
 

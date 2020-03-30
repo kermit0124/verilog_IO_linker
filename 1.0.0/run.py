@@ -64,9 +64,8 @@ class ModuleManagerFrame ( wx_gui.moduleManagerFrame.ModuleManagerFrame):
         for inst in self.core.inst_lt:
             self.m_listBox__inst.Append(inst.inst_name)
         pass
-    def UpdateParamList(self):
+    def UpdateInstParam(self):
         self.m_listBox__override_param.Clear()
-        # inst_sel = self.core.inst_lt[self.m_listBox__inst.GetSelection()]
         for param in self.core.proc_inst.param_lt:
             str = param.name
             if (param.override_obj != None):
@@ -77,7 +76,7 @@ class ModuleManagerFrame ( wx_gui.moduleManagerFrame.ModuleManagerFrame):
     def UpdateWrapperParam(self):
         self.m_listBox__wrapper_param.Clear()
         for param in self.core.proc_wrapper.param_lt:
-            str = param.name
+            str = '%s = %s'%(param.name,param.value)
             self.m_listBox__wrapper_param.Append(str)
         pass
 
@@ -106,7 +105,7 @@ class ModuleManagerFrame ( wx_gui.moduleManagerFrame.ModuleManagerFrame):
         self.UpdateInstList()
     def inst__onListBox( self, event ):
         self.core.Select_procInst(self.m_listBox__inst.GetSelection())
-        self.UpdateParamList()
+        self.UpdateInstParam()
         pass
     def loadAsWrapper__onBtnClick( self, event ):
         sel_num = self.m_listBox__parser_module.GetSelection()
@@ -116,10 +115,10 @@ class ModuleManagerFrame ( wx_gui.moduleManagerFrame.ModuleManagerFrame):
         num_instParam = self.m_listBox__override_param.GetSelection()
         num_wrapParam = self.m_listBox__wrapper_param.GetSelection()
         wrap_param_obj = self.core.proc_wrapper.param_lt[num_wrapParam]
-        inst_param_obj = self.core.proc_inst.param_lt[num_wrapParam]
-        # # self.core.proc_inst.param_lt[num_instParam].override_txt = self.core.proc_wrapper.param_lt[num_wrapParam].name
+        inst_param_obj = self.core.proc_inst.param_lt[num_instParam]
+        
         self.core.LinkParam(wrap_param_obj,inst_param_obj)
-        self.UpdateParamList()
+        self.UpdateInstParam()
 
         self.m_listBox__override_param.Select((num_instParam+1)%self.m_listBox__override_param.GetCount())
         self.m_listBox__wrapper_param.Select((num_wrapParam+1)%self.m_listBox__wrapper_param.GetCount())
@@ -130,23 +129,41 @@ class ModuleManagerFrame ( wx_gui.moduleManagerFrame.ModuleManagerFrame):
         self.core.CreateEmptyWrapper(wrapName)
 
     def overrideParamByConst__onBtnClick( self, event ):
+        value = self.m_textCtrl__setInstParamByConst.GetValue()
+        if (value.replace(' ','')!=''):
+            param_num = self.m_listBox__override_param.GetSelection()
+            param_obj = self.core.proc_inst.param_lt[param_num]
+            param_obj.value = value
+            self.UpdateInstParam()
         pass
     
     def createNewParam__onBtnClick( self, event ):
-        # paramName = self.m_textCtrl__newParam_name.GetValue()
-        # paramValue = self.m_textCtrl_newParam_value.GetValue()
-        # paramName = paramName.replace(" ","")
-        # re_res_lt = re.findall(r"(\[.+\])(.+)",paramName)
-        # paramDepth = ''
-        # if (len(re_res_lt)>0):
-        #     re_res_lt = re_res_lt[0]
-        #     paramName = re_res_lt[1]
-        #     paramDepth = re_res_lt[0]
+        paramName = self.m_textCtrl__newParam_name.GetValue()
+        paramValue = self.m_textCtrl_newParam_value.GetValue()
+        paramName = paramName.replace(" ","")
+        re_res_lt = re.findall(r"(\[.+\])(.+)",paramName)
+        paramBit = ''
+        if (len(re_res_lt)>0):
+            re_res_lt = re_res_lt[0]
+            paramName = re_res_lt[1]
+            paramBit = re_res_lt[0]
 
-        # if ((paramName!='') & (paramValue!='')):
-        #     self.core.CreateParameterToWrapper(paramName,paramValue,paramDepth)
-        #     self.UpdateWrapperParam()
+        if ((paramName!='') & (paramValue!='')):
+            self.core.CreateParameterToWrapper(paramName,paramValue,paramBit)
+            self.UpdateWrapperParam()
         pass
+
+    def delWrapParam__onBtnClick( self,event ):
+        param_num = self.m_listBox__wrapper_param.GetSelection()
+        self.core.proc_wrapper.RemoveParam(param_num)
+        self.UpdateWrapperParam()
+        self.UpdateInstParam()
+    
+    def clearInstParamOverride__onBtnClick( self,event ):
+        param_num = self.m_listBox__override_param.GetSelection()
+        self.core.proc_inst.param_lt[param_num].override_obj = None
+        self.UpdateInstParam()
+
 
 class MainFrame ( wx_gui.mainFrame.MainFrame ):	
     def __init__( self, parent ):
